@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign up</title>
+    <link rel="stylesheet" type="text/css" href="/stylesheets/style.css">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+
+</head>
+<body>
+    <section>
+        <div class="container py-5 h-100">
+            <div class="row d-flex justify-content-center align-items-center h-100">
+                <div class="col col-md-8" >
+                    <div class="card shadow" style="border-radius: 1rem;">
+                        <div class="row g-0">
+                            <div class="col-md-6 col-lg-6">
+                                <img src="https://images.unsplash.com/photo-1507668077129-56e32842fceb?auto=format&fit=crop&q=80&w=1374&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                    alt="login form" class="img-fluid" style="border-radius: 1rem 0 0 1rem; height: 100%;" />
+                            </div>
+                            <div class="col-md-6 col-lg-6 d-flex align-items-center" >
+                                <div class="card-body text-black">
+                                    <div class="signup-form" id="form">
+                                        <form class="row login_form" action="" method="post" enctype="multipart/form-data" id="contactForm" >
+                                            <h2>Sign Up</h2>
+                                            <p>Please fill in this form to create an account!</p>
+                                            <hr>
+
+                                            <div class="col-md-12 form-group">
+                                                 <input type="text" class="form-control" name="name" placeholder="Username" onblur="validateName()" required>
+                                                 <div id="nameError" class="error-message text-danger"></div>
+                                            </div>
+                                            <div class="col-md-12 form-group">
+                                                 <input type="email" class="form-control" name="email" placeholder="Email" onblur="validateEmail()" required>
+                                                 <div id="emailError" class="error-message text-danger"></div>
+                                            </div>
+                                            <div class="col-md-12 form-group">
+                                                 <input type="tel" class="form-control" name="mobile" placeholder="Mobile Number" maxlength="10" onblur="validateMobile()" >
+                                                 <div id="mnoError" class="error-message text-danger"></div>
+                                            </div>
+                                            <div class="col-md-12 form-group">
+                                                 <input type="file" class="form-control"  name="image" required>
+                                            </div>
+                                            <div class="col-md-12 form-group">
+                                                <input type="password" class="form-control" name="password" placeholder="Password" onblur="validatePassword()" required>
+                                                <div id="passwordError" class="error-message text-danger"></div>
+                                          </div>
+                                          
+                                          <!-- showPassword -->
+                                          <!-- <div class="form-check" style="margin-left: 10px; margin-bottom: 20px;">
+                                            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                                            <label class="form-check-label" id="showPassword" for="flexCheckDefault"><small>show password</small></label>
+                                          </div> -->
+                                          <!-- showPassword -->
+                                          
+                                          <div class="col-md-12 form-group">
+                                            <input type="password" class="form-control" name="verify_password" placeholder="Verify Password" onblur="validatePasswordConfirmation(); checkFormValidity()" required>
+                                            <div id="passwordMatchError" class="error-message text-danger"></div>
+                                          </div>
+                                          <div class="col-md-12 form-group">
+                                            <!-- <button type="submit" class="primary-btn" id="submitButton" disabled>Sign Up</button> -->
+                
+                                          </div>
+                                            <div class="col-md-12 form-group">
+                                                 <% if (typeof message !== 'undefined') { %>
+                                                      <p class="text-center text-success"><%= message %><span class="text-danger"><a  href="https://mail.google.com/mail/">Goto Gmail !</a></span><br><br></p>
+                                                      <p class="text-center"></p>
+                                                 <% } %>
+                                                 <button type="submit" class="btn btn-warning btn-lg" id="submitButton" disabled style="background-color: #C70B2C;">Sign Up</button>
+                                                 <!-- <button type="submit" class="primary-btn">Log In</button> -->
+                                                 <!-- <div class="col-md-12 form-group">
+                                                    <button type="submit" class="primary-btn" id="submitButton" disabled>Log In</button>
+                                              </div> -->
+                                              <div class="mt-2 py-2">
+                                                 <a href="#">Forgot Password?</a>
+                                                 <a href="/verification">not verified?</a>
+                                            </div>
+                                            <p class="mb-5 " style="color: #393f81;">
+                                                Already have an account?
+                                                <a href="login" style="color: #3598dc;">Login</a>
+                                              </p>
+                                      </form>
+                                   
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+           
+    </section>
+
+    <script src="/javascripts/checkPass.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+</body>
+</html>
