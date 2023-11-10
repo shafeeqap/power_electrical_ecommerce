@@ -17,9 +17,9 @@
                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">No</th>
                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">Product Name</th>
                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">Category</th>
-                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">Company Name</th>
+                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">Brand</th>
                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">Quantity</th>
-                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">Details</th>
+                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">Description</th>
                     <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder ">Price</th>
                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">Image</th>
                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">Edit</th>
@@ -42,20 +42,20 @@
                       <p class="text-xs font-weight-bold mb-0"><%=products.category%></p>
                     </td>
                     <td>
-                      <p class="text-xs font-weight-bold mb-0"><%=products.company%></p>
+                      <p class="text-xs font-weight-bold mb-0"><%=products.brand%></p>
                     </td>
                     <td>
                       <p class="text-xs font-weight-bold mb-0"><%=products.qty%></p>
                     </td>
                     <td>
-                      <p class="text-xs font-weight-bold mb-0"><%=products.dtails%></p>
+                      <p class="text-xs font-weight-bold mb-0"><%=products.description%></p>
                     </td>
                   
                     <td class="align-middle text-center">
                       <p class="text-xs font-weight-bold mb-0">&#x20B9;<%=products.price%></p>
                     </td>
                     <td>
-                        <img src="<%=products.image %>" class="avatar avatar-sm me-3 border-radius-lg" alt="">
+                        <img src="/adminAssets/images/<%=products.image[0] %>" class="avatar avatar-sm me-3 border-radius-lg" alt="">
                     </td>
                     <td>
                       <p class="text-xs font-weight-bold mb-0"><a href="">Edit</a></p>

@@ -41,9 +41,11 @@
 					</ul>
 					<ul class="header-links pull-right">
 						<!-- <li><a href="#"><i class="fa fa-rupee"></i> IND</a></li> -->
+						<% if(user){%>
 						<li><a href="/logout"><i class="fa fa-user-o"></i>Logout</a></li>
-						<!-- <li><a href="#">/</i> Logout</a></li> -->
-						
+						<%}else{%>
+						<li><a href="/login"><i class="fa fa-user-o"></i> Login</a></li>
+						<%}%>
 					</ul>
 				
 				</div>

@@ -37,6 +37,12 @@
                       </div>
                       <div class="col md-3 py-4">
                         <div class="form-group">
+                            <div class="form-label">Brand</div>
+                            <input type="text"  name="brand" placeholder="Brand" required>
+                        </div>
+                      </div>
+                      <div class="col md-3 py-4">
+                        <div class="form-group">
                             <div class="form-label">Quantity</div>
                             <input type="text"  name="qty" placeholder="Quantity" required>
                         </div>
@@ -52,8 +58,9 @@
                       <div class="row">
                         <div class="col md-3 py-4">
                             <div class="form-group">
-                                <input type="file" name="image" >
-                            </div>
+                                <input type="file" name="image" id="image" multiple accept="image/*" required>
+                                <div class="image-preview-container mt-2"></div>
+                              </div>
                         </div>
                       </div>
                       <div class="row">
@@ -64,7 +71,6 @@
                 </div>
             </form>
             </div>
-            
             </div>
           </div>
         </div>
@@ -72,7 +78,33 @@
     </div>
 </div>
 
+<script>
 
+  document.addEventListener('DOMContentLoaded',function(){
+    const inputImage=document.getElementById('image');
+    const previewContainer = document.querySelector('.image-preview-container');
+
+    inputImage.addEventListener('change', function(){
+      previewContainer.innerHTML='';
+
+      Array.from(inputImage.files).forEach(function(file){
+        const reader = new FileReader();
+
+        reader.onload=function(){
+          const imagePreview = document.createElement('div');
+          imagePreview.classList.add('image-preview');
+
+          const image = document.createElement('img');
+          image.src = reader.result;
+          image.classList.add('img-fluid');
+        }
+
+      })
+
+
+    })
+  })
+</script>
 
 
 <%-include('../admin/adminLayout/footer.ejs')%>

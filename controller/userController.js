@@ -147,32 +147,25 @@ const verifyLogin=async(req, res)=>{
         const email=req.body.email;
         const password=req.body.password;
         if(email===''){
-            res.render('login',{message:'Please enter email'})
+            return res.render('login',{message:'Please enter email'})
         }
 
         const userData = await User.findOne({email:email});
 
-        if(userData){   
-            const passwordMatch = await bcrypt.compare(password, userData.password);
-            if(passwordMatch){
-                if(userData.is_varified===0){
-                    res.render('login', {message:"Please verify your mail."});
+        if(!userData || !(await bcrypt.compare(password, userData.password))){   
 
-                }else{
-                    req.session.user_id=userData._id;
-                    res.redirect('/home');
-                }
-
-            }else{
-                res.render('login', {message:"Email and password is incorrect."});
-            }    
-
-        }else{
-            res.render('login', {message:"Email and password is incorrect."});
+            return res.render('login', {message:"Email and password is incorrect."});
         }
 
+        if(userData.is_varified===0){
+            res.render('login', {message:"Please verify your mail."});
+        }
+        req.session.user_id=userData._id;
+        res.redirect('/home');
+                
+
     } catch (error) {
-        console.log(message);
+        console.log(error);
         
     }
 }
@@ -180,7 +173,7 @@ const verifyLogin=async(req, res)=>{
 // Load Home page
 const loadHome = async(req,res)=>{
     try {
-        res.render('home',{message:'Home'});
+        res.render('home',{user:req.session.user_id ,message:'Home'});
     } catch (error) {
         console.log(error);
         
@@ -209,7 +202,7 @@ const userLogout = async(req,res)=>{
 // Forget Password
 const forgetPassword = async(req,res)=>{
     try {
-        res.render('forget-password',{title:'Forget Password'});
+        res.render('forget-password',{user:req.session.user_id});
     } catch (error) {
         console.log(error);
     }
@@ -290,7 +283,7 @@ const resetPassword = async(req,res)=>{
 const verificationLoad = async(req,res)=>{
 
     try {
-        res.render('verification');
+        res.render('verification',{user:req.session.user_id});
         
     } catch (error) {
         console.log(error);
