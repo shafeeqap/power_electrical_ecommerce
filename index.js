@@ -5,13 +5,16 @@ const path = require('path');
 const express = require('express');
 const app=express();
 const session = require('express-session');
+// const MemoryStore = session.MemoryStore;
 require('dotenv').config();
 
 
 app.use(session({
   secret:process.env.SESSION_SECRET,
   resave:false,
-  saveUninitialized:true
+  saveUninitialized:true,
+  // store: new MemoryStore(),
+
 }));
 
 

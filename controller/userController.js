@@ -54,7 +54,7 @@ const verifyMail=async(req,res)=>{
     try {
         const updateInfo = await User.updateOne({_id:req.query.id},{$set:{is_varified:1}});
         console.log(updateInfo);
-        res.render('email-verified');
+        res.render('email-verified',{user: req.session.user_id});
 
     } catch (error) {
         console.log(error);
@@ -73,6 +73,11 @@ const loadRegister= async(req,res)=>{
 // user registration-------------//
 const insertUser = async(req,res)=>{
     try {
+        // Check if the email already exists in the database.
+        const existingUser = await User.findOne({email:req.body.email});
+        if(existingUser){
+            res.render('register',{req:'Email is already in use'})
+        }
       
         const spassword = await securePassword(req.body.password);
         const user = new User({
@@ -92,7 +97,6 @@ const insertUser = async(req,res)=>{
             res.render('register',{message:'Your registration is failed.'});
         }
     } catch (error) {
-
         console.log(error);
     }
 }
@@ -116,7 +120,6 @@ const sendResetPasswordMail= async(name,email,token)=>{
             subject:'For Reset Password',
             html:'<p> Hi '+ name +', please click here to <a href="http://localhost:3000/reset-password?token='+token+'"> Reset </a> your password.</p> '
             
-
         }
         transprter.sendMail(mailoption, function(error, info){
             if(error){
@@ -152,17 +155,24 @@ const verifyLogin=async(req, res)=>{
 
         const userData = await User.findOne({email:email});
 
-        if(!userData || !(await bcrypt.compare(password, userData.password))){   
+        if(userData){
+            const passwordMatch = await bcrypt.compare(password, userData.password);
+            if(passwordMatch){
+                if(userData.is_varified === 0){
+                    res.render('login', {message:"Please verify your mail."});
 
-            return res.render('login', {message:"Email and password is incorrect."});
-        }
+                }else{
+                    req.session.user_id = userData._id;
+                    res.redirect('/home');
+                }
 
-        if(userData.is_varified===0){
-            res.render('login', {message:"Please verify your mail."});
+            }else{
+                res.render('login', {message:"Email and password is incorrect."});
+            }    
+
+        }else{
+            res.render('login', {message:"Email and password is incorrect."});
         }
-        req.session.user_id=userData._id;
-        res.redirect('/home');
-                
 
     } catch (error) {
         console.log(error);
@@ -173,7 +183,7 @@ const verifyLogin=async(req, res)=>{
 // Load Home page
 const loadHome = async(req,res)=>{
     try {
-        res.render('home',{user:req.session.user_id ,message:'Home'});
+        res.render('home',{user:req.session.user_id ,message:'Home'}); 
     } catch (error) {
         console.log(error);
         
@@ -297,9 +307,9 @@ const sendVerificationLink = async(req,res)=>{
         const userData = await User.findOne({email:email})
         if(userData){
             sendVerifyMail(userData.name, userData.email, userData._id);
-            res.render('verification',{message:'Reset verification mail sent your mail id ,please check.'});
+            res.render('verification',{message:'Reset verification mail sent your mail id ,please check.',user:req.session.user_id});
         }else{
-            res.render('verification',{message:'This email is not exit'});
+            res.render('verification',{message:'This email is not exit',user:req.session.user_id});
         }
     } catch (error) {
         console.log(error);

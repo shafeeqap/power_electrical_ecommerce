@@ -29,8 +29,9 @@ a {
 	border-radius: 3px;
 }
 .signup-form {
-	width: 340px;
+	/* width: 340px; */
 	margin: 30px auto;
+	/* padding: 10px; */
 }
 .signup-form form {
 	color: #999;

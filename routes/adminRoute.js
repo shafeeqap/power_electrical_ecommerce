@@ -4,7 +4,8 @@ const session = require('express-session');
 const config = require('../config/config');
 const adminAuth = require('../middlewares/adminAuth');
 
-const adminController = require('../controller/adminController');
+
+
 const path = require('path');
 const multer = require('multer');
 
@@ -33,14 +34,29 @@ const upload = multer({
 //----------------------------------//
 
 
+const adminController = require('../controller/adminController');
+const categoryController = require('../controller/categoryController');
+const productController = require('../controller/productController');
+
+
 admin_route.get('/',adminAuth.isLogout,adminController.loadLogin);
 admin_route.post('/',adminController.verifyLogin);
 
 admin_route.get('/adminHome',adminAuth.isLogin,adminController.loadDashboard);
-admin_route.get('/logout',adminAuth.isLogin,adminController.logout)
+admin_route.get('/logout',adminAuth.isLogin,adminController.logout);
+admin_route.get('/forget-password',adminAuth.isLogout,adminController.forgetLoad);
+admin_route.post('/forget-password',adminAuth.isLogout,adminController.forgetverify);
 
-admin_route.get('/view-product',adminController.viewProduct);
-admin_route.get('/add-product',adminController.loadProduct);
-admin_route.post('/add-product',upload.array('image',4),adminController.addProduct);
+admin_route.get('/reset-password',adminAuth.isLogout,adminController.resetPasswordLoad);
+admin_route.post('/reset-password',adminController.resetPassword);
+
+
+admin_route.get('/view-product',adminAuth.isLogin,productController.viewProduct);
+admin_route.get('/add-product',productController.loadProduct);
+admin_route.post('/add-product',upload.array('image',4),productController.addProduct);
+
+admin_route.get('/view-category',adminAuth.isLogin,categoryController.viewCategory);
+admin_route.get('/add-category',categoryController.addCategoryLoad);
+admin_route.post('/add-category',upload.single('image'),categoryController.addCategory);
 
 module.exports = admin_route
