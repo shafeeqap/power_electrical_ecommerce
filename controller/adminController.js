@@ -179,6 +179,47 @@ const resetPassword = async(req,res)=>{
 }
 
 
+// View Users in Admin Dashboard
+const viewUsers = async(req,res)=>{
+    try {
+
+        const userData = await User.find({ });
+        console.log(userData);
+
+        res.render('view-users',{message:'View Users',userData })
+        
+    } catch (error) {
+        console.log(error);
+    }
+
+};
+
+// Edit User Load
+const userBlockorActive = async(req,res)=>{
+    try {
+
+        const user_id=req.query.id;
+        // console.log(user_id);
+       const userData = await User.findById({_id:user_id});
+    //    console.log(userData);
+    if(userData.is_block===true){
+
+        await User.updateOne({_id:user_id},{$set:{is_block:false}});
+        res.redirect('/admin/view-users')
+
+    }else{
+        await User.updateOne({_id:user_id},{$set:{is_block:true}});
+        res.redirect('/admin/view-users');
+    }
+
+        
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+
+
 module.exports={
     loadLogin,
     verifyLogin,
@@ -189,4 +230,7 @@ module.exports={
     sendResetPasswordMail,
     resetPasswordLoad,
     resetPassword,
+    viewUsers,
+    userBlockorActive,
+    
 }

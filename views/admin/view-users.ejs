@@ -1,0 +1,88 @@
+<%-include('../admin/adminLayout/header.ejs')%>
+
+<div class="container-fluid py-4">
+  <div class="row">
+    <div class="col-12">
+      <div class="card my-4">
+        <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+          <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
+            <h6 class="text-white text-capitalize ps-3"><%=message%></h6>
+          </div>
+        </div>
+        <div class="card-body px-0 pb-2">
+          <div class="table-responsive p-0">
+            <table class="table align-items-center mb-4">
+              <thead>
+                <tr>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">No</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">User Name</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">Email</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">Mobile</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">Image</th>
+                  <!-- <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">Update</th> -->
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">Status</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">Action</th>
+                  
+                </tr>
+              </thead>
+              <tbody>
+                <% let counter = 1; %>
+                <% userData.forEach(user=>{%>
+                <tr>
+                  <td>
+                    <p class="text-xs font-weight-bold mb-0"><%= counter %></p>
+                  </td>
+                  <td>
+                    <p class="text-xs font-weight-bold mb-0"><%=user.name%></p>
+                  </td>
+                  <td>
+                    <p class="text-xs font-weight-bold mb-0"><%=user.email%></p>
+                  </td>
+                  <td>
+                    <p class="text-xs font-weight-bold mb-0"><%=user.mobile%></p>
+                  </td>
+                  <td>
+                    <img src="/userImages/<%=user.image %>" class="avatar avatar-sm me-3 border-radius-lg" alt="">
+                  </td>
+
+                  <!-- Verified/Not Verified -->
+                  <% if(user.is_varified==0){%>
+                  <td>
+                    <p class="text-xs text-danger font-weight-bold mb-0">Not Verified</p>
+                  </td>
+                  <%}else{%>
+                    <td>
+                      <p class="text-xs text-success font-weight-bold mb-0">Verified</p>
+                    </td>
+                    <%}%>
+
+                    <!-- User Active/Blocked -->
+                  <% if(user.is_block===true){%>
+                  <td class=" text-sm">
+                    <a href="/admin/is_blockUser?id=<%= user._id %>">
+                    <span class="badge badge-sm bg-gradient-success">Active</span></a>
+                  </td>
+
+                  <% }else{ %>
+                    
+                    <td class=" text-sm">
+                      <a href="/admin/is_blockUser?id=<%= user._id %>">
+                      <span class="badge badge-sm bg-gradient-danger">Blocked</span></a>
+                    </td>
+                    <% } %>
+
+                  <% counter++; %>
+              <%});%>
+                  
+                </tr>
+                
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%-include('../admin/adminLayout/footer.ejs')%>

@@ -33,28 +33,27 @@ const storage = multer.diskStorage({
 const upload = multer({storage:storage});
 //------------------------------------------//
 
-user_router.get('/register', userAuth.isLogout,userController.loadRegister);
-user_router.post('/register', userAuth.isLogout,upload.single('image'),userController.insertUser);
-
-user_router.get('/verify',userController.verifyMail);
+user_router.get('/register', userController.loadRegister);
+user_router.post('/register',upload.single('image'),userController.verifyOtp);
+user_router.get('/user-otp',userController.loadOtp);
+user_router.post('/user-otp',userController.insertUser);
+user_router.get('/resend-otp',userController.resendOtp);
 
 user_router.get('/', userAuth.isLogout, userController.loginLoad)
 user_router.get('/login', userAuth.isLogout,userController.loginLoad);
-
 user_router.post('/login', userAuth.isLogout,userController.verifyLogin);
-
-user_router.get('/home', userAuth.isLogin, userController.loadHome);
 user_router.get('/logout',userAuth.isLogin,userController.userLogout);
 
-user_router.get('/product',userController.productLoad);
+user_router.get('/home', userAuth.isLogin, userController.loadHome);
+
+user_router.get('/product',userAuth.isLogin,userController.productLoad);
+
 user_router.get('/forget-password',userAuth.isLogout,userController.forgetPassword)
 user_router.post('/forget-password',userController.forgetVerify);
-
 user_router.get('/reset-password',userAuth.isLogout,userController.resetPasswordLoad)
 user_router.post('/reset-password',userController.resetPassword)
 
-user_router.get('/verification', userController.verificationLoad);
-user_router.post('/verification', userController.sendVerificationLink)
+
 
 
 module.exports = user_router;

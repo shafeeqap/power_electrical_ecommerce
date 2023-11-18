@@ -22,26 +22,29 @@
                             <div class="col-md-6 col-lg-6 d-flex align-items-center" >
                                 <div class="card-body text-black">
                                     <div class="signup-form" id="form">
-                                        <form class="row login_form" action="" method="post" enctype="multipart/form-data" id="contactForm" >
+                                        <form class="row login_form" action="register" method="post" enctype="multipart/form-data" id="contactForm" >
                                             <h2>Sign Up</h2>
                                             <p>Please fill in this form to create an account!</p>
                                             <hr>
-
                                             <div class="col-md-12 form-group">
                                                  <input type="text" class="form-control" name="name" placeholder="Username" onblur="validateName()" required>
                                                  <div id="nameError" class="error-message text-danger"></div>
+                                                 <div class="error-message text-danger"></div>
                                             </div>
                                             <div class="col-md-12 form-group">
                                                  <input type="email" class="form-control" name="email" placeholder="Email" onblur="validateEmail()" required>
-                                                 <div id="emailError" class="error-message text-danger"></div>
+                                                    <p class="text-danger"></p>
+                                                    <div id="emailError" class="error-message text-danger"></div>
+                                                    <!-- <p class="text-center"></p> -->
+                                             
                                             </div>
                                             <div class="col-md-12 form-group">
-                                                 <input type="tel" class="form-control" name="mobile" placeholder="Mobile Number" onblur="validateMobile()" required>
-                                                 <div id="mnoError" class="error-message text-danger"></div>
-                                            </div>
-                                            <div class="col-md-12 form-group">
+                                                <input type="tel" class="form-control" name="mobile" placeholder="Mobile Number" onblur="validateMobile()" >
+                                                <div id="mnoError" class="error-message text-danger"></div>
+                                           </div>
+                                            <!-- <div class="col-md-12 form-group">
                                                  <input type="file" class="form-control"  name="image" required>
-                                            </div>
+                                            </div> -->
                                             <div class="col-md-12 form-group">
                                                 <input type="password" class="form-control" name="password" placeholder="Password" onblur="validatePassword()" required>
                                                 <div id="passwordError" class="error-message text-danger"></div>
@@ -99,78 +102,132 @@
     <!-- script for form validation -->
     <script>
      
-		function validateName() {
-			 const name = document.querySelector('[name="name"]').value;
-			 const nameRegex = /^[A-Za-z\s]+$/;
-			 const nameError = document.getElementById('nameError');
-			 nameError.textContent = '';
-			 if (!nameRegex.test(name)) {
-				  nameError.textContent = "Name must only contain letters and spaces.";
-			 }
+     function validateName() {
+			const name = document.querySelector('[name="name"]').value.trim();
+			const nameRegex = /^[A-Za-z][A-Za-z\s]*$/;
+			const nameError = document.getElementById('nameError');
+			nameError.textContent = '';
+	
+			if (!nameRegex.test(name)) {
+				nameError.textContent = "Name must start with a letter and can include letters and spaces but not at the beginning.";
+				setTimeout(function () {
+					nameError.textContent = '';
+				}, 3000); // Hide error message after 3 seconds
+			}
 		}
-  
+	
 		function validateEmail() {
-			 const email= document.querySelector('[name="email"]').value;
-			 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-			 const emailError = document.getElementById('emailError');
-			 emailError.textContent = '';
-			 if (!emailRegex.test(email)) {
-				  emailError.textContent = "Please enter a valid email address.";
-			 }
+			const email = document.querySelector('[name="email"]').value;
+			const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+			const emailError = document.getElementById('emailError');
+			emailError.textContent = '';
+			if (!emailRegex.test(email)) {
+				emailError.textContent = "Please enter a valid email address.";
+				setTimeout(function () {
+					emailError.textContent = '';
+				}, 3000); // Hide error message after 3 seconds
+			}
 		}
-  
+	
 		function validateMobile() {
-			 const mno = document.querySelector('[name="mno"]').value;
-			 const mnoRegex = /^\d{10}$/;
-			 const mnoError = document.getElementById('mnoError');
-			 mnoError.textContent = '';
-			 if (!mnoRegex.test(mno)) {
-				  mnoError.textContent = "Mobile number must be exactly 10 digits.";
-			 }
+			const mno = document.querySelector('[name="mno"]').value;
+			const mnoRegex = /^\d{10}$/;
+			const mnoError = document.getElementById('mnoError');
+			mnoError.textContent = '';
+	
+			// Check for repetition of four consecutive numbers
+			const consecutiveNumbersRegex = /(\d)\1\1\1/;
+	
+			if (!mnoRegex.test(mno) || consecutiveNumbersRegex.test(mno)) {
+				mnoError.textContent = "Mobile number must be exactly 10 digits and should not include repetition of four consecutive numbers.";
+				setTimeout(function () {
+					mnoError.textContent = '';
+				}, 3000); // Hide error message after 3 seconds
+			}
 		}
-  
+	
 		function validatePassword() {
-            const password = document.querySelector('[name="password"]').value;
-            const passwordError = document.getElementById('passwordError');
-            passwordError.textContent = '';
+			const password = document.querySelector('[name="password"]').value;
+			const passwordError = document.getElementById('passwordError');
+			passwordError.textContent = '';
+	
+			// Regular expression for a strong password
+			const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+	
+			if (!passwordRegex.test(password)) {
+				passwordError.textContent = "Password must be at least 8 characters long and contain at least one lowercase letter, one uppercase letter, one numeric digit, and one special character (@ $ ! % * ? &).";
+				setTimeout(function () {
+					passwordError.textContent = '';
+				}, 3000); // Hide error message after 3 seconds
+			}
+		}
+	
+		function validatePasswordConfirmation() {
+			const password = document.querySelector('[name="password"]').value;
+			const verifyPassword = document.querySelector('[name="verify_password"]').value;
+			const passwordMatchError = document.getElementById('passwordMatchError');
+			passwordMatchError.textContent = '';
+	
+			if (password !== verifyPassword) {
+				passwordMatchError.textContent = "Passwords do not match.";
+				setTimeout(function () {
+					passwordMatchError.textContent = '';
+				}, 3000); // Hide error message after 3 seconds
+			}
+		}
+	
+		function checkFormValidity() {
+			const nameError = document.getElementById('nameError').textContent;
+			const emailError = document.getElementById('emailError').textContent;
+			const mnoError = document.getElementById('mnoError').textContent;
+			const passwordError = document.getElementById('passwordError').textContent;
+			const passwordMatchError = document.getElementById('passwordMatchError').textContent;
+	
+			const submitButton = document.getElementById('submitButton');
+			const formIsValid = !(nameError || emailError || mnoError || passwordError || passwordMatchError);
+	
+			if (formIsValid) {
+				submitButton.removeAttribute('disabled');
+				submitButton.classList.add('enabled');
+			} else {
+				submitButton.setAttribute('disabled', 'true');
+				submitButton.classList.remove('enabled');
+			}
+		}
 
-    // Regular expression for a strong password
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
-    if (!passwordRegex.test(password)) {
-        passwordError.textContent = "Password must be at least 8 characters long and contain at least one lowercase letter, one uppercase letter, one numeric digit, and one special character (@ $ ! % * ? &).";
+        // Handle Server Message
+
+        function handleServerMessages() {
+        // Handle email message
+        const emailMessage = '<%= emailMessage %>';
+        const emailError = document.getElementById('emailError');
+        emailError.textContent = emailMessage;
+
+        if (emailMessage) {
+            setTimeout(function () {
+                emailError.textContent = '';
+            }, 3000); // Hide error message after 3 seconds
+        }
+
+        // Handle mobile message
+        const mobileMessage = '<%= mobileMessage %>';
+        const mnoError = document.getElementById('mnoError');
+        mnoError.textContent = mobileMessage;
+
+        if (mobileMessage) {
+            setTimeout(function () {
+                mnoError.textContent = '';
+            }, 3000); // Hide error message after 3 seconds
+        }
     }
-}
 
-function validatePasswordConfirmation() {
-    const password = document.querySelector('[name="password"]').value;
-    const verifyPassword = document.querySelector('[name="verify_password"]').value;
-    const passwordMatchError = document.getElementById('passwordMatchError');
-    passwordMatchError.textContent = '';
+    // Call this function when the page loads to handle the server-side messages
+    document.addEventListener('DOMContentLoaded', function () {
+        handleServerMessages();
+    });
 
-    if (password !== verifyPassword) {
-        passwordMatchError.textContent = "Passwords do not match.";
-    }
-}
 
-	function checkFormValidity() {
-    const nameError = document.getElementById('nameError').textContent;
-    const emailError = document.getElementById('emailError').textContent;
-    const mnoError = document.getElementById('mnoError').textContent;
-    const passwordError = document.getElementById('passwordError').textContent;
-    const passwordMatchError = document.getElementById('passwordMatchError').textContent;
-
-    const submitButton = document.getElementById('submitButton');
-    const formIsValid = !(nameError || emailError || mnoError || passwordError || passwordMatchError);
-
-    if (formIsValid) {
-        submitButton.removeAttribute('disabled');
-        submitButton.classList.add('enabled');
-    } else {
-        submitButton.setAttribute('disabled', 'true');
-        submitButton.classList.remove('enabled');
-     }
-}
 
     </script>
 </body>

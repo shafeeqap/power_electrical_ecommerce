@@ -73,6 +73,12 @@ a {
   -webkit-transition: 0.2s color;
   transition: 0.2s color;
 }
+/* ==================== */
+.image-preview{
+  width: 80px; 
+}
+
+/* ======================= */
 
 a:hover, a:focus {
   color: #D10024;
@@ -1955,7 +1961,7 @@ textarea.input {
 .newsletter form .input {
   width: calc(100% - 160px);
   margin-right: -4px;
-  border-radius: 40px 0px 0px 40px;
+  border-radius: 40px 40px 40px 40px;
 }
 
 .newsletter form .newsletter-btn {
@@ -1965,7 +1971,7 @@ textarea.input {
   background: #D10024;
   color: #FFF;
   border: none;
-  border-radius: 0px 40px 40px 0px;
+  border-radius: 40px 40px 40px 40px;
 }
 
 .newsletter .newsletter-follow {

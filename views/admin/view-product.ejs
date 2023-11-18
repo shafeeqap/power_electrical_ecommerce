@@ -5,8 +5,20 @@
       <div class="col-12">
         <div class="card my-4">
           <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-            <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
-              <h6 class="text-white text-capitalize ps-3"><%=message%></h6>
+            <div class="bg-gradient-primary shadow-primary border-radius-lg ">
+              <div class="row justify-content-lg-between align-items-center margin-0 py-0">
+                <div class="col-md-12 col-lg-6 mb-2 mb-lg-0">
+                  <h6 class="text-white text-capitalize ps-3"><%=message%></h6>
+                </div>
+                <div class="col-md-12 col-lg-6">
+                  <div class="d-flex justify-content-end">
+                    <a class="nav-link text-white " href="/admin/add-product">
+                      <button type="button" class="btn bg-gradient-success ms-3 mt-2">
+                        <i class="material-icons opacity-10">add</i> Add Product</button>
+                    </a>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
           <div class="card-body px-0 pb-2">
@@ -22,7 +34,7 @@
                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">Description</th>
                     <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder ">Price</th>
                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">Image</th>
-                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">Edit</th>
+                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">Update</th>
                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">Status</th>
                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">Action</th>
                     
@@ -42,7 +54,7 @@
                       <p class="text-xs font-weight-bold mb-0"><%=products.category%></p>
                     </td>
                     <td>
-                      <p class="text-xs font-weight-bold mb-0"><%=products.brand%></p>
+                      <p class="text-xs font-weight-bold mb-0"><%=products.brandName%></p>
                     </td>
                     <td>
                       <p class="text-xs font-weight-bold mb-0"><%=products.qty%></p>
@@ -58,14 +70,35 @@
                         <img src="/adminAssets/images/<%=products.image[0] %>" class="avatar avatar-sm me-3 border-radius-lg" alt="">
                     </td>
                     <td>
-                      <p class="text-xs font-weight-bold mb-0"><a href="">Edit</a></p>
+                      <p class="text-xs font-weight-bold mb-0"><a href="/admin/edit-product?id=<%=products._id%>">Edit</a></p>
                     </td>
+
+                    <!-- Stock/Out of Stock -->
+                    <% if(products.qty<=0){%>
                     <td>
-                      <p class="text-xs font-weight-bold mb-0">Stock</p>
+                      <p class="text-xs text-danger font-weight-bold mb-0">Out of Stock</p>
                     </td>
+                    <%}else{%>
+                      <td>
+                        <p class="text-xs text-success font-weight-bold mb-0">Stock</p>
+                      </td>
+                      <%}%>
+
+                      <!-- product List/Unlist -->
+                    <% if(products.is_active===true){%>
                     <td class=" text-sm">
-                      <span class="badge badge-sm bg-gradient-success">List</span>
+                      <a href="/admin/is_activeProduct?id=<%= products._id %>">
+                      <span class="badge badge-sm bg-gradient-success">List</span></a>
                     </td>
+
+                    <% }else{ %>
+                      
+                      <td class=" text-sm">
+                        <a href="/admin/is_activeProduct?id=<%= products._id %>">
+                        <span class="badge badge-sm bg-gradient-danger">Unlist</span></a>
+                      </td>
+                      <% } %>
+
                     <% counter++; %>
                 <%});%>
                     

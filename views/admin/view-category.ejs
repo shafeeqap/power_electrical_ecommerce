@@ -5,8 +5,20 @@
       <div class="col-12">
         <div class="card my-4">
           <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-            <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
-              <h6 class="text-white text-capitalize ps-3"><%=message%></h6>
+            <div class="bg-gradient-primary shadow-primary border-radius-lg">
+              <div class="row justify-content-lg-between align-items-center margin-0 py-0">
+                <div class="col-md-12 col-lg-6 mb-2 mb-lg-0">
+                  <h6 class="text-white text-capitalize ps-3"><%=message%></h6>
+                </div>
+                <div class="col-md-12 col-lg-6">
+                  <div class="d-flex justify-content-end">
+                    <a class="nav-link text-white " href="/admin/add-category">
+                      <button type="button" class="btn bg-gradient-success ms-3 mt-2">
+                        <i class="material-icons opacity-10">add</i> Add Category</button>
+                    </a>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
           <div class="card-body px-0 pb-2">
@@ -15,14 +27,10 @@
                 <thead>
                   <tr>
                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">No</th>
-                    <!-- <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">Product Name</th> -->
                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">Category Name</th>
-                    <!-- <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">Brand</th> -->
-                    <!-- <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">Quantity</th> -->
                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">Description</th>
-                    <!-- <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder ">Price</th> -->
                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">Image</th>
-                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">Edit</th>
+                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">Update</th>
                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">Status</th>
                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">Action</th>
                     
@@ -51,13 +59,15 @@
                     <td>
                       <p class="text-xs font-weight-bold mb-0">Stock</p>
                     </td>
-                    <% if (cat.is_block===0){%>
+                    <% if (cat.is_block==false){%>
                     <td class=" text-sm">
-                      <span class="badge badge-sm bg-gradient-danger">Unlist</span>
+                      <a href="/admin/is_blockCategory?id=<%= cat._id %>">
+                      <span class="badge badge-sm bg-gradient-danger">Unlist</span></a>
                     </td>
                     <%}else{%>
                       <td class=" text-sm">
-                        <span class="badge badge-sm bg-gradient-success">List</span>
+                        <a href="/admin/is_blockCategory?id=<%= cat._id %>">
+                        <span class="badge badge-sm bg-gradient-success">List</span></a>
                       </td>
                       <% } %>
                       <% counter++; %>

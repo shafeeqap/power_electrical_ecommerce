@@ -1,23 +1,31 @@
 const User = require('../models/userModel');
 const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
-const randomstring = require('randomstring')
+const otpGenerator = require('otp-generator');
+const randomstring = require('randomstring');
+const Category = require('../models/categoryModel');
+const Product = require('../models/productModel');
 
 const config = require('../config/config');
 
 // securePassword (bcrypt)----------------------//
 const securePassword = async(password)=>{
+    console.log("sec");
+    console.log(password);
     try {
         const passwordHash = await bcrypt.hash(password, 10);
         return passwordHash;
     } catch (error) {
-        console.log(error.message);
+        console.log(error);
     }
 }
+
+
 // for send mail
-const sendVerifyMail= async(name,email,user_id)=>{
+const sendVerifyMail= async(email, otp)=>{
     try {
-        const transprter = nodemailer.createTransport({
+
+        const transporter = nodemailer.createTransport({
             host:'smtp.gmail.com',
             port:587,
             secure:false,
@@ -27,44 +35,153 @@ const sendVerifyMail= async(name,email,user_id)=>{
                 pass:config.passwordUser
             }
         });
+
         const mailoption={
             from:config.emailUser,
             to:email,
-            subject:'For Vrification mail',
-            html:'<p> Hi '+name+ 'please click here to <a href="http://localhost:3000/verify?id='+user_id+'"> verify </a> your mail.</p> '
-            
-
-        }
-        transprter.sendMail(mailoption, function(error, info){
-            if(error){
-                console.log(error);
-            }else{
-                 console.log("Email has been sent :-", info.response);
-            }
-        })
+            subject:'For OTP Vrification mail',
+            html: `<p> Hi , your OTP is <strong>${otp}</strong>.</p> `,
+           
+        };
+        console.log(email)
+        
+        await transporter.sendMail(mailoption);
+        // const info = await transporter.sendMail(mailOptions);
+        // console.log("Email has been sent:", info.response);
         
     } catch (error) {
-        console.log(error.message);
+        console.error("Error sending email:", error);
+        throw error; 
+        // console.log(error.message);
     }
-}
+};
 
-// verifyMail-------------------//
-const verifyMail=async(req,res)=>{
-    
+// Load OTP Verification 
+const loadOtp = async(req,res)=>{
     try {
-        const updateInfo = await User.updateOne({_id:req.query.id},{$set:{is_varified:1}});
-        console.log(updateInfo);
-        res.render('email-verified',{user: req.session.user_id});
+        // console.log("ot entered")
+        
+        const user = await User.findById(req.session.user_id);
 
+        res.redirect('user-otp',{title:'User-OTP-Verification',user});
+        
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+// Verify OTP
+const verifyOtp = async (req, res) => {
+    try {
+        // Generate OTP
+        const otpCode = otpGenerator.generate(6, {
+            digits: true,
+            alphabets: false,
+            specialChars: false,
+            upperCaseAlphabets: false,
+            lowerCaseAlphabets: false,
+        });
+
+        // console.log("otp code is: ",otpCode)
+
+        const creationTime = Date.now() / 1000;
+        const expirationTime = creationTime + 30;
+        // Check if the email already exists in the database.
+
+        const userCheck = await User.findOne({ email: req.body.email });
+        const mobileCheck = await User.findOne({mobile:req.body.mobile});
+        const emailMessage = userCheck ? 'Email is already exist' : '';
+        const mobileMessage = mobileCheck ? 'Mobile is already exist' : '';
+
+        if (userCheck) {
+            res.render('register', {message:'Your registration is failed.',
+            emailMessage :'Email is already exist',
+            mobileMessage :'Mobile is already exist'});
+        } else {
+            // console.log("in");
+            // console.log(req.body.password);
+            // console.log(req.body.name);
+            const spassword = await securePassword(req.body.password);
+            // console.log("pass");
+
+            req.session.name = req.body.name;
+            req.session.email = req.body.email;
+            req.session.mobile = req.body.mobile;
+
+            if (req.body.name && req.body.email && req.body.mobile) {
+                if (req.body.password === req.body.verify_password) {
+                    req.session.password = spassword;
+
+                    req.session.otp = {
+                        code: otpCode,
+                        expiry: expirationTime,
+                    };
+
+                    // console.log("out")
+
+                    // console.log(req.session.email);
+                    // console.log(req.session.email);
+
+                    // Send OTP to the user's email
+                    sendVerifyMail(req.session.email, req.session.otp.code);
+                    res.render('user-otp', { message: 'Email OTP has been sent to your email', user: req.session.user_id });
+
+
+                } else {
+                    res.render('register', { message: 'Password does not match',emailMessage ,mobileMessage :''});
+                }
+            } else {
+                res.render('register', { message: 'Please enter all details',emailMessage ,mobileMessage :''});
+            }
+        }
+
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+
+
+//  Resend OTP after expire time
+const resendOtp = async(req,res)=>{ 
+    try {
+        const currentTime = Date.now() / 1000;
+
+        if(req.session.otp.expire !=null){
+            if(currentTime>req.session.otp.expire){
+                const newDigit = otpGenerator.generate(6,{
+                    digits: true,
+                    alphabets: false,
+                    specialChars: false,
+                    upperCaseAlphabets: false,
+                    lowerCaseAlphabets: false,
+                });
+                req.session.otp.code=newDigit;
+                const newExpiry=currentTime+60;
+                req.session.otp.expire=newExpiry;
+                sendVerifyMail(req.body.name, req.body.email,req.body.mobile, req.session.otp.code);
+                res.redirect('user-otp', { message: 'New OTP send into your Email', user: req.session.user_id });
+
+
+            }else{
+                res.render('user-otp', { message: 'Email Verified', _req:session.user_id });
+            }
+        }else{
+            res.render('user-otp',{message:'Already registerd'})
+        }
+
+        
     } catch (error) {
         console.log(error);
     }
 }
 
+
+
 // view sign up page ---------------//
 const loadRegister= async(req,res)=>{
     try {
-        res.render('register');
+        res.render('register',{ emailMessage: '' ,mobileMessage :''});
     } catch (error) {
         console.log(message);
     }
@@ -73,38 +190,42 @@ const loadRegister= async(req,res)=>{
 // user registration-------------//
 const insertUser = async(req,res)=>{
     try {
-        // Check if the email already exists in the database.
-        const existingUser = await User.findOne({email:req.body.email});
-        if(existingUser){
-            res.render('register',{req:'Email is already in use'})
-        }
       
-        const spassword = await securePassword(req.body.password);
-        const user = new User({
-            name:req.body.name,
-            email:req.body.email,
-            mobile:req.body.mobile,
-            image:req.file.filename,
-            password:spassword,
-            is_admin:0,
-        });
-        const userData = await user.save();
-        if(userData){
-            sendVerifyMail(req.body.name, req.body.email, userData._id);
-            res.render('register',{message:'Your registration is successfull. Please verify your mail.'});
+
+         const creationTime = Math.floor(Date.now()/1000)
+         if(req.body.otp === req.session.otp.code ){
+            // console.log("oooooooooooooo");
+            const user = new User({
+                name:req.session.name,
+                email:req.session.email,
+                mobile:req.session.mobile,
+                // image:req.file.filename,
+                password:req.session.password,
+                is_varified:1,
+                is_admin:0
+                
+            });
+
+            const userData = await user.save();
+            console.log(userData)
+
+            if(userData){
+                res.render('login',{message:'Your registration is success.'});
+            }else{
+                res.render('register',{message:'Your registration is failed.',emailMessage: '',mobileMessage:'' });
+            }
+
         }
-        else{
-            res.render('register',{message:'Your registration is failed.'});
-        }
+        
     } catch (error) {
         console.log(error);
     }
-}
+};
 
 //for reset password send mail
 const sendResetPasswordMail= async(name,email,token)=>{
     try {
-        const transprter = nodemailer.createTransport({
+        const transporter = nodemailer.createTransport({
             host:'smtp.gmail.com',
             port:587,
             secure:false,
@@ -121,7 +242,7 @@ const sendResetPasswordMail= async(name,email,token)=>{
             html:'<p> Hi '+ name +', please click here to <a href="http://localhost:3000/reset-password?token='+token+'"> Reset </a> your password.</p> '
             
         }
-        transprter.sendMail(mailoption, function(error, info){
+        transporter.sendMail(mailoption, function(error, info){
             if(error){
                 console.log(error);
             }else{
@@ -183,7 +304,17 @@ const verifyLogin=async(req, res)=>{
 // Load Home page
 const loadHome = async(req,res)=>{
     try {
-        res.render('home',{user:req.session.user_id ,message:'Home'}); 
+        const categoryData = await Category.find({is_block:true}); // Fetch form database
+        const productData = await Product.find({is_active:true});
+        const user = await User.findById(req.session.user_id);
+
+        res.render('home',{
+            user,
+            categoryData,
+            productData,
+            title:'Home'}); 
+
+
     } catch (error) {
         console.log(error);
         
@@ -193,7 +324,18 @@ const loadHome = async(req,res)=>{
 // Load Product
 const productLoad = async(req,res)=>{
     try {
-        res.render('product', {message:'Product'});
+
+        const user =  await User.findById(req.session.user_id);
+        const productData = await Product.find({is_active:true});
+        const categoryData = await Category.find({is_block:true});
+
+        res.render('product', {
+            user,
+            productData,
+            categoryData,
+            title:'Product'});
+
+
     } catch (error) {
         console.log(error);
     }
@@ -289,37 +431,15 @@ const resetPassword = async(req,res)=>{
     }
 }
 
-// for verification send mail link
-const verificationLoad = async(req,res)=>{
 
-    try {
-        res.render('verification',{user:req.session.user_id});
-        
-    } catch (error) {
-        console.log(error);
-    }
-}
 
-// Send Verification Link
-const sendVerificationLink = async(req,res)=>{
-    try {
-        const email=req.body.email;
-        const userData = await User.findOne({email:email})
-        if(userData){
-            sendVerifyMail(userData.name, userData.email, userData._id);
-            res.render('verification',{message:'Reset verification mail sent your mail id ,please check.',user:req.session.user_id});
-        }else{
-            res.render('verification',{message:'This email is not exit',user:req.session.user_id});
-        }
-    } catch (error) {
-        console.log(error);
-    }
-}
 
 module.exports ={
     loadRegister,
     insertUser,
-    verifyMail,
+    loadOtp,
+    verifyOtp,
+    resendOtp,
     loginLoad,
     verifyLogin,
     loadHome,
@@ -329,6 +449,4 @@ module.exports ={
     forgetVerify,
     resetPasswordLoad,
     resetPassword,
-    verificationLoad,
-    sendVerificationLink
 }

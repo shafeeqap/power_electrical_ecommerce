@@ -1860,7 +1860,7 @@ progress {
     color: #495057;
     background-color: transparent;
     pointer-events: none;
-    border-color: inherit;
+    border-color: black;
     border-style: solid;
     border-width: 0;
     border-inline-end-width: 1px;
