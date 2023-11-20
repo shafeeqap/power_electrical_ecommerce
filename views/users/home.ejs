@@ -1,11 +1,7 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Home</title>
-   
-  </head>
-  <body>
+
     <%-include('../layout/header.ejs') %>
+
+	<%-include('../layout/navigation.ejs')%>
 
     <!-- SECTION -->
 		<div class="section">
@@ -22,7 +18,7 @@
 								</div> 
 								<div class="shop-body">
 									<h3><%=cat.categoryName%><br>Collection</h3>
-									<a href="#" class="cta-btn">Shop now <i class="fa fa-arrow-circle-right"></i></a>
+									<a href="/product" class="cta-btn">Shop now <i class="fa fa-arrow-circle-right"></i></a>
 								</div>
 							</div>
 						</div>
@@ -36,6 +32,9 @@
 		</div>
 		<!-- /SECTION -->
 
+
+
+		
 		<!-- SECTION -->
 		<div class="section">
 			<!-- container -->
@@ -791,5 +790,3 @@
 		<!-- /NEWSLETTER -->
 
     <%-include('../layout/footer.ejs') %>
-  </body>
-</html>

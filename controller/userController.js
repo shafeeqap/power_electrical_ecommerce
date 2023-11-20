@@ -5,13 +5,14 @@ const otpGenerator = require('otp-generator');
 const randomstring = require('randomstring');
 const Category = require('../models/categoryModel');
 const Product = require('../models/productModel');
+const Brand = require('../models/brandModel');
 
 const config = require('../config/config');
 
 // securePassword (bcrypt)----------------------//
 const securePassword = async(password)=>{
-    console.log("sec");
-    console.log(password);
+    // console.log("sec");
+    // console.log(password);
     try {
         const passwordHash = await bcrypt.hash(password, 10);
         return passwordHash;
@@ -43,7 +44,7 @@ const sendVerifyMail= async(email, otp)=>{
             html: `<p> Hi , your OTP is <strong>${otp}</strong>.</p> `,
            
         };
-        console.log(email)
+        // console.log(email)
         
         await transporter.sendMail(mailoption);
         // const info = await transporter.sendMail(mailOptions);
@@ -86,15 +87,15 @@ const verifyOtp = async (req, res) => {
 
         const creationTime = Date.now() / 1000;
         const expirationTime = creationTime + 30;
+
         // Check if the email already exists in the database.
-
-        const userCheck = await User.findOne({ email: req.body.email });
+        const emailCheck = await User.findOne({ email: req.body.email });
         const mobileCheck = await User.findOne({mobile:req.body.mobile});
-        const emailMessage = userCheck ? 'Email is already exist' : '';
-        const mobileMessage = mobileCheck ? 'Mobile is already exist' : '';
+        
 
-        if (userCheck) {
-            res.render('register', {message:'Your registration is failed.',
+        if (emailCheck && mobileCheck) {
+            res.render('register', 
+            {message:'Your registration is failed.',
             emailMessage :'Email is already exist',
             mobileMessage :'Mobile is already exist'});
         } else {
@@ -194,7 +195,7 @@ const insertUser = async(req,res)=>{
 
          const creationTime = Math.floor(Date.now()/1000)
          if(req.body.otp === req.session.otp.code ){
-            // console.log("oooooooooooooo");
+            
             const user = new User({
                 name:req.session.name,
                 email:req.session.email,
@@ -207,10 +208,10 @@ const insertUser = async(req,res)=>{
             });
 
             const userData = await user.save();
-            console.log(userData)
+            // console.log(userData)
 
             if(userData){
-                res.render('login',{message:'Your registration is success.'});
+                res.render('login');
             }else{
                 res.render('register',{message:'Your registration is failed.',emailMessage: '',mobileMessage:'' });
             }
@@ -270,25 +271,39 @@ const verifyLogin=async(req, res)=>{
     try {
         const email=req.body.email;
         const password=req.body.password;
+
         if(email===''){
             return res.render('login',{message:'Please enter email'})
         }
 
         const userData = await User.findOne({email:email});
+        // const blocked =await User.find({_id:user_id,is_block:true});
+        // console.log('user blocked',blocked);
 
         if(userData){
-            const passwordMatch = await bcrypt.compare(password, userData.password);
-            if(passwordMatch){
-                if(userData.is_varified === 0){
-                    res.render('login', {message:"Please verify your mail."});
+            if(userData.is_block==false){
+
+                const passwordMatch = await bcrypt.compare(password, userData.password);
+
+                if(passwordMatch){
+
+                    if(userData.is_varified === 0){
+
+                        res.render('login', {message:"Please verify your mail."});
+                
+                    }else{
+                        req.session.user_id = userData._id;
+
+                        res.redirect('/home');
+                    }
 
                 }else{
-                    req.session.user_id = userData._id;
-                    res.redirect('/home');
+                    
+                    res.render('login', {message:"Email and password is incorrect."});
                 }
 
             }else{
-                res.render('login', {message:"Email and password is incorrect."});
+                res.render('login', { message: "Your account is blocked." });
             }    
 
         }else{
@@ -296,7 +311,7 @@ const verifyLogin=async(req, res)=>{
         }
 
     } catch (error) {
-        console.log(error);
+        console.log(error,  { message: 'An error occurred', status: 500 });
         
     }
 }
@@ -304,15 +319,27 @@ const verifyLogin=async(req, res)=>{
 // Load Home page
 const loadHome = async(req,res)=>{
     try {
-        const categoryData = await Category.find({is_block:true}); // Fetch form database
+
+        // const userData = req.session.user_id;
+
+        // console.log('find user data',userData);
+
+        const categoryData = await Category.find({is_block:false}); // Fetch form database
         const productData = await Product.find({is_active:true});
         const user = await User.findById(req.session.user_id);
+        const userData = await User.find({is_block:false});
 
-        res.render('home',{
-            user,
-            categoryData,
-            productData,
-            title:'Home'}); 
+        if(userData){
+            res.render('home',{
+                user,
+                categoryData,
+                productData,
+                title:'Home'})
+
+        }else{
+            res.redirect('/login');
+
+        } 
 
 
     } catch (error) {
@@ -325,14 +352,53 @@ const loadHome = async(req,res)=>{
 const productLoad = async(req,res)=>{
     try {
 
+        // Search
+        var search='';
+        if(req.query.search){
+            search=req.query.search;
+        }
+
+        // Pagination
+        var page=1;
+
+        if(req.query.page){
+            page =req.query.page;
+        }
+
+        const limit=6;
+
         const user =  await User.findById(req.session.user_id);
-        const productData = await Product.find({is_active:true});
-        const categoryData = await Category.find({is_block:true});
+        const categoryData = await Category.find({is_block:false});
+        const brandData = await Brand.find({is_block:false});
+        const productData = await Product.find({
+            is_active:true,
+            $or:[
+                {name:{$regex:'.*'+search+'.*',$options:'i'}},
+                {category:{$regex:'.*'+search+'.*',$options:'i'}},
+                {brandName:{$regex:'.*'+search+'.*',$options:'i'}},
+            ]
+        })
+        .limit(limit*1)
+        .skip((page-1)*limit)
+        .exec();
+
+        // Count of pages
+        const count = await Product.find({
+            is_active:true,
+            $or:[
+                {name:{$regex:'.*'+search+'.*',$options:'i'}},
+                {category:{$regex:'.*'+search+'.*',$options:'i'}},
+                {brandName:{$regex:'.*'+search+'.*',$options:'i'}},
+            ]
+        }).countDocuments()
+        
 
         res.render('product', {
             user,
             productData,
             categoryData,
+            brandData,
+            totalPages:Math.ceil(count/limit),  //Ex:- count of document/limit (9/6=1.5 =>2)
             title:'Product'});
 
 
@@ -340,6 +406,7 @@ const productLoad = async(req,res)=>{
         console.log(error);
     }
 }
+
 
 // User Logout
 const userLogout = async(req,res)=>{

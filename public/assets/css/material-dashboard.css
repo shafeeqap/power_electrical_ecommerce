@@ -4,6 +4,8 @@
  * Copyright 2011-2021 Twitter, Inc.
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  */
+
+
 :root {
   --bs-blue: #63B3ED;
   --bs-indigo: #596CFF;
@@ -2750,7 +2752,8 @@ textarea.form-control-lg {
 
 .btn-outline-secondary {
   color: #7b809a;
-  border-color: #7b809a; }
+  /* border-color: #7b809a; */
+ }
   .btn-outline-secondary:hover {
     color: #000;
     background-color: #7b809a;

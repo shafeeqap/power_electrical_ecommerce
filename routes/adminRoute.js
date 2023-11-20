@@ -28,8 +28,30 @@ const storage = multer.diskStorage({
     }
 });
 
+// const fileFilter = (req, file, cb) => {
+//     // Allow only image files
+//     if (file.mimetype.startsWith('image/')) {
+//       cb(null, true);
+//     } else {
+//       cb(new Error('Only image files are allowed!'), false);
+//     }
+//   };
+
 const upload = multer({
     storage:storage,
+    fileFilter:(req,file,cb)=>{
+        if(file.mimetype==="image/png"||
+            file.mimetype==="image/jpg"||
+            file.mimetype==="image/jpeg"||
+            file.mimetype==="image/webp"||
+            file.mimetype==="image/avif"
+        ){
+            cb(null,true)
+        }else{
+            cb(null,false);
+            return cb(new Error("Only .png, .jpg, .jpeg, .webp format allowed."));
+        }
+    }
 });
 //----------------------------------//
 
@@ -54,7 +76,7 @@ admin_route.get('/view-users',adminAuth.isLogin,adminController.viewUsers);
 admin_route.get('/is_blockUser',adminController.userBlockorActive);
 
 admin_route.get('/view-product',adminAuth.isLogin,productController.viewProduct);
-admin_route.get('/add-product',productController.loadProduct);
+admin_route.get('/add-product',adminAuth.isLogin,productController.loadAddProduct);
 admin_route.post('/add-product',upload.array('image',4),productController.addProduct);
 admin_route.get('/edit-product',adminAuth.isLogin,productController.editProductLoad);
 admin_route.post('/edit-product',upload.array('image',4),productController.editProduct);

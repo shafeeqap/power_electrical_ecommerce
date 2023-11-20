@@ -1,4 +1,6 @@
-<%-include('../admin/adminLayout/header.ejs')%>
+<%-include('../admin/adminLayout/sidebar.ejs')%>
+
+<%- include('../admin/adminLayout/navbar.ejs')%>
 
 <div class="container-fluid py-4">
     <div class="row">
@@ -25,13 +27,13 @@
             <div class="table-responsive p-0">
               <table class="table align-items-center mb-4">
                 <thead>
-                  <tr>
-                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">No</th>
-                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">Brand Name</th>
-                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">Description</th>
-                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">Image</th>
-                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">Update</th>
-                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">Status</th>
+                  <tr style="background-color: rgb(227, 225, 225);">
+                    <th class="text-uppercase text-xxs font-weight-bolder  ps-2" style="color: black;">No</th>
+                    <th class="text-uppercase text-xxs font-weight-bolder  ps-2" style="color: black;">Brand Name</th>
+                    <th class="text-uppercase text-xxs font-weight-bolder  ps-2" style="color: black;">Description</th>
+                    <th class="text-uppercase text-xxs font-weight-bolder  ps-2" style="color: black;">Image</th>
+                    <th class="text-uppercase text-xxs font-weight-bolder  ps-2" style="color: black;">Update</th>
+                    <th class="text-uppercase text-xxs font-weight-bolder  ps-2" style="color: black;">Status</th>
                     <!-- <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">Action</th> -->
                     
                   </tr>
@@ -62,12 +64,12 @@
                     <% if (brand.is_block==false){%>
                     <td class=" text-sm">
                       <a href="/admin/is_blockBrand?id=<%= brand._id %>">
-                      <span class="badge badge-sm bg-gradient-danger">Unlist</span></a>
+                      <span class="badge badge-sm bg-gradient-success">List</span></a>
                     </td>
                     <%}else{%>
                       <td class=" text-sm">
                         <a href="/admin/is_blockBrand?id=<%= brand._id %>">
-                        <span class="badge badge-sm bg-gradient-success">List</span></a>
+                        <span class="badge badge-sm bg-gradient-danger">Unlist</span></a>
                       </td>
                       <% } %>
                       <% counter++; %>

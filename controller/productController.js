@@ -1,21 +1,58 @@
 const Product = require('../models/productModel');
 const Category = require('../models/categoryModel');
 const Brand = require('../models/brandModel');
+// const sharp = require('sharp');
+// const { path } = require('../routes/adminRoute');
 
 
 // View Product page
-const viewProduct = async(req,res)=>{
+const viewProduct = async (req, res) => {
     try {
-        const product = await Product.find(); // Fetch data from database
-        res.render('view-product',{message:'Product Details',product}); // passing product.
-        
+
+        //Pagination
+        let query = {};
+
+        // Check if there is a search query in the URL
+        if (req.query.search) {
+            const searchRegex = new RegExp(req.query.search, 'i');
+            query = {
+                $or: [
+                    { name: searchRegex },
+                    { category: searchRegex },
+                    { brandName: searchRegex },
+                    { description: searchRegex },
+                ]
+            };
+        }
+
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 5;
+        const skip = (page - 1) * limit;
+
+        const product = await Product.find(query).skip(skip).limit(limit);
+        const totalCount = await Product.countDocuments(query);
+
+        const totalPages = Math.ceil(totalCount / limit);
+
+        res.render('view-product', {
+            message: 'Product Details',
+            product,
+            searchQuery: req.query.search || '',
+            pagination: {
+                page,
+                limit,
+                totalCount,
+                totalPages
+            }
+        });
     } catch (error) {
         console.log(error);
         res.status(500).send('Server error');
     }
-}
+};
+
 // Load add Product
-const loadProduct = async(req,res)=>{
+const loadAddProduct = async(req,res)=>{
     try {
        
         const category = await Category.find();  // Fetch data from database
@@ -40,10 +77,21 @@ const addProduct = async(req,res)=>{
 
          
         const image = []
-        for(i=0;i<req.files.length;i++){
-            image[i]=req.files[i].filename;
-           
+        for(i=0;i<req.files.length && i<4;i++){
+            image[i] = req.files[i].filename;
+            
+        //     await sharp(path.join(__dirname,'../public/adminAssets/images',filename))
+        //         .resize(300, 300)
+        //         .toFile(path.join(__dirname,'../public/adminAssets/images', 'resized-'+filename));
+
+        //     image[i]='resized-'+filename;
         }
+
+        if(req.files.length>4){
+            console.log("More than 4 images were uploaded. Only the first 4 will be processed.");
+        }
+
+
         const newProduct = new Product({
             name:name,
             category:category,
@@ -57,7 +105,7 @@ const addProduct = async(req,res)=>{
         
         const result = await newProduct.save();
         // console.log(result);
-        res.redirect('view-product')
+        res.redirect('/admin/view-product')
         
     } catch (error) {
         console.log(error);
@@ -96,7 +144,15 @@ const editProduct = async(req,res)=>{
         const image = [];
 
         for(i=0;i<req.files.length;i++){
-            image[i]=req.files[i].filename;
+            image[i] = req.files[i].filename;
+
+            // image[i] = filename;
+
+            // await sharp(path.join(__dirname, '../public/adminAssets/images', filename))
+            //     .resize(300, 300)
+            //     .toFile(path.join(__dirname, '../public/adminAssets/images', 'resized-' + filename));
+
+            //     image[i] = 'resized-' + filename;
         };
 
         const updatedData = await Product.findByIdAndUpdate({_id:id},
@@ -150,7 +206,7 @@ const productListorUnlist = async(req,res)=>{
 
 module.exports={
     viewProduct,
-    loadProduct,
+    loadAddProduct,
     addProduct,
     editProductLoad,
     editProduct,

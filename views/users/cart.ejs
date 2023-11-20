@@ -1,0 +1,132 @@
+
+<%-include('../layout/header.ejs') %>
+
+<%-include('../layout/navigation.ejs')%>
+
+<!-- BREADCRUMB -->
+<div id="breadcrumb" class="section">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h3 class="breadcrumb-header">Cart</h3>
+                <ul class="breadcrumb-tree">
+                    <li><a href="#">Home</a></li>
+                    <li class="active">Cart</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /BREADCRUMB -->
+
+<!-- SECTION -->
+<div class="section">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <!-- Cart Details -->
+                <div class="cart-details">
+                    <div class="section-title">
+                        <h3 class="title">Shopping Cart</h3>
+                    </div>
+                    <div class="cart-table">
+                        <!-- Table header -->
+                        <div class="cart-table-header">
+                            <div class="product">Product</div>
+                            <div class="price">Price</div>
+                            <div class="quantity">Quantity</div>
+                            <div class="total">Total</div>
+                            <div class="remove">Remove</div>
+                        </div>
+                        <!-- Table items (loop through cart items) -->
+                        <div class="cart-table-item card">
+                            <div class="card-body">
+                                <div class="product">
+                                    <img src="../adminAssets/images/1699240551657-patrick-tomasso-2R5QtSqJtdY-unsplash.jpg" alt="Product Image" class="img-fluid" style="width: 100px; height: 100px;">
+                                    <span class="product-name">Hanging Led Light 12 Wats</span>
+                                </div>
+                                <div class="price">$980.00</div>
+                                <div class="quantity">
+                                    <input type="number" value="1" min="1" class="form-control">
+                                </div>
+                                <div class="total">$980.00</div>
+                                <div class="remove">
+                                    <button class="btn btn-danger">
+                                        <i class="material-icons-round">delete</i>
+                                        <!-- Remove -->
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="cart-table-item card" >
+                            <div class="card-body">
+                                <div class="product">
+                                    <img src="../adminAssets/images/1699253134161-daniele-franchi-VP5R-n47v9Q-unsplash.jpg" alt="Product Image" class="img-fluid" style="width: 100px; height: 100px;">
+                                    <span class="product-name">Hanging Led Light 12 Wats</span>
+                                </div>
+                                <div class="price">$980.00</div>
+                                <div class="quantity">
+                                    <input type="number" value="1" min="1" class="form-control">
+                                </div>
+                                <div class="total">$980.00</div>
+                                <div class="remove">
+                                    <button class="btn btn-danger">
+                                        <i class="material-icons-round">delete</i>
+                                        <!-- Remove -->
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Repeat the above block for each product in the cart -->
+                    </div>
+                </div>
+                <!-- /Cart Details -->
+
+                <!-- Order Summary -->
+                <div class="order-summary">
+                    <div class="section-title">
+                        <h3 class="title">Order Summary</h3>
+                    </div>
+                    <div class="order-col">
+                        <div><strong>PRODUCT</strong></div>
+                        <div><strong>TOTAL</strong></div>
+                    </div>
+                    <!-- Order products (loop through cart items) -->
+                    <div class="order-products">
+                        <div class="order-col">
+                            <div>1x Product Name Goes Here</div>
+                            <div>$980.00</div>
+                        </div>
+                        <div class="order-col">
+                            <div>2x Product Name Goes Here</div>
+                            <div>$980.00</div>
+                        </div>
+                        <!-- Repeat the above block for each product in the cart -->
+                    </div>
+                    <div class="order-col">
+                        <div>Shipping</div>
+                        <div><strong>FREE</strong></div>
+                    </div>
+                    <div class="order-col">
+                        <div><strong>TOTAL</strong></div>
+                        <div><strong class="order-total">$2940.00</strong></div>
+                    </div>
+                </div>
+                <!-- /Order Summary -->
+
+                <!-- Checkout Button -->
+                <div class="checkout-button">
+                    <a href="#" class="primary-btn order-submit">Proceed to Checkout</a>
+                </div>
+                <!-- /Checkout Button -->
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /SECTION -->
+
+
+
+
+<%-include('../layout/footer.ejs') %>

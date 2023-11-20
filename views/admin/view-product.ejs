@@ -1,48 +1,108 @@
-<%-include('../admin/adminLayout/header.ejs')%>
+
+<%- include('../admin/adminLayout/sidebar.ejs') %>
+
+<%- include('../admin/adminLayout/navbar.ejs')%>
+<style>
+   .btn-outline-secondary {
+    width: 160px;
+    margin-top: 30px;
+    margin-right: 10px;
+    /* background-color: #FFCA2C; */
+  }
+
+  .form-control {
+    width: 350px;
+    height: 40px;
+    /* padding-top: 50px; */
+    /* margin-top: 50px; */
+    /* background-color:aliceblue; */
+    border: 1px solid #ced4da;
+  }
+
+  .b,
+  strong {
+    margin-left: 50px;
+  }
+  .element.style{
+    margin-top: 50px;
+  }
+
+
+</style>
 
 <div class="container-fluid py-4">
-    <div class="row">
-      <div class="col-12">
-        <div class="card my-4">
-          <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-            <div class="bg-gradient-primary shadow-primary border-radius-lg ">
-              <div class="row justify-content-lg-between align-items-center margin-0 py-0">
-                <div class="col-md-12 col-lg-6 mb-2 mb-lg-0">
-                  <h6 class="text-white text-capitalize ps-3"><%=message%></h6>
-                </div>
-                <div class="col-md-12 col-lg-6">
-                  <div class="d-flex justify-content-end">
-                    <a class="nav-link text-white " href="/admin/add-product">
-                      <button type="button" class="btn bg-gradient-success ms-3 mt-2">
-                        <i class="material-icons opacity-10">add</i> Add Product</button>
-                    </a>
-                  </div>
+  <div class="row">
+    <div class="col-12">
+      <div class="card my-4">
+        <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+          <div class="bg-gradient-primary shadow-primary border-radius-lg ">
+            <div class="row justify-content-lg-between align-items-center margin-0 py-0">
+              <div class="col-md-12 col-lg-6 mb-2 mb-lg-0">
+                <h6 class="text-white text-capitalize ps-3"><%= message %></h6>
+              </div>
+              <div class="col-md-12 col-lg-6">
+                <div class="d-flex justify-content-end">
+                  <a class="nav-link text-white " href="/admin/add-product">
+                    <button type="button" class="btn bg-gradient-success ms-3 mt-2">
+                      <i class="material-icons opacity-10">add</i> Add Product
+                    </button>
+                  </a>
                 </div>
               </div>
             </div>
           </div>
-          <div class="card-body px-0 pb-2">
-            <div class="table-responsive p-0">
-              <table class="table align-items-center mb-4">
-                <thead>
-                  <tr>
-                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">No</th>
-                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">Product Name</th>
-                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">Category</th>
-                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">Brand</th>
-                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">Quantity</th>
-                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">Description</th>
-                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder ">Price</th>
-                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">Image</th>
-                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">Update</th>
-                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">Status</th>
-                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">Action</th>
-                    
-                  </tr>
-                </thead>
-                <tbody>
-                  <% let counter = 1; %>
-                  <% product.forEach(products=>{%>
+        </div>
+
+        <!-- Search and filter -->
+
+        <div class="row mb-4 " style="margin-top: 50px;">
+          <div class="col-md-6 " style="margin-left: 50px;">
+             <!-- Centered Search Form -->
+            <form action="/admin/view-product" method="GET" class="d-inline-flex">
+              <input type="text" name="search" class="form-control me-2" placeholder="&nbsp;&nbsp;&nbsp;Search..." value="<%= searchQuery %>">
+              <input type="hidden" name="page" value="<%= pagination.page %>">
+              <input type="hidden" name="limit" value="<%= pagination.limit %>">
+              <button type="submit" class="btn btn-primary">Search</button>
+          </form>
+            
+
+          </div>
+          <div class="col-md-6" style="margin-top: 20px;">
+            <% if (searchQuery) { %>
+              <p class="mb-3"><strong>Search Results for:</strong> <%= searchQuery %></p>
+    
+            <% } %>
+    
+            <p class="mb-3"><strong>Total Products:</strong> <%= product.length %></p>
+          </div>
+
+        </div>
+
+        <!-- End Search and filter -->
+
+
+        <div class="card-body px-0 pb-2">
+          <div class="table-responsive p-0">
+            <table class="table align-items-center">
+              <thead>
+                <tr style="background-color: rgb(227, 225, 225);">
+                  <th class="text-uppercase text-xxs font-weight-bolder  ps-2" style="color: black;">No</th>
+                  <th class="text-uppercase text-xxs font-weight-bolder  ps-2" style="color: black;">Product Name</th>
+                  <th class="text-uppercase text-xxs font-weight-bolder  ps-2" style="color: black;">Category</th>
+                  <th class="text-uppercase text-xxs font-weight-bolder  ps-2" style="color: black;">Brand</th>
+                  <th class="text-uppercase text-xxs font-weight-bolder  ps-2" style="color: black;">Quantity</th>
+                  <th class="text-uppercase text-xxs font-weight-bolder  ps-2" style="color: black;">Description</th>
+                  <th class="text-center text-uppercase text-xxs font-weight-bolder " style="color: black;">Price</th>
+                  <th class="text-uppercase  text-xxs font-weight-bolder  ps-2" style="color: black;">Image</th>
+                  <th class="text-uppercase text-xxs font-weight-bolder  ps-2" style="color: black;">Update</th>
+                  <th class="text-uppercase  text-xxs font-weight-bolder  ps-2" style="color: black;">Status</th>
+                  <th class="text-uppercase  text-xxs font-weight-bolder  ps-2" style="color: black;">Action</th>
+
+                </tr>
+              </thead>
+              <tbody>
+                <% let counter = 1; %>
+                <% product.forEach(products => { %>
                   <tr>
                     <td>
                       <p class="text-xs font-weight-bold mb-0"><%= counter %></p>
@@ -100,17 +160,44 @@
                       <% } %>
 
                     <% counter++; %>
-                <%});%>
-                    
+                
                   </tr>
-                  
-                </tbody>
-              </table>
+                <% }); %>
+              </tbody>
+            </table>
+
+            <!-- star pagination -->
+
+            <div class="d-flex justify-content-center">
+              <nav aria-label="Page navigation">
+                  <ul class="pagination">
+                      <% if (pagination.page > 1) { %>
+                          <li class="page-item">
+                              <a class="page-link" href="?page=<%= pagination.page - 1 %>&limit=<%= pagination.limit %>&search=<%= searchQuery %>">Previous</a>
+                          </li>
+                      <% } %>
+          
+                      <% for (let i = 1; i <= pagination.totalPages; i++) { %>
+                          <li class="page-item <%= i === pagination.page ? 'active' : '' %>">
+                              <a class="page-link" href="?page=<%= i %>&limit=<%= pagination.limit %>&search=<%= searchQuery %>"><%= i %></a>
+                          </li>
+                      <% } %>
+          
+                      <% if (pagination.page < pagination.totalPages) { %>
+                          <li class="page-item">
+                              <a class="page-link" href="?page=<%= pagination.page + 1 %>&limit=<%= pagination.limit %>&search=<%= searchQuery %>">Next</a>
+                          </li>
+                      <% } %>
+                  </ul>
+              </nav>
             </div>
+
+            <!-- End pagination -->
           </div>
         </div>
       </div>
     </div>
+  </div>
 </div>
 
-<%-include('../admin/adminLayout/footer.ejs')%>
+<%- include('../admin/adminLayout/footer.ejs') %>

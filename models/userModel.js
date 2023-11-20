@@ -39,7 +39,7 @@ var userSchema = new mongoose.Schema({
     },
     is_block:{
         type:Boolean,
-        default:true
+        default:false
     }
 }, {timestamp:true});
 
