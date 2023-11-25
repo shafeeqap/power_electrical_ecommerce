@@ -53,11 +53,15 @@ user_router.post('/reset-password',userController.resetPassword)
 
 user_router.get('/home', userAuth.isLogin, userController.loadHome);
 
-user_router.get('/product',userController.productLoad);
+user_router.get('/product',userAuth.isLogin,userController.productLoad);
 
-user_router.get('/cart',cartController.cartLoad);
+user_router.get('/cart',userAuth.isLogin,cartController.cartLoad);
+user_router.post('/addToCart',userAuth.isLogin,cartController.addToCart);
+user_router.post('/cart-quantity',userAuth.isLogin,cartController.cartQuantity);
+user_router.post('/remove-product',userAuth.isLogin,cartController.removeProduct);
 
 
+// user_router.get('/checkout',cartController.loadCheckout);
 
 
 module.exports = user_router;

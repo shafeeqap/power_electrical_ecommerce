@@ -398,7 +398,8 @@ const productLoad = async(req,res)=>{
             productData,
             categoryData,
             brandData,
-            totalPages:Math.ceil(count/limit),  //Ex:- count of document/limit (9/6=1.5 =>2)
+            totalPages:Math.ceil(count/limit),  //Ex:- count of document/limit (9/6 = 1.5 => 2)
+            currentPage:page,   // page 1
             title:'Product'});
 
 

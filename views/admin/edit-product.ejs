@@ -73,7 +73,7 @@
                                 <% if(productData.image.length>0){%>
                                 <div class="form-label rounded">Images</div>
                                     <% productData.image.forEach(img=>{ %>
-                                        <img type="file" src="/adminAssets/images/<%= img %>" alt="Old Image" style="width: 100px;">
+                                        <img type="file" src="/adminAssets/images/<%= img %>" alt="Old Image" style="width: 100px;" class="imgView">
                                 <% }); %>
                                 <div class="image-preview-container mt-2"></div>
                                 <% } %>
@@ -82,7 +82,7 @@
                         <!-- <div class="col md-3 py-4"> -->
                             <div class="form-group">
                                 <div class="form-label rounded">New Image</div>
-                                <input type="file" name="image" id="image" multiple accept="image/*" required>
+                                <input type="file" name="image" id="image" multiple accept="image/*"onchange="viewImage(event)">
                                 <div class="image-preview-container mt-2"></div>
                               </div>
                         <!-- </div> -->
@@ -114,3 +114,14 @@
 
 
 <%-include('../admin/adminLayout/footer.ejs')%>
+
+<script>
+  function viewImage(event) {
+    var imgViews = document.getElementsByClassName('imgView');
+
+    for(let i=0;i<imgViews.length;i++){
+      imgViews[i].src=URL.createObjectURL(event.target.files[i]);
+
+    }
+  }
+</script>

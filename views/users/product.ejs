@@ -4,21 +4,21 @@
     
     /* Equal height for product widgets */
     .product-widget {
-        display: flex;
-        flex-direction: column;
+        /* display: flex; */
+        /* flex-direction: column; */
         /* height: 100%; Ensure the widgets take the full height */
     }
 
     /* Adjust margins and spacing */
     .section {
-        margin-bottom: 30px;
+        /* margin-bottom: 30px; */
     }
 
     /* Ensure product items have equal height and proper alignment */
     .product-item {
         display: flex;
         flex-direction: column;
-        height: 60%; /* Ensure product items take the full height */
+        height: 60%; 
     }
 </style>
 
@@ -75,7 +75,7 @@
                 <!-- /aside Widget -->
 
                 <!-- aside Widget -->
-                <div class="aside">
+                <!-- <div class="aside">
                     <h3 class="aside-title">Price</h3>
                     <div class="price-filter">
                         <div id="price-slider"></div>
@@ -91,7 +91,7 @@
                             <span class="qty-down">-</span>
                         </div>
                     </div>
-                </div>
+                </div> -->
                 <!-- /aside Widget -->
 
                 <!-- aside Widget -->
@@ -108,7 +108,7 @@
                             </label>
                         </div>
                     </div>
-                    <%})%>
+                    <% }); %>
                 </div>
                 <!-- /aside Widget -->
 
@@ -215,7 +215,7 @@
                                 </div>
                             </div>
                             <div class="add-to-cart">
-                                <button class="add-to-cart-btn"><i class="fa fa-shopping-cart"></i> add to cart</button>
+                                <a onclick="addToCart('<%=product._id%>')"><button class="add-to-cart-btn"><i class="fa fa-shopping-cart"></i> add to cart</button></a>
                             </div>
                         </div>
                     </div>
@@ -228,12 +228,16 @@
                 <div class="store-filter clearfix">
                     <span class="store-qty">Showing 20-100 product</span>
                     <ul class="store-pagination">
-                        <li class="active">1</li>
-                        <li><a href="#">2</a></li>
-                        <li><a href="#">3</a></li>
-                        <li><a href="#">4</a></li>
-                        <li><a href="#"><i class="fa fa-angle-right"></i></a></li>
+                    <% for(let i=1;i<=totalPages;i++){%>
+                        <% if(currentPage==i){%>
+                            <li class="active"><a href="?page=<%= i %>"><%= i %></a></li>
+                            <% }else{ %>
+                        <li><a href="?page=<%= i %>"><%= i %></a></li>
+                            <% } %>
+
+                        <% }; %>
                     </ul>
+                    <!-- <i class="fa fa-angle-right"></i> -->
                 </div>
                 <!-- /store bottom filter -->
             </div>
@@ -284,51 +288,85 @@
 
 
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="/path/to/script.js"></script>
+<!-- Include SweetAlert library -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
 <script>
     $(document).ready(function () {
-        // Store the initial state of products
-        const initialProducts = $('.product-item');
+    // Store the initial state of products
+    const initialProducts = $('.product-item');
 
-        // Attach a click event handler to brand checkboxes
-        $('.brand-checkbox').on('change', function () {
-            updateProductDisplay();
-        });
+    // Attach a click event handler to brand checkboxes
+    $('.brand-checkbox').on('change', function () {
+        updateProductDisplay();
+    });
 
-        // Attach a click event handler to category checkboxes
-        $('[id^="category-"]').on('change', function () {
-            updateProductDisplay();
-        });
+    // Attach a click event handler to category checkboxes
+    $('[id^="category-"]').on('change', function () {
+        updateProductDisplay();
+    });
 
-        // Function to update the product display based on selected filters
-        function updateProductDisplay() {
-            // Get the selected brands
-            const selectedBrands = $('.brand-checkbox:checked').map(function () {
-                return $(this).siblings('label').text().trim();
-            }).get();
+    // Function to update the product display based on selected filters
+    function updateProductDisplay() {
+        // Get the selected brands
+        const selectedBrands = $('.brand-checkbox:checked').map(function () {
+            return $(this).siblings('label').text().trim();
+        }).get();
 
-            // Get the selected categories
-            const selectedCategories = $('[id^="category-"]:checked').map(function () {
-                return $(this).siblings('label').text().trim();
-            }).get();
+        // Get the selected categories
+        const selectedCategories = $('[id^="category-"]:checked').map(function () {
+            return $(this).siblings('label').text().trim();
+        }).get();
 
-            // Filter products based on selected brands and categories
-            if (selectedBrands.length > 0 || selectedCategories.length > 0) {
-                initialProducts.hide();
+        // Filter products based on selected brands and categories
+        if (selectedBrands.length > 0 || selectedCategories.length > 0) {
+            initialProducts.hide();
 
-                selectedBrands.forEach(function (brand) {
-                    $(`.product-item[data-brand="${brand}"]`).show();
-                });
+            selectedBrands.forEach(function (brand) {
+                $(`.product-item[data-brand="${brand}"]`).show();
+            });
 
-                selectedCategories.forEach(function (category) {
-                    $(`.product-category:contains("${category}")`).closest('.product-item').show();
-                });
-            } else {
-                // If no filters selected, show all products
-                initialProducts.show();
-            }
+            selectedCategories.forEach(function (category) {
+                $(`.product-category:contains("${category}")`).closest('.product-item').show();
+            });
+        } else {
+            // If no filters selected, show all products
+            initialProducts.show();
+        }
+    }
+});
+
+
+
+// Add to Cart function
+
+function addToCart(id){
+    console.log('Add to cart function called'+id);
+    $.ajax({
+        url:"/addToCart",
+        method:"post",
+        encoded:true,
+        data:{id:id},
+    }).done((data)=>{
+        if(data){
+            console.log(data);
+
+            Swal.fire({
+                icon:'success',
+                title:'Item has been added to cart',
+                showConfirmButton:false,
+                timer:1000
+            })
+        }else{
+            Swal("Fail to add");
         }
     });
+}
 </script>
+
+
+
+
 
 

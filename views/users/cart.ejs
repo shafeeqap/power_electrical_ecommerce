@@ -3,6 +3,7 @@
 
 <%-include('../layout/navigation.ejs')%>
 
+
 <!-- BREADCRUMB -->
 <div id="breadcrumb" class="section">
     <div class="container">
@@ -29,62 +30,73 @@
                     <div class="section-title">
                         <h3 class="title">Shopping Cart</h3>
                     </div>
-                    <div class="cart-table">
-                        <!-- Table header -->
-                        <div class="cart-table-header">
-                            <div class="product">Product</div>
-                            <div class="price">Price</div>
-                            <div class="quantity">Quantity</div>
-                            <div class="total">Total</div>
-                            <div class="remove">Remove</div>
-                        </div>
-                        <!-- Table items (loop through cart items) -->
-                        <div class="cart-table-item card">
-                            <div class="card-body">
-                                <div class="product">
-                                    <img src="../adminAssets/images/1699240551657-patrick-tomasso-2R5QtSqJtdY-unsplash.jpg" alt="Product Image" class="img-fluid" style="width: 100px; height: 100px;">
-                                    <span class="product-name">Hanging Led Light 12 Wats</span>
-                                </div>
-                                <div class="price">$980.00</div>
-                                <div class="quantity">
-                                    <input type="number" value="1" min="1" class="form-control">
-                                </div>
-                                <div class="total">$980.00</div>
-                                <div class="remove">
-                                    <button class="btn btn-danger">
-                                        <i class="material-icons-round">delete</i>
-                                        <!-- Remove -->
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
 
-                        <div class="cart-table-item card" >
-                            <div class="card-body">
-                                <div class="product">
-                                    <img src="../adminAssets/images/1699253134161-daniele-franchi-VP5R-n47v9Q-unsplash.jpg" alt="Product Image" class="img-fluid" style="width: 100px; height: 100px;">
-                                    <span class="product-name">Hanging Led Light 12 Wats</span>
-                                </div>
-                                <div class="price">$980.00</div>
-                                <div class="quantity">
-                                    <input type="number" value="1" min="1" class="form-control">
-                                </div>
-                                <div class="total">$980.00</div>
-                                <div class="remove">
-                                    <button class="btn btn-danger">
-                                        <i class="material-icons-round">delete</i>
-                                        <!-- Remove -->
-                                    </button>
-                                </div>
-                            </div>
+
+                    <div class="row">
+                        <div class="col-md-12" id="reloadDiv">
+                            <!-- Cart Table -->
+                            <table class="cart-table" style="width: 100%; border-collapse: collapse; border-spacing: 0;">
+                                <!-- Cart Table Header -->
+                                <thead style="background-color: #f1f1f2;">
+                                    <tr>
+                                        <th style="width: 500px; padding: 10px; font-weight: bold;">Product</th>
+                                        <th style="font-weight: bold;">Price</th>
+                                        <th style="width: 300px;font-weight: bold;">Quantity</th>
+                                        <th style="width: 150px; margin-left: 10px; font-weight: bold;">Total</th>
+                                        <th style="width: 90px; font-weight: bold;">Remove</th>
+                                    </tr>
+                                </thead>
+                                <!-- Cart Table Body -->
+                                <tbody>
+                                    <% if(cart && cart.length > 0){ %>
+                                        <% cart.forEach((data) => { %>
+                                            <tr class="cart-table-item card">
+                                                <td style="display: flex; align-items: center;">
+                                                    <div class="product">
+                                                        <img src="/adminAssets/images/<%=data.productId.image[0]%>" alt="Product Image" class="img-fluid" style="width: 100px; height: 100px">
+                                                    </div>
+                                                    <div class="product-name" style="margin-left: 50px;">
+                                                        <h5><%=data.productId.name%></h5>
+                                                    </div>
+                                                </td>
+                                                <td>&#x20B9;<%=data.productId.price%></td>
+                                                <td>
+                                                    <div class="input-group" style="width: 130px;">
+                                                        <span class="input-group-btn">
+                                                            <button type="button" class="btn btn-default btn-number" onclick="cartCount('<%=data.productId._id%>','<%=userId%>',-1)" data-type="minus"  data-field="quant[1]">
+                                                                <span class="glyphicon glyphicon-minus"></span>
+                                                            </button>
+                                                        </span>
+                                                        <input type="text" name="quant[1]" class="form-control input-number" id="<%=data.productId%>" value="<%=data.quantity%>">
+                                                        <span class="input-group-btn" >
+                                                            <button type="button" class="btn btn-default btn-number" onclick="cartCount('<%=data.productId._id%>','<%=userId%>',1)" data-type="plus" data-field="quant[1]">
+                                                                <span class="glyphicon glyphicon-plus"></span>
+                                                            </button>
+                                                        </span>
+                                                    </div>
+                                                </td>
+                                                <td>&#x20B9;<%=data.totalPrice%></td>
+                                                <td>
+                                                    <button class="btn btn-danger" onclick="removeProduct('<%=data.productId._id%>')">
+                                                        <i class="material-icons-round">delete</i>
+                                                        <!-- Remove -->
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        <% }) %>
+                                    <% } %>
+                                </tbody>
+                            </table>
+                            <!-- /Cart Table -->
                         </div>
-                        <!-- Repeat the above block for each product in the cart -->
                     </div>
+                    
+                    
                 </div>
                 <!-- /Cart Details -->
 
                 <!-- Order Summary -->
-                <div class="order-summary">
+                <div class="order-summary" id="order-summary">
                     <div class="section-title">
                         <h3 class="title">Order Summary</h3>
                     </div>
@@ -93,25 +105,27 @@
                         <div><strong>TOTAL</strong></div>
                     </div>
                     <!-- Order products (loop through cart items) -->
+                    <% if(cart && cart.length>0){%>
+                        <% cart.forEach((cartData) => {%>
                     <div class="order-products">
                         <div class="order-col">
-                            <div>1x Product Name Goes Here</div>
-                            <div>$980.00</div>
+                            <div><%=cartData.productId.name%></div>
+                            <div>&#x20B9;<%=cartData.totalPrice%></div>
                         </div>
-                        <div class="order-col">
-                            <div>2x Product Name Goes Here</div>
-                            <div>$980.00</div>
-                        </div>
+
                         <!-- Repeat the above block for each product in the cart -->
                     </div>
+                    <% });%>
+                    
                     <div class="order-col">
-                        <div>Shipping</div>
+                        <div><strong>Shipping</strong></div>
                         <div><strong>FREE</strong></div>
                     </div>
                     <div class="order-col">
                         <div><strong>TOTAL</strong></div>
-                        <div><strong class="order-total">$2940.00</strong></div>
+                        <div><strong class="order-total">&#x20B9;<%=total%></strong></div>
                     </div>
+                    <% } %>
                 </div>
                 <!-- /Order Summary -->
 
@@ -127,6 +141,102 @@
 <!-- /SECTION -->
 
 
+<!-- link for ajax -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+<!-- CDN link for sweetalert -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    function removeProduct(productId){
+
+        $.ajax({
+            url:'/remove-product',
+            method:'post',
+            data:{product:productId},
+        }).done(data=>{
+            if(data){
+
+                $('#reloadDiv').load('/cart #reloadDiv, #order-summary', function(){
+
+                Swal.fire({
+                    
+                    icon:'success',
+                    title:'Item Romoved Successfully',
+                    showConfirmButton:false,
+                    timer:1500
+                });
+
+            });
+
+            }else{
+                console.log('Item remove failed')
+            }
+        })
+    }
+
+    // Function cart count
+    function cartCount(productId, userId, changeCount){
+
+        console.log('cartCount function called');
+        
+        const quantityElement = document.getElementById(productId);
+        const quantity = parseInt(quantityElement.value);
+        const count = parseInt(changeCount);
+
+        if(count === -1 && quantity === 1){
+            return;
+        }
+
+        $.ajax({
+            url:'/cart-quantity',
+            method:'post',
+            encoded:true,
+            data:{
+                product:productId,
+                user:userId,
+                count:count,
+                quantity:quantity
+            }
+        }).done(data=>{
+            console.log(data);
+
+            if(data.changeSuccess){
+                const newQuantity = quantity + count;
+                quantityElement.innerHTML = newQuantity;
+
+
+                // Enable the minus button if the quantity is grater than 0
+                const minusButton = quantityElement.previousElementSibling;
+                if(newQuantity<=0){
+                    minusButton.style.pointerEvents='none';
+                    minusButton.style.opacity=0.5;
+                }else{
+                    minusButton.style.pointerEvents='auto';
+                    minusButton.style.opacity = 1;
+        }
+
+        $('#reloadDiv').load('/cart #reloadDiv');
+    } else if (data.check) {
+        // This block will execute if the product is out of stock
+        swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Out of stock",
+          });
+    } else {
+        swal.fire({
+            position: "center",
+            icon: "warning",
+            text: data.message,
+            timer: 1500,
+            showConfirmButton: false,
+        });
+    }
+});
+
+}
+  
+</script>
 
 <%-include('../layout/footer.ejs') %>
