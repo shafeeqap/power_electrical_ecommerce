@@ -540,8 +540,20 @@ const resetPassword = async(req,res)=>{
 // Load profile
 const loadProfile = async(req, res)=>{
     try {
+
+        // Check if req.session.user_id is defined
+        if (!req.session.user_id) {
+            return res.status(400).send('User ID is missing');
+        }
+
         const userId = req.session.user_id
         const userData = await User.findById({_id:userId});
+        
+        // Check if the user was found
+        if (!userData) {
+            return res.status(404).send('User not found');
+        }
+
         const address = await Address.findOne({userId:userId})
         // console.log(address);
 
