@@ -7,6 +7,7 @@ const config = require('../config/config');
 
 const userController = require('../controller/userController');
 const cartController = require('../controller/cartController');
+const orderController = require('../controller/orderController');
 
 const path = require('path');
 const userAuth = require('../middlewares/userAuth');
@@ -35,7 +36,7 @@ const upload = multer({storage:storage});
 //------------------------------------------//
 
 user_router.get('/register', userController.loadRegister);
-user_router.post('/register',upload.single('image'),userController.verifyOtp);
+user_router.post('/register',userController.verifyOtp);
 user_router.get('/user-otp',userController.loadOtp);
 user_router.post('/user-otp',userController.insertUser);
 user_router.get('/resend-otp',userController.resendOtp);
@@ -60,8 +61,17 @@ user_router.post('/addToCart',userAuth.isLogin,cartController.addToCart);
 user_router.post('/cart-quantity',userAuth.isLogin,cartController.cartQuantity);
 user_router.post('/remove-product',userAuth.isLogin,cartController.removeProduct);
 
+user_router.get('/profile',userAuth.isLogin,userController.loadProfile);
+user_router.get('/address',userAuth.isLogin,userController.loadAddress);
+user_router.get('/addAddress',userAuth.isLogin,userController.loadAddAddress);
+user_router.post('/addAddress',userAuth.isLogin,userController.addAddress);
+user_router.get('/editAddress',userAuth.isLogin,userController.loadEditAddress);
+user_router.post('/editAddress',userAuth.isLogin,userController.updateUserAddress);
 
-// user_router.get('/checkout',cartController.loadCheckout);
 
+user_router.get('/checkout',userAuth.isLogin,orderController.loadCheckOut);
+user_router.post('/placeOrder',userAuth.isLogin,orderController.placeOrder);
+user_router.get('/orderPlaced/:id',orderController.orderPlacedPageLoad);
+user_router.get('/orders',userAuth.isLogin,orderController.loadOrderPage);
 
 module.exports = user_router;

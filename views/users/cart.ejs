@@ -24,7 +24,7 @@
 <div class="section">
     <div class="container">
         <div class="row">
-            <div class="col-md-12">
+            <div class="col-md-12" id="reloadDiv">
                 <!-- Cart Details -->
                 <div class="cart-details">
                     <div class="section-title">
@@ -33,7 +33,7 @@
 
 
                     <div class="row">
-                        <div class="col-md-12" id="reloadDiv">
+                        <div class="col-md-12">
                             <!-- Cart Table -->
                             <table class="cart-table" style="width: 100%; border-collapse: collapse; border-spacing: 0;">
                                 <!-- Cart Table Header -->
@@ -60,22 +60,32 @@
                                                     </div>
                                                 </td>
                                                 <td>&#x20B9;<%=data.productId.price%></td>
-                                                <td>
-                                                    <div class="input-group" style="width: 130px;">
-                                                        <span class="input-group-btn">
-                                                            <button type="button" class="btn btn-default btn-number" onclick="cartCount('<%=data.productId._id%>','<%=userId%>',-1)" data-type="minus"  data-field="quant[1]">
-                                                                <span class="glyphicon glyphicon-minus"></span>
-                                                            </button>
-                                                        </span>
-                                                        <input type="text" name="quant[1]" class="form-control input-number" id="<%=data.productId%>" value="<%=data.quantity%>">
-                                                        <span class="input-group-btn" >
-                                                            <button type="button" class="btn btn-default btn-number" onclick="cartCount('<%=data.productId._id%>','<%=userId%>',1)" data-type="plus" data-field="quant[1]">
-                                                                <span class="glyphicon glyphicon-plus"></span>
-                                                            </button>
-                                                        </span>
+
+                                                <!-- Cart Count -->
+                                                <td class="quantity-col">
+                                                    <%if(data.productId.quantity != 0){%>
+                                                    <div class=" flex-w m-l-auto m-r-4" >
+                                                        <button type="button"
+                                                            class="btn btn-light"
+                                                            onclick="cartCount('<%=data.productId._id%>','<%=userId%>',-1)" 
+                                                            >-</button>
+                                                        <span   
+                                                            class="mtext-104 cl3 txt-center num-product "
+                                                            id="<%=data.productId._id%>"
+                                                            ><%=data.quantity%></span>
+                                                        <button
+                                                            class="btn btn-light"
+                                                            onclick="cartCount('<%=data.productId._id%>','<%=userId%>', 1)"
+                                                            >+</button>
                                                     </div>
-                                                </td>
+                                                  <%}else{%>
+                                                    <p class="text-danger text-center">Out of Stock </p>
+                                                  <%}%>
+                                                  </td>
+                                                <!-- Cart Count -->
+
                                                 <td>&#x20B9;<%=data.totalPrice%></td>
+                                                
                                                 <td>
                                                     <button class="btn btn-danger" onclick="removeProduct('<%=data.productId._id%>')">
                                                         <i class="material-icons-round">delete</i>
@@ -96,7 +106,7 @@
                 <!-- /Cart Details -->
 
                 <!-- Order Summary -->
-                <div class="order-summary" id="order-summary">
+                <div class="order-summary">
                     <div class="section-title">
                         <h3 class="title">Order Summary</h3>
                     </div>
@@ -125,13 +135,15 @@
                         <div><strong>TOTAL</strong></div>
                         <div><strong class="order-total">&#x20B9;<%=total%></strong></div>
                     </div>
-                    <% } %>
+                    <% }else{ %>
+                        <h1 class="d-flex justify-content-center text-danger">CART IS EMPTY</h1>
+                        <% } %>
                 </div>
                 <!-- /Order Summary -->
 
                 <!-- Checkout Button -->
                 <div class="checkout-button">
-                    <a href="#" class="primary-btn order-submit">Proceed to Checkout</a>
+                    <a href="/checkout" class="primary-btn order-submit">Proceed to Checkout</a>
                 </div>
                 <!-- /Checkout Button -->
             </div>
@@ -153,11 +165,13 @@
         $.ajax({
             url:'/remove-product',
             method:'post',
-            data:{product:productId},
+            data:{
+                product:productId
+            },
         }).done(data=>{
             if(data){
 
-                $('#reloadDiv').load('/cart #reloadDiv, #order-summary', function(){
+                $('#reloadDiv').load('/cart #reloadDiv')
 
                 Swal.fire({
                     
@@ -167,7 +181,7 @@
                     timer:1500
                 });
 
-            });
+        
 
             }else{
                 console.log('Item remove failed')
@@ -176,13 +190,13 @@
     }
 
     // Function cart count
-    function cartCount(productId, userId, changeCount){
+    function cartCount(productId, userId, count){
 
-        console.log('cartCount function called');
+        // console.log('cartCount function called');
         
         const quantityElement = document.getElementById(productId);
-        const quantity = parseInt(quantityElement.value);
-        const count = parseInt(changeCount);
+        const quantity = parseInt(quantityElement.innerHTML);
+        // const count = parseInt(count);
 
         if(count === -1 && quantity === 1){
             return;
@@ -191,15 +205,15 @@
         $.ajax({
             url:'/cart-quantity',
             method:'post',
-            encoded:true,
+            // encoded:true,
             data:{
                 product:productId,
-                user:userId,
+                userId:userId,
                 count:count,
-                quantity:quantity
+                // quantity:quantity
             }
         }).done(data=>{
-            console.log(data);
+            console.log('Quantity data',data);
 
             if(data.changeSuccess){
                 const newQuantity = quantity + count;
@@ -208,13 +222,11 @@
 
                 // Enable the minus button if the quantity is grater than 0
                 const minusButton = quantityElement.previousElementSibling;
-                if(newQuantity<=0){
-                    minusButton.style.pointerEvents='none';
-                    minusButton.style.opacity=0.5;
-                }else{
-                    minusButton.style.pointerEvents='auto';
-                    minusButton.style.opacity = 1;
-        }
+                
+                minusButton.style.pointerEvents = newQuantity <= 0 ? 'none' : 'auto';
+                minusButton.style.opacity = newQuantity <= 0 ? 0.5 : 1;
+           
+        
 
         $('#reloadDiv').load('/cart #reloadDiv');
     } else if (data.check) {

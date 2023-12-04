@@ -184,7 +184,7 @@ const viewUsers = async(req,res)=>{
     try {
 
         const userData = await User.find({ });
-        console.log(userData);
+        // console.log(userData);
 
         res.render('view-users',{message:'View Users',userData })
         

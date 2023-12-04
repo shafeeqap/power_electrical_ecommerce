@@ -6,13 +6,16 @@ const randomstring = require('randomstring');
 const Category = require('../models/categoryModel');
 const Product = require('../models/productModel');
 const Brand = require('../models/brandModel');
+const Cart = require('../models/cartModel');
+const Address = require('../models/addressModel');
+const { ObjectId } = require('mongodb');
 
 const config = require('../config/config');
 
 // securePassword (bcrypt)----------------------//
 const securePassword = async(password)=>{
     // console.log("sec");
-    // console.log(password);
+    console.log(password);
     try {
         const passwordHash = await bcrypt.hash(password, 10);
         return passwordHash;
@@ -91,7 +94,9 @@ const verifyOtp = async (req, res) => {
         // Check if the email already exists in the database.
         const emailCheck = await User.findOne({ email: req.body.email });
         const mobileCheck = await User.findOne({mobile:req.body.mobile});
-        
+
+        let emailMessage = '';
+        let mobileMessage = '';
 
         if (emailCheck && mobileCheck) {
             res.render('register', 
@@ -148,7 +153,7 @@ const resendOtp = async(req,res)=>{
     try {
         const currentTime = Date.now() / 1000;
 
-        if(req.session.otp.expire !=null){
+        if(req.session.otp && req.session.otp.expire != null){
             if(currentTime>req.session.otp.expire){
                 const newDigit = otpGenerator.generate(6,{
                     digits: true,
@@ -289,30 +294,32 @@ const verifyLogin=async(req, res)=>{
 
                     if(userData.is_varified === 0){
 
-                        res.render('login', {message:"Please verify your mail."});
+                        return res.render('login', {message:"Please verify your mail."});
                 
                     }else{
                         req.session.user_id = userData._id;
 
-                        res.redirect('/home');
+                        return res.redirect('/home');
                     }
 
                 }else{
                     
-                    res.render('login', {message:"Email and password is incorrect."});
+                    return res.status(401).json({message:"Email and password is incorrect."});
                 }
 
             }else{
-                res.render('login', { message: "Your account is blocked." });
+
+                return res.status(403).json({ message: "Your account is blocked." });
+       
             }    
 
         }else{
-            res.render('login', {message:"Email and password is incorrect."});
+            return res.status(401).json({message:"Email and password is incorrect."});
         }
 
     } catch (error) {
         console.log(error,  { message: 'An error occurred', status: 500 });
-        
+        return res.status(500).json({message:'An error occurred'});
     }
 }
 
@@ -328,18 +335,49 @@ const loadHome = async(req,res)=>{
         const productData = await Product.find({is_active:true});
         const user = await User.findById(req.session.user_id);
         const userData = await User.find({is_block:false});
+        
+        if (!user) {
+            return res.redirect('/login');
+        }
+        
+        const userId = new ObjectId(user._id);
+        // console.log('User Id',userId);
 
-        if(userData){
+
+        const cartTotal = await Cart.aggregate([
+            {
+                $match:{userId:userId}
+            },
+            {
+                $unwind:'$products'
+            },
+            {
+                $group:{_id:null, totalQuantity:{$sum:'$products.quantity'}}
+            }
+        ])
+
+        // console.log('Cart Total',cartTotal);
+
+        const totalQuantity = cartTotal.length> 0 ? cartTotal[0].totalQuantity:0;
+        // console.log('TotalQuntity:',totalQuantity);
+
+        if (!userData) {
+            return res.redirect('/login');
+        }
+
+        // if(userData){
             res.render('home',{
                 user,
                 categoryData,
                 productData,
-                title:'Home'})
+                totalQuantity,
+                title:'Home'
+            })
 
-        }else{
-            res.redirect('/login');
+        // }else{
+        //     res.redirect('/login');
 
-        } 
+        // } 
 
 
     } catch (error) {
@@ -463,17 +501,17 @@ const resetPasswordLoad = async(req,res)=>{
         const token = req.query.token;
 
         if(!token){
-            console.log('No tocken')
+            // console.log('No tocken')
             return res.render('error', {message:'Token is invalid',status:404})
         }
         const tokenData = await User.findOne({token:token});
 
         if (!tokenData) {
-            console.log('Second case')
+            // console.log('Second case')
             return res.render('error',{message:'Token is invalid',status:404});
             
         }else{
-            console.log(tokenData)
+            // console.log(tokenData)
             res.render('reset-password',{user_id:tokenData._id});
         
         }
@@ -499,7 +537,140 @@ const resetPassword = async(req,res)=>{
     }
 }
 
+// Load profile
+const loadProfile = async(req, res)=>{
+    try {
+        const userId = req.session.user_id
+        const userData = await User.findById({_id:userId});
+        const address = await Address.findOne({userId:userId})
+        // console.log(address);
 
+        res.render('profile',{user:userData, address})
+        
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+// Load User Address Detailes
+const loadAddress = async(req, res)=>{
+    try {
+        const userId = req.session.user_id
+        const userData = await User.findById({_id:userId});
+        const address = await Address.findOne({userId:userId})
+        // console.log('user',user.name);
+        
+        res.render('address',{user:userData,address})
+        
+    } catch (error) {
+        console.log(error);
+        res.render(500)        
+    }
+}
+
+
+// Load Add New Address Page
+const loadAddAddress = async(req,res)=>{
+    try {
+        const userId = req.session.user_id
+        const userData = await User.findById({_id:userId});
+        const address = await Address.findOne({userId:userId})
+
+        res.render('addAddress',{user:userData, address});
+        
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+
+// Add New Address Page
+const addAddress = async(req, res)=>{
+    try {
+
+        let userAddress = await Address.findOne({userId:req.session.user_id});
+        if(!userAddress){
+
+            userAddress = new Address({
+                userId:req.session.user_id,
+                addresses:[
+                    {
+                        fullName:req.body.fullName,
+                        mobile:req.body.mobile,
+                        city:req.body.city,
+                        state:req.body.state,
+                        country:req.body.country,
+                        pincode:req.body.pincode
+                    }
+                ]
+            })
+        }else{
+            userAddress.addresses.push({
+                fullName:req.body.fullName,
+                mobile:req.body.mobile,
+                city:req.body.city,
+                state:req.body.state,
+                country:req.body.country,
+                pincode:req.body.pincode
+
+            })
+        }
+        await userAddress.save();
+
+        res.redirect('/profile')
+        
+    } catch (error) {
+        console.log(error);
+        res.status(500);
+    }
+};
+
+// Load Edit Address
+const loadEditAddress = async(req, res)=>{
+    try {
+        const id = req.query.id
+        // console.log('query');
+        const userId = req.session.user_id
+        const userData = await User.findById({_id:userId});
+        const userAddress = await Address.findOne({userId:userId},{addresses:{$elemMatch:{_id:id}}});
+        // console.log(userAddress);
+        const address = userAddress.addresses
+        // console.log('Address',address);
+
+
+        res.render('editAddress',{user:userData, address})
+        
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+// Update User Address
+const updateUserAddress = async(req, res)=>{
+    try {
+        const addressId = req.body.id
+        // console.log('Address_Id');
+        const userId = req.session.user_id
+
+        const updateAddress = await Address.updateOne({userId:userId, 'addresses._id':addressId},
+        {$set:{
+            'addresses.$.fullName':req.body.fullName,
+            'addresses.$.mobile':req.body.mobile,
+            'addresses.$.country':req.body.country,
+            'addresses.$.city':req.body.city,
+            'addresses.$.pincode':req.body.pincode,
+            'addresses.$.state':req.body.state
+        }})
+
+    
+            res.redirect('/profile');
+
+        
+    } catch (error) {
+        console.log(error);
+        res.status(500).send('Internal Server Error');
+    }
+}
 
 
 module.exports ={
@@ -517,4 +688,10 @@ module.exports ={
     forgetVerify,
     resetPasswordLoad,
     resetPassword,
+    loadProfile,
+    loadAddress,
+    loadAddAddress,
+    addAddress,
+    loadEditAddress,
+    updateUserAddress,
 }

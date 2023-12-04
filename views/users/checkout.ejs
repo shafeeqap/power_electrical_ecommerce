@@ -1,1 +1,338 @@
-<h1>Checkout</h1>
+<%-include('../layout/header.ejs') %>
+
+<%-include('../layout/navigation.ejs')%>
+<style>
+    /* dropdown */
+    .dropdown {
+      display: inline-block;
+      position: relative;
+    }
+
+    .dropdown-toggle {
+      cursor: pointer;
+    }
+
+    .dropdown-menu {
+      position: absolute;
+      right: 0;
+      top: 100%;
+      display: none;
+      background-color: #fff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      min-width: 100px;
+      z-index: 1;
+    }
+
+    .dropdown-menu a {
+      display: block;
+      padding: 10px;
+      color: #333;
+      text-decoration: none;
+    }
+
+    .dropdown-menu a:hover {
+      background-color: #f5f5f5;
+    }
+
+    .show {
+      display: block !important;
+    }
+</style>
+
+<!-- BREADCRUMB -->
+<div id="breadcrumb" class="section">
+    <!-- container -->
+    <div class="container">
+        <!-- row -->
+        <div class="row">
+            <div class="col-md-12">
+                <h3 class="breadcrumb-header">Checkout</h3>
+                <ul class="breadcrumb-tree">
+                    <li><a href="#">Home</a></li>
+                    <li class="active">Checkout</li>
+                </ul>
+            </div>
+        </div>
+        <!-- /row -->
+    </div>
+    <!-- /container -->
+</div>
+<!-- /BREADCRUMB -->
+
+<!-- SECTION -->
+<div class="section">
+    <!-- container -->
+    <div class="container">
+        <!-- row -->
+        <div class="row">
+
+            <div class="col-md-7">
+                <!-- Billing Details -->
+                <div class="billing-details">
+                    <div class="section-title">
+                        <h3 class="title">Shiping address</h3>
+                    </div>
+                    <div class="row" style="background-color: rgb(239,239,239); border-radius: 5px; width: 650px;">
+                        <div >
+                        <div class="col-md-10" >
+                            <% if (address) { %>
+                                <!-- Address Details -->
+                                <div >
+                                    <div style="padding: 15px; margin: 15px;">
+                                        <h6 style="text-transform: uppercase;"><%= address.addresses[0].fullName %></h6>
+                                        <p>
+                                            <%= address.addresses[0].city %>,<br>
+                                            <%= address.addresses[0].state %>,<br>
+                                            <%= address.addresses[0].country %>, <br>
+                                            <%= address.addresses[0].pincode %><br>
+                                            <%= address.addresses[0].mobile %>
+                                        </p>
+                                    </div>
+                                </div>
+                            <% } %>
+                        </div>
+                    
+                        <div class="col-md-2" >
+                            <!-- Dropdown for Edit and Delete actions -->
+                            <div class="dropdown" style="align-items: center; margin-top: 80px;">
+                                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                    <li><a class="dropdown-item" href="#">Edit</a></li>
+                                    <li><a class="dropdown-item" href="#">Delete</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                    
+            
+
+                    <!-- <div class="form-group">
+                        <input class="input" type="text" name="name" placeholder="Name">
+                    </div> -->
+                    <!-- <div class="form-group">
+                        <input class="input" type="text" name="last-name" placeholder="Last Name">
+                    </div> -->
+                    <!-- <div class="form-group">
+                        <input class="input" type="email" name="email" placeholder="Email">
+                    </div> -->
+                    <!-- <div class="form-group">
+                        <input class="input" type="text" name="address" placeholder="Address">
+                    </div> -->
+                    <!-- <div class="form-group">
+                        <input class="input" type="text" name="city" placeholder="City">
+                    </div> -->
+                    <!-- <div class="form-group">
+                        <input class="input" type="text" name="country" placeholder="Country">
+                    </div> -->
+                    <!-- <div class="form-group">
+                        <input class="input" type="text" name="zip-code" placeholder="ZIP Code">
+                    </div> -->
+                    <!-- <div class="form-group">
+                        <input class="input" type="tel" name="tel" placeholder="Telephone">
+                    </div> -->
+                    <!-- <div class="form-group">
+                        <div class="input-checkbox">
+                            <input type="checkbox" id="create-account">
+                            <label for="create-account">
+                                <span></span>
+                                Create Account?
+                            </label>
+                            <div class="caption">
+                                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt.</p>
+                                <input class="input" type="password" name="password" placeholder="Enter Your Password">
+                            </div>
+                        </div>
+                    </div> -->
+                </div>
+                <!-- /Billing Details -->
+
+                <!-- Shiping Details -->
+                <div class="shiping-details">
+                    <!-- <div class="section-title">
+                        <h3 class="title">Shiping address</h3>
+                    </div> -->
+                    <div class="input-checkbox">
+                        <input type="checkbox" id="shiping-address">
+                        <label for="shiping-address">
+                            <span></span>
+                            Ship to a diffrent address?
+                        </label>
+                        <div class="caption">
+                            <div class="form-group">
+                                <input class="input" type="text" name="name" placeholder="Name">
+                            </div>
+                            <!-- <div class="form-group">
+                                <input class="input" type="text" name="last-name" placeholder="Last Name">
+                            </div> -->
+                            <div class="form-group">
+                                <input class="input" type="email" name="email" placeholder="Email">
+                            </div>
+                            <div class="form-group">
+                                <input class="input" type="text" name="address" placeholder="Address">
+                            </div>
+                            <div class="form-group">
+                                <input class="input" type="text" name="city" placeholder="City">
+                            </div>
+                            <div class="form-group">
+                                <input class="input" type="text" name="country" placeholder="Country">
+                            </div>
+                            <div class="form-group">
+                                <input class="input" type="text" name="zip-code" placeholder="ZIP Code">
+                            </div>
+                            <div class="form-group">
+                                <input class="input" type="tel" name="tel" placeholder="Telephone">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /Shiping Details -->
+
+                <!-- Order notes -->
+                <div class="order-notes">
+                    <textarea class="input" placeholder="Order Notes"></textarea>
+                </div>
+                <!-- /Order notes -->
+            </div>
+           
+            <!-- Order Details -->
+            <form id="checkout-form">
+            <div class="col-md-5 order-details">
+                <div class="section-title text-center">
+                    <h3 class="title">Your Order</h3>
+                </div>
+                <div class="order-summary">
+                    <div class="order-col">
+                        <div><strong>PRODUCT</strong></div>
+                        <div><strong>TOTAL</strong></div>
+                    </div>
+                    <div class="order-products">
+                        <% products.forEach((data)=>{%>
+                        <div class="order-col">
+                            <div><%=data.productId.name %></div>
+                            <div>&#x20B9;<%=data.productId.price%></div>
+                        </div>
+                        <%})%>
+                    </div>
+                    <div class="order-col">
+                        <div>Shiping</div>
+                        <div><strong>FREE</strong></div>
+                    </div>
+                    <div class="order-col">
+                        <div><strong>TOTAL</strong></div>
+                        <div><strong class="order-total" id="total">&#x20B9;<%=total%></strong></div>
+                    </div>
+                </div>
+                <div class="payment-method">
+                    <h5>Payment Method</h5>
+                    <div class="input-radio">
+                        <input type="radio" name="payment" id="COD" value="COD" checked>
+                        <label for="COD">
+                            <span></span>
+                            Cash on delivery
+                        </label>
+                        <div class="caption">
+                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                        </div>
+                    </div>
+                    <div class="input-radio">
+                        <input type="radio" name="payment" id="payment" value="onlinePayment">
+                        <label for="payment">
+                            <span></span>
+                            Online Payment
+                        </label>
+                        <div class="caption">
+                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                        </div>
+                    </div>
+                    <div class="input-radio">
+                        <input type="radio" name="payment" id="wallet" value="wallet">
+                        <label for="wallet">
+                            <span></span>
+                            Wallet
+                        </label>
+                        <div class="caption">
+                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="input-checkbox">
+                    <input type="checkbox" id="terms">
+                    <label for="terms">
+                        <span></span>
+                        I've read and accept the <a href="#">terms & conditions</a>
+                    </label>
+                </div>
+                <a href="">
+                <button type="submit" class="btn btn-danger" style="width: 100%; border-radius: 20px;">Place order</button>
+                    </a>
+            </div>
+        </form>
+            <!-- /Order Details -->
+        </div>
+        <!-- /row -->
+    </div>
+    <!-- /container -->
+</div>
+<!-- /SECTION -->
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+
+
+<Script>
+
+$(document).ready(function () {
+    $("#checkout-form").on("submit", function (e) {
+        e.preventDefault();
+        $(this).find("button[type='submit']").prop('disabled', true);
+
+        console.log('clicked');
+
+        
+        var address = $("input[name='address']").val();
+        var total = $("#total").text();
+        var payment = $("input[name='payment']:checked").val();
+
+        console.log("buttonClicked");
+        console.log('before AJAX request');
+
+        $.ajax({
+            type: 'post',
+            url: "/placeOrder",
+            contentType: "application/json",
+            data: JSON.stringify({ total: total, address: address, payment: payment }),
+            success: function (response) {
+                if (response.success === true) {
+                    window.location.href = `/orderPlaced/${response.orderid}`;
+                } else {
+                    swal.fire({
+                        icon: "error",
+                        title: "Your transaction failed",
+                        showConfirmButton: false,
+                        showCancelButton: false,
+                        timer: 1500,
+                    });
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error("AJAX Error:", error);
+            },
+        });
+
+        console.log('After AJAX request');
+        console.log('Total:', total);
+        console.log('Address:', address);
+        console.log('Payment:', payment);
+    });
+});
+
+
+
+</Script>
+
+
+<%-include('../layout/footer.ejs') %>

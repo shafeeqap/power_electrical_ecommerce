@@ -11,16 +11,23 @@ const addToCart = async (req, res) => {
         // const user = await User.findById(req.session.user_id);
 
         if (req.session.user_id) {
+        
             const productId = req.body.id;
-            const name = req.session.user_id
-            const userData = await User.findOne({_id:name})
-            const user_Id = userData._id
-            
+            // console.log('Product Id',productId);
+            const userId  = req.session.user_id
+            const userData = await User.findOne({_id:userId })
+
+            if (!userData) {
+                // Handle case where user is not found
+                return res.json({ error: 'User not found' });
+            }
+
+            const userCart = await Cart.findOne({ userId: userId });
+            // console.log('User Cart', userCart);
+
             const productData = await Product.findById(productId);
             // console.log("product data",productData);
 
-            const userCart = await Cart.findOne({ userId: user_Id });
-            // console.log('User Cart', userCart);
 
             if (userCart) {
 
@@ -28,12 +35,14 @@ const addToCart = async (req, res) => {
 
                 const productExist = userCart.products.findIndex(product => product.productId == productId);
                 // console.log('Product Exist',productExist);
-
+                // res.json({warning:'Product Exist'})
 
                 if (productExist !== -1) {
+                    // console.log('jjjj');
                     const cartData = await Cart.findOne(
-                        { userId: user_Id, "products.productId": productId },
+                        { userId: userId, "products.productId": productId },
                         { "products.productId.$": 1, "products.quantity": 1 }
+                        
                     );
 
                     const [{ quantity: existingQuantity }] = cartData.products;
@@ -42,28 +51,34 @@ const addToCart = async (req, res) => {
                          res.json({ outofstock: true });
                     } else {
                         await Cart.findOneAndUpdate(
-                            { userId: user_Id, "products.productId": productId },
+                            { userId: userId, "products.productId": productId },
                             { $inc: { "products.$.quantity": 1 } }
                         );
+                        // res.json({ success: true });
                     }
                 } else {
                     await Cart.findOneAndUpdate(
-                        { userId: user_Id },
+                        { userId: userId },
                         { $push: { products: { productId: productId, 
-                            price: productData.discountedPrice 
-                            ? Math.ceil(productData.discountedPrice)    //if discount price 
-                            :productData.price } } }    // if no discout, use regular price
-                    );
+                            price:productData.price}}});
+                
                 }
+
+
             } else {
 
                 const data = new Cart({
-                    userId: user_Id,
-                    products: [{ productId: productId, price: productData.price }],
+                    userId: userId,
+                    products: [{ 
+                        productId: productId, 
+                        price: productData.price }],
                 });
-                const cartData = await data.save();
+
+                await data.save();
+                
             }
-                res.json({ success: true });
+            return res.json({ success: true });
+                
 
         }else{
 
@@ -80,19 +95,15 @@ const addToCart = async (req, res) => {
 
 
 // Cart Page Load
-
 const cartLoad = async(req,res)=>{
     try {
 
-        // console.log('Cart Load Route Called');
+        // const user_id  = req.session.user_id
+        // Find user login/logout
+        const user = await User.findById(req.session.user_id);
 
-        const id = req.session.user_id
+        // console.log('User', user);
 
-        // Find the user by ID
-        const user = await User.findById({_id:id}); 
-        // console.log('User Data',user);
-
-        // Check if the user is not found
         if (!user) {
             return res.render('cart', { message: "User not found", cart: [], total: 0 });
         }
@@ -103,35 +114,42 @@ const cartLoad = async(req,res)=>{
         const cartData = await Cart.findOne({userId:user_Id}).populate("products.productId");
         // console.log('Cart data',cartData);
 
-        if(req.session.user_id){
+        
 
+        if(req.session.user_id){
+            // console.log('User', user);
             if(cartData){
                 // console.log('User==========',cartData);
+                // console.log('User', user);
+
                 let Total;
-                if(cartData.products !=0){
+                if(cartData.products?.length){
                     const total = await Cart.aggregate([
-                        {$match: {userId :new ObjectId(user_Id)},
+                    {$match: {userId :new ObjectId(user_Id)},
                     },
                     {$unwind:'$products'},
-
                     {$project:{price:'$products.price',quantity:'$products.quantity'}},
-
                     {$group:{_id:null, total:{$sum: {$multiply:["$quantity","$price"]}}}}]);
 
-                    Total=total[0].total
-                    // console.log('Total',Total);
+                    Total=total[0]?. total || 0
+                    // console.log('Total',total);
                     // console.log('Cart============',cartData.products, Total);
-                    res.render('cart',{user:user_Id, cart:cartData.products, userId:user_Id, total:Total});
+                    // console.log('User', user);
+                    res.render('cart',{user, cart:cartData.products, userId:user_Id, total:Total});
                 }else{
-                    res.render('cart',{user:req.session.user, cart:[], total:0 });
+                    res.render('cart',{user, cart:[], total:0 });
                 }
                 
             }else{
-                res.render('cart',{user:req.session.user, cart:[], total:0});
+                res.render('cart',{user, cart:[], total:0});
+                // console.log('User', user);
+
             }
 
         }else{
             res.render('cart',{message:"User Logged", cart:[], total:0});
+            // console.log('User', user);
+
         }
         
     } catch (error) {
@@ -144,32 +162,50 @@ const cartLoad = async(req,res)=>{
 const cartQuantity = async(req, res)=>{
     try {
 
-        const user_Id = req.session.user_id;
+        const userId = req.session.user_id;
         const productId = req.body.product;
         // console.log('product id',productId);
         const count = parseInt(req.body.count);
+        // console.log('Count',count);
 
-        const cartData = await Cart.findOne({userId:new ObjectId(user_Id),
+        const cartData = await Cart.findOne({userId:new ObjectId(userId),
             "products.productId":new ObjectId(productId)},
             {"products.productId.$":1, "products.quantity":1});
             
-            console.log("Cart Data______",cartData);
+            // console.log("Cart Data______",cartData);
 
         const [{quantity:quantity}]=cartData.products;
+        
 
         const stockAvailable = await Product.findById({_id:new ObjectId(productId)})
         // console.log('stock Available');
 
-        if(stockAvailable.quantity < quantity+count){
+        if(stockAvailable.qty < quantity + count){
             return res.json({changeSuccess:false, message:'Insufficient stock'});
 
+        }else{
+
+            await Cart.updateOne({userId:userId,"products.productId":productId},
+            {$inc:{"products.$.quantity":count}});
+            res.json({changeSuccess:true});
         }
+        
+        const updateCartData = await Cart.findOne({userId:userId});
+        // console.log('updateCartData',updateCartData);
+        const updatedProduct = updateCartData.products.find((product)=>product.productId.toString()===productId.toString());
+        // console.log('updatedProduct', updatedProduct);
 
-        await Cart.updateOne({user:user_Id,"products.productId":productId},
-        {$inc:{"products.$.quantity":count},
-        $set:{"products.$.totalPrices":stockAvailable.price*(quantity+count)}});
+        const updatedQuantity = updatedProduct.quantity
+        // console.log('updateedquantity',updatedQuantity);
+        const productPrice = stockAvailable.price;
+        // console.log('Product Price',productPrice);
+        const productTotal = productPrice*updatedQuantity
+        // console.log('Product Total', productTotal);
 
-        res.json({changeSuccess:true});
+        const prodcutTotal = await Cart.updateOne({userId:userId,"products.productId":productId},
+        {$set:{"products.$.totalPrice":productTotal}})
+
+        // console.log('prodcutTotal',prodcutTotal);
 
     } catch (error) {
         console.log(error);

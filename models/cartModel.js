@@ -25,7 +25,7 @@ const cartSchema = new mongoose.Schema({
             totalPrice:{
                 type:Number,
                 default:function(){
-                    return this.price * this.quantity;
+                    return this.quantity * this.price;
                 }
             }
         },

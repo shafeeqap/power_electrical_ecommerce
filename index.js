@@ -14,8 +14,6 @@ app.use(session({
   cookie:{maxAge:600000},
   resave:false,
   saveUninitialized:true,
-  
-
 }));
 
 
