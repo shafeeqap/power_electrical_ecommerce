@@ -1,0 +1,123 @@
+<%-include('../admin/adminLayout/sidebar.ejs')%>
+<%- include('../admin/adminLayout/navbar.ejs')%>
+
+
+
+
+<div class="container-fluid py-4">
+    <div class="row">
+      <div class="col-12">
+        <div class="card my-4">
+          <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+            <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
+              <h6 class="text-white text-capitalize ps-3"><%=message%></h6>
+            </div>
+          </div>
+          <div class="card-body px-0 pb-2">
+            <div class="table-responsive p-0">
+              <table class="table align-items-center mb-4">
+                <thead>
+                  <tr style="background-color: rgb(227, 225, 225);">
+                    <th class="text-uppercase text-xxs font-weight-bolder  ps-2" style="color: black;">No</th>
+                    <th class="text-uppercase text-xxs font-weight-bolder  ps-2" style="color: black;">user Name</th>
+                    <th class="text-uppercase text-xxs font-weight-bolder  ps-2" style="color: black;">Order Date</th>
+                    <th class="text-uppercase text-xxs font-weight-bolder  ps-2" style="color: black;">Quantity</th>
+                    <th class="text-uppercase text-xxs font-weight-bolder  ps-2" style="color: black;">Price</th>
+                    <th class="text-uppercase text-xxs font-weight-bolder  ps-2" style="color: black;">Image</th>
+                    <th class="text-uppercase text-xxs font-weight-bolder  ps-2" style="color: black;">Order Status</th>
+                    <th class="text-uppercase text-xxs font-weight-bolder  ps-2" style="color: black;">Payment Status</th>
+                    <th class="text-uppercase text-xxs font-weight-bolder  ps-2" style="color: black;">Action</th>
+                    
+                  </tr>
+                </thead>
+                <tbody>
+                    <% if(orders.length>0){%>
+                        <% let count=1%>
+                        <% orders.forEach((data)=>{%>
+                  <tr>
+                    <td>
+                      <p class="text-xs font-weight-bold mb-0"><%=count%></p>
+                    </td>
+                    <td>
+                      <p class="text-xs font-weight-bold mb-0"><%=data.user.name%></p>
+                    </td>
+                    <td>
+                      <p class="text-xs font-weight-bold mb-0"><%=data.orderDetails.date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit' }).replace(/\//g, '-')%></p>
+                    </td>
+                    <td>
+                      <p class="text-xs font-weight-bold mb-0"><%=data.orderDetails.quantity%></p>
+                    </td>
+                    <td>
+                        <p class="text-xs font-weight-bold mb-0"><%=data.product.price%></p>
+                      </td>
+                    <td>
+                      <img src="/adminAssets/images/<%=data.product.image[0]%>" class="avatar avatar-sm me-3 border-radius-lg" alt="">
+                    </td>
+                    
+                    <!-- Verified/Not Verified -->
+                    <% if(data.orderDetails.orderStatus==='Placed'){%>
+                    <td>
+                      <p class="text-xs text-warning font-weight-bold mb-0">Placed</p>
+                    
+                    <% }else if(data.orderDetails.orderStatus==='Pending') {%>
+                      
+                        <p class="text-xs text-secondary font-weight-bold mb-0">Pending</p>
+                      
+                        <% }else if(data.orderDetails.orderStatus==='Shipped') {%>
+                        
+                        <p class="text-xs text-primary font-weight-bold mb-0">Shipped</p>
+                        
+                        <% }else if(data.orderDetails.orderStatus==='Delivered'){%>
+                        
+                            <p class="text-xs text-success font-weight-bold mb-0">Delivered</p>
+                          
+                          <% }else if(data.ordreDetails.orderStatus==='Cancelled'){ %>
+                            
+                                <p class="text-xs text-danger font-weight-bold mb-0">Cancelled</p>
+                              
+                              <% }else if(data.orderDetails.orderStatus==='OutforDelivery'){%>
+                                
+                                    <p class="text-xs text-info font-weight-bold mb-0">OutforDelivery</p>
+                                  </td>
+                                  <% } %>
+
+                                  <% if(data.orderDetails.paymentStatus==='Pending'){%>
+                                  <td>
+                                    <p class="text-xs font-weight-bold mb-0">Pending</p>
+                                    <% }else if(data.orderDetails.paymentStatus==='Success'){%>
+                                        <p class="text-xs font-weight-bold mb-0">Success</p>
+                                        <% }else if(data.orderDetails.paymentStatus==='Failed'){%>
+                                            <p class="text-xs font-weight-bold mb-0">Failed</p>
+                                            <% } %>
+                                  </td>
+
+                      <!-- User Active/Blocked -->
+                    
+                    <td class=" text-sm">
+                      <a href="#">
+                      <span class="badge badge-sm bg-gradient-danger">Manage</span></a>
+                    </td>
+  
+                    
+                      
+                      <!-- <td class=" text-sm">
+                        <a href="">
+                        <span class="badge badge-sm bg-gradient-success">Active</span></a>
+                      </td> -->
+
+                    </tr>
+                    <% count++ %>
+                    <% }); %>
+                    <% } %>
+                  
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+<%-include('../admin/adminLayout/footer.ejs')%>

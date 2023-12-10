@@ -335,6 +335,7 @@ const loadHome = async(req,res)=>{
         const productData = await Product.find({is_active:true});
         const user = await User.findById(req.session.user_id);
         const userData = await User.find({is_block:false});
+
         
         if (!user) {
             return res.redirect('/login');
@@ -343,22 +344,20 @@ const loadHome = async(req,res)=>{
         const userId = new ObjectId(user._id);
         // console.log('User Id',userId);
 
+        // cart Quantity    //
+        // const cartTotal = await Cart.aggregate([
+        //     {
+        //         $match:{userId:userId}
+        //     },
+        //     {
+        //         $unwind:'$products'
+        //     },
+        //     {
+        //         $group:{_id:null, totalQuantity:{$sum:'$products.quantity'}}
+        //     }
+        // ])
 
-        const cartTotal = await Cart.aggregate([
-            {
-                $match:{userId:userId}
-            },
-            {
-                $unwind:'$products'
-            },
-            {
-                $group:{_id:null, totalQuantity:{$sum:'$products.quantity'}}
-            }
-        ])
-
-        // console.log('Cart Total',cartTotal);
-
-        const totalQuantity = cartTotal.length> 0 ? cartTotal[0].totalQuantity:0;
+        // const cartQuantity = cartTotal.length> 0 ? cartTotal[0].totalQuantity:0;
         // console.log('TotalQuntity:',totalQuantity);
 
         if (!userData) {
@@ -370,7 +369,6 @@ const loadHome = async(req,res)=>{
                 user,
                 categoryData,
                 productData,
-                totalQuantity,
                 title:'Home'
             })
 
@@ -408,6 +406,7 @@ const productLoad = async(req,res)=>{
         const user =  await User.findById(req.session.user_id);
         const categoryData = await Category.find({is_block:false});
         const brandData = await Brand.find({is_block:false});
+
         const productData = await Product.find({
             is_active:true,
             $or:[
@@ -429,7 +428,7 @@ const productLoad = async(req,res)=>{
                 {brandName:{$regex:'.*'+search+'.*',$options:'i'}},
             ]
         }).countDocuments()
-        
+
 
         res.render('product', {
             user,
@@ -548,7 +547,7 @@ const loadProfile = async(req, res)=>{
 
         const userId = req.session.user_id
         const userData = await User.findById({_id:userId});
-        
+
         // Check if the user was found
         if (!userData) {
             return res.status(404).send('User not found');

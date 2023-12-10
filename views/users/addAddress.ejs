@@ -7,14 +7,15 @@
       /* margin-top: 20px; */
       color: #1a202c;
       text-align: left;
-      /* background-color: #e2e8f0; */
+      background-color: #e2e8f0;
     }
     .main-body {
       padding: 15px;
     }
     .card {
-      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1),
-        0 1px 2px 0 rgba(0, 0, 0, 0.06);
+      /* box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), */
+        /* 0 1px 2px 0 rgba(0, 0, 0, 0.06); */
+        margin-bottom: 30px;
     }
 
     .card {
@@ -104,7 +105,7 @@
                 class="list-group-item d-flex justify-content-between align-items-center flex-wrap"
               >
                 <h5 class="mb-0">
-                    <div class='fas fa-shopping-bag'></div><a href=""> My Orders</a>
+                    <div class='fas fa-shopping-bag'></div><a href="/orders"> My Orders</a>
                 </h5>
                 <!-- <span class="text-secondary">https://bootdey.com</span> -->
               </li>
@@ -159,7 +160,7 @@
                   <div class="col-sm-3 me-3">
                     <h5 style="width: 250px; padding-left: 20px; margin-top: 30px;">ADD A NEW ADDRESS</h5>
 
-                    <div class="container mt-5">
+                    <div class="container">
                         <div class="row justify-content-center">
                             <div class="col-md-6">
                                 <div class="card">
@@ -233,19 +234,19 @@
           var city = document.getElementById("city").value;
           var state = document.getElementById("state").value;
           var pincode = document.getElementById("pinCode").value;
-          var mobile = document.getElementById("mobile").value;
+          var mobile = document.getElementById("mobile").value.trim();
   
           // Function to display an error message
           function showError(inputElement, errorMessage, errorId) {
               var errorElement = document.getElementById(errorId);
-              errorElement.innerHTML = errorMessage;
+              errorElement.textContent = errorMessage;
               errorElement.style.display = "block";
           }
   
           // Function to hide the error message
           function hideError(errorId) {
               var errorElement = document.getElementById(errorId);
-              errorElement.innerHTML = "";
+              errorElement.textContent = "";
               errorElement.style.display = "none";
           }
   

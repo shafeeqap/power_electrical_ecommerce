@@ -1,13 +1,16 @@
 const isLogin = async(req,res,next)=>{
     try {
-        if(req.session.user_id){}
+        if(req.session.user_id){
+            next();
+        }
         else{
             res.redirect('/admin')
         }
-        next();
+        
         
     } catch (error) {
         console.log(error);
+        res.status(500).send('Server Error');
     }
 }
 

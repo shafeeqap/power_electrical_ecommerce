@@ -2,7 +2,7 @@ const Cart = require('../models/cartModel');
 const User = require('../models/userModel');
 const Product = require('../models/productModel');
 const Address = require('../models/addressModel');
-const Order = require('../models/orderModel')
+const Order = require('../models/orderModel');
 const { ObjectId } = require('mongodb');
 
 
@@ -27,13 +27,8 @@ const loadCheckOut = async(req,res)=>{
         const cart = await Cart.findOne({userId:userId});
         // console.log('Cart',cart);
         const address = await Address.findOne({userId:userId})
+        // console.log('address',address);
 
-        let cartQuantity=0;
-
-        if(cart){
-            cartQuantity = cart.products.length;
-            // console.log('cart quantity', cartQuantity);
-        }
         let Total;
 
         const total = await Cart.aggregate([ 
@@ -47,7 +42,7 @@ const loadCheckOut = async(req,res)=>{
 
         Total=total[0].total
         // console.log(Total);
-
+        // console.log('Address',address);
         res.render('checkout',{
             user:userData,
             products,
@@ -65,22 +60,15 @@ const placeOrder = async(req, res)=>{
     try {
         const userId = req.session.user_id
         const address = req.body.address
-        // if (!address) {
-        //     return res.status(400).send('Delivery details are required.');
-        // }
-
         const cartData = await Cart.findOne({userId:userId});
-        // console.log(cartData);
-        // if (!cartData || !cartData.products || cartData.products.length === 0) {
-        //     console.log('Cart is empty or products not found');
-        //     return res.status(400).send('Cart is empty or products not found');
-        // }
         const total = parseInt(req.body.total);
         const paymentMethod = req.body.payment;
         const userData = await User.findOne({_id:userId});
         const name = userData.name
         // console.log(name);
-
+        // console.log('Total',total);
+        // console.log('Address',address);
+        
         const uniNum = Math.floor(Math.random()*900000)+100000;
         const status = paymentMethod==='COD' ? 'placed':'pending';
         const statusLevel = status==='placed' ? 1 : 0;
@@ -90,14 +78,9 @@ const placeOrder = async(req, res)=>{
         // console.log(productId);
         // const code = req.body.code
         
-        // if(!cartData.products || cartData.products.length === 0){
-        //     console.log('Cart is empty');
-        //     return res.status(400).send('Cart is empty');
-        // }
-
         const today = new Date();
         const deliveryDate = new Date(today);
-        deliveryDate.setDate(today.getDate()+7);
+        deliveryDate.setDate(today.getDate() +7);
 
         const cartProducts = cartData.products.map(productItem =>({
             productId:productItem.productId,
@@ -117,7 +100,7 @@ const placeOrder = async(req, res)=>{
             userName:name,
             paymentMethod:paymentMethod,
             products:cartProducts,
-            totalAmount:isNaN(total) ? 0 : total,
+            totalAmount:total,
             date:new Date(),
             expectedDelivery:deliveryDate
         })
@@ -198,7 +181,7 @@ const placeOrder = async(req, res)=>{
                     }
 
                 }
-                // res.status(200).send('Order placed successfully');
+                
             }
 
             // Clear the user's cart after placing the order
@@ -235,9 +218,109 @@ const orderPlacedPageLoad = async(req, res)=>{
 const loadOrderPage = async(req, res)=>{
     try {
         const userId = req.session.user_id
+        const cartData = await Cart.findOne({userId:userId});
         const userData = await User.findOne({_id:userId});
-        res.render('orders',{user:userData})
         
+        const orderData = await Order.find({userId:userId})
+
+        // console.log('orderData',orderData);
+
+        res.render('orders',{user:userData, orderData})
+        
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+// Load Order Details
+const orderDetails = async(req, res)=>{
+    try {
+        const id = req.query.id
+        // console.log('Id',id);
+        const userId = req.session.user_id
+        const userData = await User.findOne({_id:userId})
+        const orderData = await Order.findOne({_id:id}).populate('products.productId');
+        
+        // console.log('Order Data',orderData);
+
+        res.render('orderDetails',{user:userData, orders:orderData})
+        
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+// Load Checkout Edit Addrss
+const loadCheckoutEditAddress = async(req, res)=>{
+    try {
+        const id = req.query.id
+        // console.log('Id',id);
+        const userId = req.session.user_id
+        const userData = await User.findById({_id:userId});
+        let userAddress = await Address.findOne({userId:userId},
+            {addresses:{$elemMatch:{_id:id}}});
+            // console.log('User Address', userAddress);
+            const address = userAddress.addresses
+            // console.log('address',address[0]);
+            res.render('editCheckoutAddress',{user:userData,address:address[0]})
+        
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+// Edit Checkout Address
+const editCheckoutAddress = async(req, res)=>{
+    try {
+
+        const addressId = req.body.id
+        // console.log('address Id',addressId);
+        const userId = req.session.user_id
+        // console.log('user Id',userId);
+        const updateAddress = await Address.updateOne({userId:userId,'addresses._id':addressId},
+        {$set:{
+            'addresses.$.fullName':req.body.fullName,
+            'addresses.$.city':req.body.city,
+            'addresses.$.country':req.body.country,
+            'addresses.$.pincode':req.body.pincode,
+            'addresses.$.state':req.body.state,
+            'addresses.$.mobile':req.body.mobile
+        }})
+
+        res.redirect('/checkout');
+        
+        
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+//Load Order Status Page
+const loadOrderStatus = async(req, res)=>{
+    try {
+        const id = req.query.id
+        console.log('Status Id',id);
+        const userId = req.session.user_id
+        console.log('User Id', userId);
+
+        
+        if(!id || !userId){
+            console.log('Invalid id or userId');
+            return res.status(400).send('Invalid id or userId');
+        }
+
+        const userData = await User.findById({_id:userId});
+        const orderData = await Order.find({_id:id});
+        console.log('Order Data',orderData);
+        // console.log('UserData',userData);
+
+        if(!orderData){
+            console.log('Order Data not found');
+            return res.status(404).send('Order Data not found');
+        };
+
+        res.render('orderStatus',{user:userData})
+
     } catch (error) {
         console.log(error);
     }
@@ -247,5 +330,9 @@ module.exports={
     loadCheckOut,
     placeOrder,
     orderPlacedPageLoad,
-    loadOrderPage
+    loadOrderPage,
+    orderDetails,
+    loadCheckoutEditAddress,
+    editCheckoutAddress,
+    loadOrderStatus
 }

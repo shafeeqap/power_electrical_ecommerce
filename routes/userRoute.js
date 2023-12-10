@@ -73,5 +73,11 @@ user_router.get('/checkout',userAuth.isLogin,orderController.loadCheckOut);
 user_router.post('/placeOrder',userAuth.isLogin,orderController.placeOrder);
 user_router.get('/orderPlaced/:id',orderController.orderPlacedPageLoad);
 user_router.get('/orders',userAuth.isLogin,orderController.loadOrderPage);
+user_router.get('/orderDetails',userAuth.isLogin,orderController.orderDetails);
+user_router.get('/orderStatus',orderController.loadOrderStatus)
+
+
+user_router.get('/editCheckoutAddress',userAuth.isLogin,orderController.loadCheckoutEditAddress);
+user_router.post('/editCheckoutAddress',userAuth.isLogin,orderController.editCheckoutAddress);
 
 module.exports = user_router;

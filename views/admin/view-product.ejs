@@ -129,8 +129,9 @@
                     <td>
                         <img src="/adminAssets/images/<%=products.image[0] %>" class="avatar avatar-sm me-3 border-radius-lg" alt="">
                     </td>
-                    <td>
-                      <p class="text-xs font-weight-bold mb-0"><a href="/admin/edit-product?id=<%=products._id%>">Edit</a></p>
+                    <td class=" text-sm">
+                      <a href="/admin/edit-product?id=<%=products._id%>">
+                        <span class="badge badge-sm bg-gradient-primary">Edit</span></a>
                     </td>
 
                     <!-- Stock/Out of Stock -->

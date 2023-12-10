@@ -74,78 +74,45 @@
                     </div>
                     <div class="row" style="background-color: rgb(239,239,239); border-radius: 5px; width: 650px;">
                         <div >
+                    <form id="checkout-form">
                         <div class="col-md-10" >
-                            <% if (address) { %>
+
+                                <% if(address.addresses.length>0){%>
+                                <% address.addresses.forEach((address)=>{%>
+
                                 <!-- Address Details -->
-                                <div >
-                                    <div style="padding: 15px; margin: 15px;">
-                                        <h6 style="text-transform: uppercase;"><%= address.addresses[0].fullName %></h6>
-                                        <p>
-                                            <%= address.addresses[0].city %>,<br>
-                                            <%= address.addresses[0].state %>,<br>
-                                            <%= address.addresses[0].country %>, <br>
-                                            <%= address.addresses[0].pincode %><br>
-                                            <%= address.addresses[0].mobile %>
-                                        </p>
+                                <div class="card mb-3 rounded shadow">
+                                    <div style="padding: 5px; margin: 15px; margin-left: 40px;">
+                                        <a href="/editCheckoutAddress?id=<%=address._id %>"><button type="button" class="close" aria-label="Edit" style="position: relative; top: 45px; left: 100px;">
+                                            <i class="fa fa-pencil"  aria-hidden="true" ></i>
+                                        </button></a>
+                                        <div class="custom-label p-3 m-2">
+                                            <div class="form-check d-flex align-item-center mx-4">
+                                                <input class="form-check-input" type="radio" name="address" id="flexRadioDefault" style="position:absolute; top: 65px; left: 30px;" 
+                                                value="<%= address.fullName %>, <%= address.city %>,<%= address.state %>,<%= address.country %>,<%= address.pincode %>,<%= address.mobile %>" checked>
+                                                <span class="error-message text-danger" id="addressError"></span>
+                                                <div class="mx-3 mx-md-5">
+                                                    <h6 style="text-transform: uppercase;"><%= address.fullName %></h6>
+                                                    <p>
+                                                        <%= address.city %>,<br>
+                                                        <%= address.state %>,
+                                                        <%= address.country %>, <br>
+                                                        <%= address.pincode %><br>
+                                                        <%= address.mobile %>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                            <% } %>
-                        </div>
-                    
-                        <div class="col-md-2" >
-                            <!-- Dropdown for Edit and Delete actions -->
-                            <div class="dropdown" style="align-items: center; margin-top: 80px;">
-                                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <i class="fas fa-ellipsis-v"></i>
-                                </button>
-                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                    <li><a class="dropdown-item" href="#">Edit</a></li>
-                                    <li><a class="dropdown-item" href="#">Delete</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    </div>
-                    
-            
+                                <% });%>
 
-                    <!-- <div class="form-group">
-                        <input class="input" type="text" name="name" placeholder="Name">
-                    </div> -->
-                    <!-- <div class="form-group">
-                        <input class="input" type="text" name="last-name" placeholder="Last Name">
-                    </div> -->
-                    <!-- <div class="form-group">
-                        <input class="input" type="email" name="email" placeholder="Email">
-                    </div> -->
-                    <!-- <div class="form-group">
-                        <input class="input" type="text" name="address" placeholder="Address">
-                    </div> -->
-                    <!-- <div class="form-group">
-                        <input class="input" type="text" name="city" placeholder="City">
-                    </div> -->
-                    <!-- <div class="form-group">
-                        <input class="input" type="text" name="country" placeholder="Country">
-                    </div> -->
-                    <!-- <div class="form-group">
-                        <input class="input" type="text" name="zip-code" placeholder="ZIP Code">
-                    </div> -->
-                    <!-- <div class="form-group">
-                        <input class="input" type="tel" name="tel" placeholder="Telephone">
-                    </div> -->
-                    <!-- <div class="form-group">
-                        <div class="input-checkbox">
-                            <input type="checkbox" id="create-account">
-                            <label for="create-account">
-                                <span></span>
-                                Create Account?
-                            </label>
-                            <div class="caption">
-                                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt.</p>
-                                <input class="input" type="password" name="password" placeholder="Enter Your Password">
-                            </div>
+                                <% }else{ %>
+                                    <h6 style="padding:10px; margin-top: 5px;">No address fount.</h6>
+                                <% } %>
                         </div>
-                    </div> -->
+                    </div>
+                    </div>
                 </div>
                 <!-- /Billing Details -->
 
@@ -160,32 +127,29 @@
                             <span></span>
                             Ship to a diffrent address?
                         </label>
-                        <div class="caption">
+                        <!-- <div class="caption">
+                            <form action="/checkoutAddrss" method="post">
                             <div class="form-group">
-                                <input class="input" type="text" name="name" placeholder="Name">
-                            </div>
-                            <!-- <div class="form-group">
-                                <input class="input" type="text" name="last-name" placeholder="Last Name">
-                            </div> -->
-                            <div class="form-group">
-                                <input class="input" type="email" name="email" placeholder="Email">
+                                <input class="input" type="text" id="FullName" name="fullName" placeholder="Full name">
                             </div>
                             <div class="form-group">
-                                <input class="input" type="text" name="address" placeholder="Address">
+                                <input class="input" type="text" id="city" name="city" placeholder="City">
                             </div>
                             <div class="form-group">
-                                <input class="input" type="text" name="city" placeholder="City">
+                                <input class="input" type="text" id="country" name="country" placeholder="Country">
                             </div>
                             <div class="form-group">
-                                <input class="input" type="text" name="country" placeholder="Country">
+                                <input class="input" type="text" id="pinCode" name="pincode" placeholder="ZIP Code">
                             </div>
                             <div class="form-group">
-                                <input class="input" type="text" name="zip-code" placeholder="ZIP Code">
+                                <input class="input" type="text" id="state" name="state" placeholder="Address">
                             </div>
                             <div class="form-group">
-                                <input class="input" type="tel" name="tel" placeholder="Telephone">
+                                <input class="input" type="tel" id="phone" name="mobile" placeholder="Telephone">
                             </div>
-                        </div>
+                            <button class="btn btn-danger" type="submit">Submit</button>
+                        </form>
+                        </div> -->
                     </div>
                 </div>
                 <!-- /Shiping Details -->
@@ -198,7 +162,6 @@
             </div>
            
             <!-- Order Details -->
-            <form id="checkout-form">
             <div class="col-md-5 order-details">
                 <div class="section-title text-center">
                     <h3 class="title">Your Order</h3>
@@ -212,7 +175,7 @@
                         <% products.forEach((data)=>{%>
                         <div class="order-col">
                             <div><%=data.productId.name %></div>
-                            <div>&#x20B9;<%=data.productId.price%></div>
+                            <div><%=data.productId.price%></div>
                         </div>
                         <%})%>
                     </div>
@@ -222,7 +185,7 @@
                     </div>
                     <div class="order-col">
                         <div><strong>TOTAL</strong></div>
-                        <div><strong class="order-total" id="total">&#x20B9;<%=total%></strong></div>
+                        <div><strong class="order-total" id="total"><%=total%></strong></div>
                     </div>
                 </div>
                 <div class="payment-method">
@@ -288,39 +251,37 @@
 $(document).ready(function () {
     $("#checkout-form").on("submit", function (e) {
         e.preventDefault();
-        $(this).find("button[type='submit']").prop('disabled', true);
+        // $(this).find("button[type='submit']").prop('disabled', true);
 
         console.log('clicked');
 
-        
-        var address = $("input[name='address']").val();
+        var address = $("input[name='address']:checked").val();
         var total = $("#total").text();
-        var payment = $("input[name='payment']:checked").val();
+        var payment = $("input[name=payment]:checked").val();
 
         console.log("buttonClicked");
         console.log('before AJAX request');
+        console.log('Selected Address:', address);
 
         $.ajax({
-            type: 'post',
+            type: "POST",
             url: "/placeOrder",
-            contentType: "application/json",
-            data: JSON.stringify({ total: total, address: address, payment: payment }),
+            // contentType: "application/json",
+            data: { total: total, address: address, payment: payment },
             success: function (response) {
                 if (response.success === true) {
                     window.location.href = `/orderPlaced/${response.orderid}`;
-                } else {
+                } else if(response.walletFailed==true){
                     swal.fire({
                         icon: "error",
-                        title: "Your transaction failed",
+                        title: "Insufficient Balance In Your Wallet",
                         showConfirmButton: false,
                         showCancelButton: false,
                         timer: 1500,
                     });
                 }
             },
-            error: function (xhr, status, error) {
-                console.error("AJAX Error:", error);
-            },
+
         });
 
         console.log('After AJAX request');
@@ -330,9 +291,8 @@ $(document).ready(function () {
     });
 });
 
-
-
 </Script>
+
 
 
 <%-include('../layout/footer.ejs') %>

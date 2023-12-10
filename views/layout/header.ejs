@@ -8,6 +8,8 @@
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 
+	<script src="https://cdn.jsdelivr.net/npm/@dotlottie/player@2.0.0/dist/dotlottie.player.js"></script>
+
 	
 		<!-- Google font -->
 		<link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,700" rel="stylesheet">
@@ -76,8 +78,8 @@
 				<div class="container">
 					<ul class="header-links pull-left">
 						<li><a href="#"><i class="fa fa-phone"></i>9526228414</a></li>
-						<li><a href="#"><i class="fa fa-envelope-o"></i> powerelectricals@email.com</a></li>
-						<li><a href="#"><i class="fa fa-map-marker"></i> 1734 Stonecoal Road</a></li>
+						<li><a href="#"><i class="fa fa-envelope-o"></i> powerelectricals@gmail.com</a></li>
+						<li><a href="#"><i class="fa fa-map-marker"></i> 1734 Malappuram Road</a></li>
 					</ul>
 				
 				</div>
@@ -128,11 +130,15 @@
 										</a>
 									</div>
 									<div>
+										
 										<a href="/cart">
 											<i class="fa fa-shopping-cart"></i>
 											<span>Your Cart</span>
-											<div class="qty">2</div>
+											
+											<div class="qty">3</div>
+											
 										</a>
+										
 									</div>
 									<div class="header-links pull-right">
 										<li class="dropdown">
@@ -145,6 +151,7 @@
 										  <div class="dropdown-content">
 											<% if(user){ %>
 											  <a href="/profile"><i class="fa fa-user"></i> Profile</a>
+											  <a href="/orders"><i class="fa fa-archive"></i> Orders</a>
 											  <a href="/logout"><i class="fa fa-sign-out-alt"></i> Logout</a>
 											<% } else { %>
 											  <a href="/login"><i class="fa fa-sign-in-alt"></i> Login</a>
@@ -166,20 +173,24 @@
 		</header>
 		<!-- /HEADER -->
 		<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script>
-    $(document).ready(function(){
-      $(".dropbtn").click(function(){
-        $(".dropdown-content").toggle();
-      });
 
-      $(document).on("click", function(event){
-        var dropdown = $(".dropdown");
-        if(!dropdown.is(event.target) && dropdown.has(event.target).length === 0){
-          $(".dropdown-content").hide();
-        }
-      });
-    });
-  </script>
+		<script>
+			$(document).ready(function(){
+			  $(".dropdown").mouseover(function(){
+				$(".dropdown-content").show();
+			  }).mouseout(function(){
+				$(".dropdown-content").hide();
+			  });
+		  
+			  $(document).on("click", function(event){
+				var dropdown = $(".dropdown");
+				if(!dropdown.is(event.target) && dropdown.has(event.target).length === 0){
+				  $(".dropdown-content").hide();
+				}
+			  });
+			});
+		</script>
+		  
 		
 		
     

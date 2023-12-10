@@ -2,6 +2,9 @@
 
 <%- include('../admin/adminLayout/navbar.ejs')%>
 
+
+
+
 <div class="container-fluid py-4">
   <div class="row">
     <div class="col-12">
@@ -20,7 +23,7 @@
                   <th class="text-uppercase text-xxs font-weight-bolder  ps-2" style="color: black;">User Name</th>
                   <th class="text-uppercase text-xxs font-weight-bolder  ps-2" style="color: black;">Email</th>
                   <th class="text-uppercase text-xxs font-weight-bolder  ps-2" style="color: black;">Mobile</th>
-                  <th class="text-uppercase text-xxs font-weight-bolder  ps-2" style="color: black;">Image</th>
+                  <!-- <th class="text-uppercase text-xxs font-weight-bolder  ps-2" style="color: black;">Image</th> -->
                   <!-- <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">Update</th> -->
                   <th class="text-uppercase text-xxs font-weight-bolder  ps-2" style="color: black;">Status</th>
                   <th class="text-uppercase text-xxs font-weight-bolder  ps-2" style="color: black;">Action</th>
@@ -43,9 +46,9 @@
                   <td>
                     <p class="text-xs font-weight-bold mb-0"><%=user.mobile%></p>
                   </td>
-                  <td>
+                  <!-- <td>
                     <img src="/userImages/<%=user.image %>" class="avatar avatar-sm me-3 border-radius-lg" alt="">
-                  </td>
+                  </td> -->
 
                   <!-- Verified/Not Verified -->
                   <% if(user.is_varified==0){%>

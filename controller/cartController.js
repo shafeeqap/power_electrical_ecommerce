@@ -44,6 +44,7 @@ const addToCart = async (req, res) => {
                         { "products.productId.$": 1, "products.quantity": 1 }
                         
                     );
+                    console.log('cart data',cartData);
 
                     const [{ quantity: existingQuantity }] = cartData.products;
 
@@ -101,8 +102,25 @@ const cartLoad = async(req,res)=>{
         // const user_id  = req.session.user_id
         // Find user login/logout
         const user = await User.findById(req.session.user_id);
-
         // console.log('User', user);
+
+        // const userId = new ObjectId(user._id);
+        // cart Quantity    //
+        // const cartTotal = await Cart.aggregate([
+        //     {
+        //         $match:{userId:userId}
+        //     },
+        //     {
+        //         $unwind:'$products'
+        //     },
+        //     {
+        //         $group:{_id:null, totalQuantity:{$sum:'$products.quantity'}}
+        //     }
+        // ])
+
+        // const cartQuantity = cartTotal.length> 0 ? cartTotal[0].totalQuantity:0;
+        // console.log('TotalQuntity:',totalQuantity);
+        
 
         if (!user) {
             return res.render('cart', { message: "User not found", cart: [], total: 0 });
@@ -123,7 +141,7 @@ const cartLoad = async(req,res)=>{
                 // console.log('User', user);
 
                 let Total;
-                if(cartData.products?.length){
+                if(cartData.products !=0){
                     const total = await Cart.aggregate([
                     {$match: {userId :new ObjectId(user_Id)},
                     },
@@ -131,7 +149,7 @@ const cartLoad = async(req,res)=>{
                     {$project:{price:'$products.price',quantity:'$products.quantity'}},
                     {$group:{_id:null, total:{$sum: {$multiply:["$quantity","$price"]}}}}]);
 
-                    Total=total[0]?. total || 0
+                    Total=total[0].total
                     // console.log('Total',total);
                     // console.log('Cart============',cartData.products, Total);
                     // console.log('User', user);

@@ -1,4 +1,6 @@
 const User = require('../models/userModel');
+const Order = require('../models/orderModel');
+const Product = require('../models/productModel');
 const bcrypt = require('bcrypt');
 const randomstring = require('randomstring');
 const config = require('../config/config');
@@ -219,6 +221,58 @@ const userBlockorActive = async(req,res)=>{
 };
 
 
+// Load View Orders Page
+const loadViewOrders = async(req, res)=>{
+    try {
+        const orderData = await Order.find();
+        // console.log('Order Data',orderData);
+
+        const productsArray=[];
+
+        for(let orders of orderData){
+            // console.log('orders', orders);
+            for(let productsValue of orders.products){
+                const productId = productsValue.productId;
+
+                const productData  = await Product.findById(productId)
+                const userDetails = await User.findById(orders.userId)
+                // console.log('productData',productData);
+
+                if(productData){
+                    
+                    productsArray.push({
+                        user:userDetails,
+                        product:productData,
+                        orderDetails:{
+                            _id:orders._id,
+                            userId:orders.userId,
+                            deliveryDetails:orders.deliveryDetails,
+                            date:orders.date,
+
+                            totalAmount:productsValue.quantity*productData.totalAmount,
+                            orderStatus:productsValue.orderStatus,
+                            paymentStatus:productsValue.paymentStatus,
+                            statusLevel:productsValue.statusLevel,
+                            paymentMethod:orders.paymentMethod,
+                            quantity:productsValue.quantity,
+
+                        }
+
+                    })
+                }
+                
+            }
+        }
+        console.log('Product Array',productsArray);
+
+        res.render('view-orders',{message:'View Orders',orders:productsArray})
+        
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+
 
 module.exports={
     loadLogin,
@@ -232,5 +286,6 @@ module.exports={
     resetPassword,
     viewUsers,
     userBlockorActive,
+    loadViewOrders
     
 }
