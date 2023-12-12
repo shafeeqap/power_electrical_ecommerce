@@ -232,9 +232,12 @@ const loadViewOrders = async(req, res)=>{
         for(let orders of orderData){
             // console.log('orders', orders);
             for(let productsValue of orders.products){
+                // console.log('productsValue', productsValue);
                 const productId = productsValue.productId;
+                // console.log('ProductId',productId);
 
                 const productData  = await Product.findById(productId)
+
                 const userDetails = await User.findById(orders.userId)
                 // console.log('productData',productData);
 
@@ -248,8 +251,7 @@ const loadViewOrders = async(req, res)=>{
                             userId:orders.userId,
                             deliveryDetails:orders.deliveryDetails,
                             date:orders.date,
-
-                            totalAmount:productsValue.quantity*productData.totalAmount,
+                            totalAmount:productsValue.quantity*orders.totalAmount,
                             orderStatus:productsValue.orderStatus,
                             paymentStatus:productsValue.paymentStatus,
                             statusLevel:productsValue.statusLevel,
@@ -263,9 +265,103 @@ const loadViewOrders = async(req, res)=>{
                 
             }
         }
-        console.log('Product Array',productsArray);
+        // console.log('Product Array',productsArray);
 
-        res.render('view-orders',{message:'View Orders',orders:productsArray})
+        res.render('view-orders',{
+            message:'View Orders',
+            orders:productsArray,
+        });
+        
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+// View OrderDetails
+const viewOrderDetails = async(req, res)=>{
+    try {
+        // const orderId = req.query.id
+        // const productId = req.query.productId;
+        const {orderId, productId}=req.query;
+        // console.log('orderId:', orderId);
+        // console.log('ProductId:', productId);
+        
+        if (!orderId || !productId) {
+            return res.status(400).send("orderId and productId are required");
+        }
+
+        const orderDetails = await Order.findById(orderId);
+        const productData = await Product.findById(productId);
+        // console.log('Order Details',orderDetails);
+        // const productDetails = await Product.findById(productId);
+        // console.log('Product Details',productDetails);
+        // console.log('Order Id',orderId);
+        const productDetails = orderDetails.products.find((product)=>product.productId.toString()===productId);
+
+        const productOrder={
+            orderId: orderDetails._id,
+            product: productData,
+            _id:productDetails._id,
+            orderStatus:productDetails.orderStatus,
+            statusLevel:productDetails.statusLevel,
+            paymentStatus:productDetails.paymentStatus,
+            totalAmount:orderDetails.totalAmount,
+            quantity:productDetails.quantity,
+            paymentMethod:orderDetails.paymentMethod,
+            deliveryDetails:orderDetails.deliveryDetails,
+            date:orderDetails.date,
+
+        }
+
+        // console.log(productOrder);
+
+        res.render('view-ordersDetails',{
+            message:'View Order Details',
+            products:productOrder,
+            orderId,
+            productId
+        })
+        
+        
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+// Change Order Status
+const changeOrderStatus = async(req, res)=>{
+    try {
+        const {status, orderId, productId}=req.body;
+        // const orderId = req.body.orderId
+        // console.log('OrderId', orderId);
+        // console.log('Status',status);
+        const orderDetails = await Order.findById(orderId);
+        // console.log(orderDetails);
+        if(!orderDetails){
+            return res.status(404).send('Order not found.');
+        }
+
+        const statusMap={
+            Shipped:2,
+            OutforDelivery:3,
+            Delivered:4,
+        };
+
+        const selectedStatus=status
+        const statusLevel=statusMap[selectedStatus]
+
+        const productDetails = orderDetails.products.find((product)=>product.productId.toString()===productId);
+        // console.log(productDetails);
+
+        productDetails.statusLevel=statusLevel;
+        productDetails.orderStatus=status;
+        productDetails.updatedAt=Date.now();
+
+        const result = await orderDetails.save();
+        // console.log('Result',result);
+
+        res.redirect(`/admin/view-ordersDetails?orderId=${orderId}&productId=${productId}`);
+
         
     } catch (error) {
         console.log(error);
@@ -286,6 +382,8 @@ module.exports={
     resetPassword,
     viewUsers,
     userBlockorActive,
-    loadViewOrders
+    loadViewOrders,
+    viewOrderDetails,
+    changeOrderStatus
     
 }

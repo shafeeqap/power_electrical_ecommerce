@@ -91,7 +91,7 @@ const orderSchema = new mongoose.Schema({
     paymentMethod:{
         type:String
     },
-    oderId:{
+    orderId:{
         type:String
     },
     paymentId:{

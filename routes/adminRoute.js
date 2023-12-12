@@ -97,7 +97,9 @@ admin_route.post('/edit-brand',upload.single('image'),brandController.editBrand)
 admin_route.get('/is_blockBrand',brandController.brandListorUnlist);
 
 
-admin_route.get('/view-orders',adminController.loadViewOrders);
+admin_route.get('/view-orders',adminAuth.isLogin,adminController.loadViewOrders);
+admin_route.get('/view-ordersDetails',adminAuth.isLogin,adminController.viewOrderDetails);
+admin_route.post('/view-ordersDetails/changeStatus',adminController.changeOrderStatus)
 
 
 

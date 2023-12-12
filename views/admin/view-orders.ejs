@@ -23,6 +23,7 @@
                     <th class="text-uppercase text-xxs font-weight-bolder  ps-2" style="color: black;">Order Date</th>
                     <th class="text-uppercase text-xxs font-weight-bolder  ps-2" style="color: black;">Quantity</th>
                     <th class="text-uppercase text-xxs font-weight-bolder  ps-2" style="color: black;">Price</th>
+                    <th class="text-uppercase text-xxs font-weight-bolder  ps-2" style="color: black;">Total Amount</th>
                     <th class="text-uppercase text-xxs font-weight-bolder  ps-2" style="color: black;">Image</th>
                     <th class="text-uppercase text-xxs font-weight-bolder  ps-2" style="color: black;">Order Status</th>
                     <th class="text-uppercase text-xxs font-weight-bolder  ps-2" style="color: black;">Payment Status</th>
@@ -31,7 +32,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                    <% if(orders.length>0){%>
+                    <% if(Array.isArray(orders) && orders.length > 0){%>
                         <% let count=1%>
                         <% orders.forEach((data)=>{%>
                   <tr>
@@ -48,63 +49,59 @@
                       <p class="text-xs font-weight-bold mb-0"><%=data.orderDetails.quantity%></p>
                     </td>
                     <td>
-                        <p class="text-xs font-weight-bold mb-0"><%=data.product.price%></p>
+                        <p class="text-xs font-weight-bold mb-0">&#x20B9;<%=data.product.price%></p>
+                      </td>
+                      <td>
+                        <p class="text-xs font-weight-bold mb-0">&#x20B9;<%=data.product.price*data.orderDetails.quantity%></p>
                       </td>
                     <td>
                       <img src="/adminAssets/images/<%=data.product.image[0]%>" class="avatar avatar-sm me-3 border-radius-lg" alt="">
                     </td>
                     
-                    <!-- Verified/Not Verified -->
-                    <% if(data.orderDetails.orderStatus==='Placed'){%>
+                    
                     <td>
+                      <% if(data.orderDetails && data.orderDetails.orderStatus === 'Placed'){%>
                       <p class="text-xs text-warning font-weight-bold mb-0">Placed</p>
                     
-                    <% }else if(data.orderDetails.orderStatus==='Pending') {%>
+                    <% }else if(data.orderDetails && data.orderDetails.orderStatus==='Pending') {%>
                       
                         <p class="text-xs text-secondary font-weight-bold mb-0">Pending</p>
                       
-                        <% }else if(data.orderDetails.orderStatus==='Shipped') {%>
+                        <% }else if(data.orderDetails && data.orderDetails.orderStatus==='Shipped') {%>
                         
                         <p class="text-xs text-primary font-weight-bold mb-0">Shipped</p>
                         
-                        <% }else if(data.orderDetails.orderStatus==='Delivered'){%>
+                        <% }else if(data.orderDetails && data.orderDetails.orderStatus==='Delivered'){%>
                         
                             <p class="text-xs text-success font-weight-bold mb-0">Delivered</p>
                           
-                          <% }else if(data.ordreDetails.orderStatus==='Cancelled'){ %>
+                          <% }else if(data.orderDetails && data.orderDetails.orderStatus==='Cancelled'){ %>
                             
                                 <p class="text-xs text-danger font-weight-bold mb-0">Cancelled</p>
                               
-                              <% }else if(data.orderDetails.orderStatus==='OutforDelivery'){%>
+                              <% }else if(data.orderDetails && data.orderDetails.orderStatus==='OutforDelivery'){%>
                                 
                                     <p class="text-xs text-info font-weight-bold mb-0">OutforDelivery</p>
                                   </td>
                                   <% } %>
 
-                                  <% if(data.orderDetails.paymentStatus==='Pending'){%>
+
+                                  <!-- paymentStatus -->
                                   <td>
-                                    <p class="text-xs font-weight-bold mb-0">Pending</p>
-                                    <% }else if(data.orderDetails.paymentStatus==='Success'){%>
-                                        <p class="text-xs font-weight-bold mb-0">Success</p>
+                                  <% if(data.orderDetails.paymentStatus==='Success'){%>
+                                    <p class="text-xs text-success font-weight-bold mb-0">Success</p>
+                                    <% }else if(data.orderDetails.paymentStatus==='Pending'){%>
+                                        <p class="text-xs font-weight-bold mb-0">Pending</p>
                                         <% }else if(data.orderDetails.paymentStatus==='Failed'){%>
                                             <p class="text-xs font-weight-bold mb-0">Failed</p>
                                             <% } %>
                                   </td>
-
-                      <!-- User Active/Blocked -->
+                                  <!-- paymentStatus end-->
                     
                     <td class=" text-sm">
-                      <a href="#">
+                      <a href="/admin/view-ordersDetails?orderId=<%=data.orderDetails._id%>&productId=<%=data.product._id%>">
                       <span class="badge badge-sm bg-gradient-danger">Manage</span></a>
                     </td>
-  
-                    
-                      
-                      <!-- <td class=" text-sm">
-                        <a href="">
-                        <span class="badge badge-sm bg-gradient-success">Active</span></a>
-                      </td> -->
-
                     </tr>
                     <% count++ %>
                     <% }); %>

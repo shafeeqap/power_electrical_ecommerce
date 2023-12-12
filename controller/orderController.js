@@ -87,7 +87,7 @@ const placeOrder = async(req, res)=>{
             quantity:productItem.quantity,
             orderStatus:'Placed',
             statusLevel:1,
-            paymentStatus:'Pending',
+            paymentStatus:'Success',
             'returnOrderStatus.status':'none',
             'returnOrderStatus.reason':'none',
             'cancelOrderStatus.reason':'none'

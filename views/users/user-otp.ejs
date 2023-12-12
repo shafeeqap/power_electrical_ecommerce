@@ -11,10 +11,10 @@
 						<div class="newsletter">
 							<p><strong>OTP Verification</strong></p>
 							<% if(typeof message !=='undefined' ){ %>
-								<h5 id="invalid-msg" class=" text-danger text-center"><%- message %></h5>
+								<h5 id="invalid-msg" class=" text-danger text-center"><%= message %></h5>
 								<% } %>
 							<form action="/user-otp" method="post">
-								<input class="input" type="text" name="otp" placeholder="Enter Your OTP">
+								<input class="input" type="text" id="otp" name="otp" placeholder="Enter Your OTP">
 								<p class="text-danger mt-3">Time left: <span id="timer">60</span></p>
                                 <button type="submit" class="btn btn-primary" 
                                 style="border-radius: 40px 40px 40px 40px; width: 160px; height: 40px; font-weight: 700;" ><i class="fa fa-envelope"></i>  Submit </button>
