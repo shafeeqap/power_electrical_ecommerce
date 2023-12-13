@@ -11,9 +11,8 @@ require('dotenv').config();
 
 app.use(session({
   secret:process.env.SESSION_SECRET,
-  cookie:{maxAge:600000},
   resave:false,
-  saveUninitialized:true,
+  saveUninitialized:false,
 }));
 
 

@@ -15,8 +15,10 @@ const config = require('../config/config');
 // securePassword (bcrypt)----------------------//
 const securePassword = async(password)=>{
     // console.log("sec");
-    console.log(password);
+    // console.log('Password',password);
+    // const password = req.body.password;
     try {
+        // const saltRounds = 10;
         const passwordHash = await bcrypt.hash(password, 10);
         return passwordHash;
     } catch (error) {
@@ -77,6 +79,8 @@ const loadOtp = async(req,res)=>{
 // Verify OTP
 const verifyOtp = async (req, res) => {
     try {
+
+        // console.log('verifyOTP');
         // Generate OTP
         const otpCode = otpGenerator.generate(6, {
             digits: true,
@@ -89,7 +93,7 @@ const verifyOtp = async (req, res) => {
         // console.log("otp code is: ",otpCode)
 
         const creationTime = Date.now() / 1000;
-        const expirationTime = creationTime + 30;
+        const expirationTime = creationTime + 60;
 
         // Check if the email already exists in the database.
         const emailCheck = await User.findOne({ email: req.body.email });
@@ -98,17 +102,17 @@ const verifyOtp = async (req, res) => {
         let emailMessage = '';
         let mobileMessage = '';
 
-        if (emailCheck && mobileCheck) {
-            res.render('register', 
-            {message:'Your registration is failed.',
-            emailMessage :'Email is already exist',
-            mobileMessage :'Mobile is already exist'});
+        if (emailCheck || mobileCheck) {
+
+            res.render('register',{
+                message:'Your registration is failed.',
+                emailMessage: emailCheck ? 'Email is already exist' : '',
+                mobileMessage: mobileCheck ? 'Mobile is already exist' : '',
+            });
+
         } else {
-            // console.log("in");
-            // console.log(req.body.password);
-            // console.log(req.body.name);
+
             const spassword = await securePassword(req.body.password);
-            // console.log("pass");
 
             req.session.name = req.body.name;
             req.session.email = req.body.email;
@@ -123,26 +127,89 @@ const verifyOtp = async (req, res) => {
                         expiry: expirationTime,
                     };
 
-                    // console.log("out")
-
-                    // console.log(req.session.email);
-                    // console.log(req.session.email);
-
-                    // Send OTP to the user's email
                     sendVerifyMail(req.session.email, req.session.otp.code);
-                    res.render('user-otp', { message: 'Email OTP has been sent to your email', user: req.session.user_id });
+                    // console.log('send otp');
+
+                    res.render('user-otp', { 
+                        message: 'Email OTP has been sent to your email', 
+                        user: req.session.user_id 
+                    });
 
 
                 } else {
-                    res.render('register', { message: 'Password does not match',emailMessage ,mobileMessage :''});
+                    res.render('register', { 
+                        message: 'Password does not match',
+                        emailMessage:'',
+                        mobileMessage :'',
+                    });
                 }
             } else {
-                res.render('register', { message: 'Please enter all details',emailMessage ,mobileMessage :''});
+                res.render('register', { 
+                    message: 'Please enter all details',
+                    emailMessage:'' ,
+                    mobileMessage :'',
+                });
             }
         }
 
     } catch (error) {
         console.log(error);
+    }
+};
+
+
+
+// view sign up page ---------------//
+const loadRegister= async(req,res)=>{
+    try {
+        res.render('register',{ emailMessage: '' ,mobileMessage :''});
+    } catch (error) {
+        console.log(message);
+    }
+}
+
+// user registration-------------//
+const insertUser = async(req,res)=>{
+
+    try {
+    //   console.log(req.body,"***************************");
+        const currentTime = Math.floor(Date.now()/1000)
+
+        if(req.body.otp === req.session.otp.code && 
+            currentTime<=req.session.otp.expiry ){
+            
+            
+            const user = new User({
+                name:req.session.name,
+                email:req.session.email,
+                mobile:req.session.mobile,
+                password:req.session.password,
+                is_varified:1,
+                is_admin:0
+                
+            });
+
+            const userData = await user.save();
+            // console.log(userData)
+
+          
+
+            if (userData) {
+                // Registration successful
+                res.json({ success: true });
+            } else {
+                // Registration failed
+                res.json({ success: false, message: 'Your registration is failed.' });
+            }
+        } else {
+            // OTP verification failed
+            res.json({ success: false, message: 'Invalid OTP.' });
+        }
+
+        
+    } catch (error) {
+        console.log(error);
+        res.json({ success: false, message: 'An error occurred while processing your request' });
     }
 };
 
@@ -182,51 +249,6 @@ const resendOtp = async(req,res)=>{
     }
 }
 
-
-
-// view sign up page ---------------//
-const loadRegister= async(req,res)=>{
-    try {
-        res.render('register',{ emailMessage: '' ,mobileMessage :''});
-    } catch (error) {
-        console.log(message);
-    }
-}
-
-// user registration-------------//
-const insertUser = async(req,res)=>{
-    try {
-      
-
-         const creationTime = Math.floor(Date.now()/1000)
-         if(req.body.otp === req.session.otp.code ){
-            
-            const user = new User({
-                name:req.session.name,
-                email:req.session.email,
-                mobile:req.session.mobile,
-                // image:req.file.filename,
-                password:req.session.password,
-                is_varified:1,
-                is_admin:0
-                
-            });
-
-            const userData = await user.save();
-            // console.log(userData)
-
-            if(userData){
-                res.render('login');
-            }else{
-                res.render('register',{message:'Your registration is failed.',emailMessage: '',mobileMessage:'' });
-            }
-
-        }
-        
-    } catch (error) {
-        console.log(error);
-    }
-};
 
 //for reset password send mail
 const sendResetPasswordMail= async(name,email,token)=>{

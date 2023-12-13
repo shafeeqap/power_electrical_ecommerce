@@ -52,19 +52,19 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
 <!-- jQuery library -->
-<!-- <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script> -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 
 
 	<script>
-		 let countdown = 60; // Initial countdown value in seconds
+		let countdown = 60; // Initial countdown value in seconds
         let timerElement = document.getElementById('timer');
         let resendButton = document.getElementById('resendButton');
         let countdownInterval;
 
         // Function to update the countdown timer
-        function updateTimer() {
-    timerElement.textContent = countdown + ' seconds';
-    countdown--;
+    function updateTimer() {
+        timerElement.textContent = countdown + ' seconds';
+        countdown--;
 
     if (countdown < 0) {
         clearInterval(countdownInterval);
@@ -76,9 +76,7 @@
 
         // Function to resend OTP
         function resendOTP() {
-            // Simulate OTP resend logic here
-            // For example, you can make an API call to send a new OTP
-
+          
             // Reset the timer
             countdown = 60;
             timerElement.textContent = countdown + ' seconds';
@@ -102,9 +100,12 @@
 
 
 
-        $(document).ready(function () {
+  $(document).ready(function () {
         $("form").submit(function (event) {
             event.preventDefault();
+
+            console.log("Form submitted!");
+
             const otp = $("#otp").val();
 
             // Make an AJAX request to verify the OTP
@@ -122,7 +123,8 @@
                             timer: 2000, 
                             showConfirmButton: false 
                         }).then(function () {
-                            window.location.href = '/login';
+                            // Redirect to another page after success
+                            window.location.href = '/login'; 
                         });
                     } else {
                         // OTP verification failed
@@ -143,6 +145,7 @@
             });
         });
     });
+
 
 	</script>
 

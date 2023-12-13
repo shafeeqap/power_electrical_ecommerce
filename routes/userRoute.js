@@ -35,11 +35,11 @@ const storage = multer.diskStorage({
 const upload = multer({storage:storage});
 //------------------------------------------//
 
-user_router.get('/register', userController.loadRegister);
+user_router.get('/register', userAuth.isLogout,userController.loadRegister);
 user_router.post('/register',userController.verifyOtp);
-user_router.get('/user-otp',userController.loadOtp);
+user_router.get('/user-otp',userAuth.isLogout,userController.loadOtp);
 user_router.post('/user-otp',userController.insertUser);
-user_router.get('/resend-otp',userController.resendOtp);
+user_router.get('/resend-otp',userAuth.isLogout,userController.resendOtp);
 
 user_router.get('/', userAuth.isLogout, userController.loginLoad)
 user_router.get('/login', userAuth.isLogout,userController.loginLoad);
