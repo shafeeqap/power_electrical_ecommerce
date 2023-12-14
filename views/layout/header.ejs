@@ -144,10 +144,11 @@
 										<li class="dropdown">
 										  <a href="#" class="dropbtn"><i class="fa fa-user-o"></i>
 											<% if (user && user.name) { %>
-											<%= user.name %></a>
+											<%= user.name %>
 											<% } else { %>
 												Guest
 											<% } %>
+										</a>
 										  <div class="dropdown-content">
 											<% if(user){ %>
 											  <a href="/profile"><i class="fa fa-user"></i> Profile</a>

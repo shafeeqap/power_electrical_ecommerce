@@ -65,19 +65,15 @@ const verifyLogin = async(req,res)=>{
     try {
         const email=req.body.email;
         const password=req.body.password;
-        const userDate=await User.findOne({email:email});
-        if(userDate){
-           const passwordMatch = await bcrypt.compare(password,userDate.password);
-
+        const adminData=await Admin.findOne({email:email});
+        if(adminData){
+           const passwordMatch = await bcrypt.compare(password,adminData.password);
+            // console.log('passmatch');
            if(passwordMatch){
 
-                if(userDate.is_admin===0){
-                    res.render('adminLogin',{message:'Email and Password incorrect'})
+                req.session.admin_id = adminData._id;
 
-                }else{
-                    req.session.user_id = userDate._id;
-                    res.redirect('/admin/adminHome');
-                }
+                res.redirect('/admin/adminHome')
 
            }else{
             res.render('adminLogin',{message:'Email and Password incorrect'})
@@ -205,13 +201,13 @@ const userBlockorActive = async(req,res)=>{
         // console.log(user_id);
        const userData = await User.findById({_id:user_id});
     //    console.log(userData);
-    if(userData.is_block===false){
+    if(userData.is_block===true){
 
-        await User.updateOne({_id:user_id},{$set:{is_block:true}});
+        await User.updateOne({_id:user_id},{$set:{is_block:false}});
         res.redirect('/admin/view-users')
 
     }else{
-        await User.updateOne({_id:user_id},{$set:{is_block:false}});
+        await User.updateOne({_id:user_id},{$set:{is_block:true}});
         res.redirect('/admin/view-users');
     }
 
@@ -239,8 +235,8 @@ const loadViewOrders = async(req, res)=>{
 
                 const productData  = await Product.findById(productId)
 
-                const userDetails = await User.findById(orders.user)
-                console.log('userDetails',userDetails);
+                const userDetails = await User.findOne({name: orders.userName})
+                // console.log('userDetails..........',userDetails);
 
                 if(productData){
                     

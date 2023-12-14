@@ -374,22 +374,6 @@ const loadHome = async(req,res)=>{
         const userId = new ObjectId(user._id);
         // console.log('User Id',userId);
 
-        // cart Quantity    //
-        // const cartTotal = await Cart.aggregate([
-        //     {
-        //         $match:{userId:userId}
-        //     },
-        //     {
-        //         $unwind:'$products'
-        //     },
-        //     {
-        //         $group:{_id:null, totalQuantity:{$sum:'$products.quantity'}}
-        //     }
-        // ])
-
-        // const cartQuantity = cartTotal.length> 0 ? cartTotal[0].totalQuantity:0;
-        // console.log('TotalQuntity:',totalQuantity);
-
         if (!userData) {
             return res.redirect('/login');
         }
@@ -473,6 +457,18 @@ const productLoad = async(req,res)=>{
     } catch (error) {
         console.log(error);
     }
+};
+
+
+// Product Details Load
+const loadProductDetails = async(req, res)=>{
+    try {
+
+        res.render('productDetails')
+        
+    } catch (error) {
+        console.log(error);
+    }
 }
 
 
@@ -489,9 +485,16 @@ const userLogout = async(req,res)=>{
 // Forget Password
 const forgetPassword = async(req,res)=>{
     try {
-        res.render('forget-password',{user:req.session.user_id});
+
+        const userData = await User.findById(req.session.user_id);
+
+        res.render('forget-password',{
+            user:userData||null,
+            message:''
+        });
     } catch (error) {
         console.log(error);
+        res.render('error', { message: 'An error occurred', status: 500 });
     }
 }
 
@@ -500,21 +503,34 @@ const forgetVerify = async(req,res)=>{
     try {
         const email = req.body.email;
         if(email===''){
-            res.render('forget-password',{message:'Please enter your email'})
+            res.render('forget-password',{
+                message:'Please enter your email',
+                user:req.session.user_id
+            })
             
         }
         const userData = await User.findOne({email:email});
         if(userData){
             if(userData.is_varified===0){
-                res.render('forget-password',{message:'Please verify your email'});
+                res.render('forget-password',{
+                    message:'Please verify your email',
+                    user:req.session.user_id
+                });
             }else{
                 const randomString = randomstring.generate();
                 const updatedData = await User.updateOne({email:email},{$set:{token:randomString}});
                 sendResetPasswordMail(userData.name,userData.email,randomString);
-                res.render('forget-password',{message:'Please check your mail to reset your password.'});
+
+                res.render('forget-password',{
+                    message:'Please check your mail to reset your password.',
+                    user:req.session.user_id
+                });
             }
         }else{
-            res.render('forget-password',{message:'Your email is in correct'});
+            res.render('forget-password',{
+                message:'Your email is in correct',
+                user:req.session.user_id
+            });
         }
         
     } catch (error) {
@@ -541,7 +557,11 @@ const resetPasswordLoad = async(req,res)=>{
             
         }else{
             // console.log(tokenData)
-            res.render('reset-password',{user_id:tokenData._id});
+
+            res.render('reset-password',{
+                user_id:tokenData._id,
+                user:tokenData._id
+            });
         
         }
         
@@ -555,10 +575,14 @@ const resetPassword = async(req,res)=>{
     try {
         const password = req.body.password;
         const user_id = req.body.user_id;
+        console.log('New password',password);
 
         const secure_password = await securePassword(password); 
 
         const updatedData = await User.findByIdAndUpdate({_id:user_id},{$set:{password:secure_password,token:''}})
+
+        console.log('updatepassword',updatedData)
+
         res.redirect('/');
 
     } catch (error) {
@@ -724,6 +748,7 @@ module.exports ={
     verifyLogin,
     loadHome,
     productLoad,
+    loadProductDetails,
     userLogout,
     forgetPassword,
     forgetVerify,

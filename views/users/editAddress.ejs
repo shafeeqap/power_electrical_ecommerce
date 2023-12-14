@@ -164,7 +164,7 @@
                             <div class="col-md-6">
                                 <div class="card">
                                     <div class="card-body">
-                                        <form action="" onsubmit="return validateForm()" method="post">
+                                        <form action="" onsubmit="return validateForm()" method="post" id="editAddress">
                                             <!-- Name Input -->
                                             <div class="mb-3">
                                                 <label for="FullName" class="form-label">Name:</label>
@@ -208,7 +208,11 @@
                                             </div>
 
                                             <!-- Submit Button -->
-                                            <button type="submit" class="btn btn-danger" style="width: 100%;">Update</button>
+                                            <div class="d-flex justify-content-between" style="display: flex; justify-content: space-between;">
+                                            <button type="submit" class="btn btn-primary" style="width: 30%;">Update</button>
+                                            <button type="button" class="btn btn-danger" style="width: 30%;" onclick="cancelAction()">Cancel</button>
+                                            <button type="button" class="btn btn-warning" style="width: 30%;">Change Password</button>
+                                          </div>
                                             <input type="hidden" name="id" value="<%=address[0]._id%>">
                                         </form>
                                     </div>
@@ -224,6 +228,13 @@
         </div>
       </div>
     </div>
+
+    <!-- link for ajax -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- CDN link for sweetalert -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
     <script>
         function validateForm() {
@@ -302,7 +313,17 @@
             }
     
             return true; // Form is valid
-        }
+        };
+
+    // function Cancel Button  
+    function cancelAction() {
+        
+        // document.getElementById("editAddress").reset();
+        window.history.back();
+        
+    }
+
+
     </script>
 
 <%- include('../layout/footer.ejs') %>

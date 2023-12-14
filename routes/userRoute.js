@@ -61,29 +61,30 @@ user_router.post('/reset-password',userController.resetPassword)
 user_router.get('/home', userAuth.isLogin, userAuth.is_blocked, userController.loadHome);
 
 user_router.get('/product',userAuth.isLogin, userAuth.is_blocked, userController.productLoad);
+user_router.get('/productDetails',userController.loadProductDetails);
 
-user_router.get('/cart',userAuth.isLogin,cartController.cartLoad);
-user_router.post('/addToCart',userAuth.isLogin,cartController.addToCart);
+user_router.get('/cart',userAuth.isLogin, userAuth.is_blocked, cartController.cartLoad);
+user_router.post('/addToCart',userAuth.isLogin, cartController.addToCart);
 user_router.post('/cart-quantity',userAuth.isLogin,cartController.cartQuantity);
 user_router.post('/remove-product',userAuth.isLogin,cartController.removeProduct);
 
-user_router.get('/profile',userAuth.isLogin,userController.loadProfile);
-user_router.get('/address',userAuth.isLogin,userController.loadAddress);
-user_router.get('/addAddress',userAuth.isLogin,userController.loadAddAddress);
+user_router.get('/profile',userAuth.isLogin, userAuth.is_blocked, userController.loadProfile);
+user_router.get('/address',userAuth.isLogin, userAuth.is_blocked, userController.loadAddress);
+user_router.get('/addAddress',userAuth.isLogin, userAuth.is_blocked, userController.loadAddAddress);
 user_router.post('/addAddress',userAuth.isLogin,userController.addAddress);
-user_router.get('/editAddress',userAuth.isLogin,userController.loadEditAddress);
+user_router.get('/editAddress',userAuth.isLogin, userAuth.is_blocked, userController.loadEditAddress);
 user_router.post('/editAddress',userAuth.isLogin,userController.updateUserAddress);
 
 
-user_router.get('/checkout',userAuth.isLogin,orderController.loadCheckOut);
+user_router.get('/checkout',userAuth.isLogin, userAuth.is_blocked, orderController.loadCheckOut);
 user_router.post('/placeOrder',userAuth.isLogin,orderController.placeOrder);
-user_router.get('/orderPlaced/:id',orderController.orderPlacedPageLoad);
-user_router.get('/orders',userAuth.isLogin,orderController.loadOrderPage);
-user_router.get('/orderDetails',userAuth.isLogin,orderController.orderDetails);
+user_router.get('/orderPlaced/:id', userAuth.is_blocked, orderController.orderPlacedPageLoad);
+user_router.get('/orders',userAuth.isLogin, userAuth.is_blocked, orderController.loadOrderPage);
+user_router.get('/orderDetails',userAuth.isLogin, userAuth.is_blocked, orderController.orderDetails);
 user_router.get('/orderStatus',orderController.loadOrderStatus)
 
 
-user_router.get('/editCheckoutAddress',userAuth.isLogin,orderController.loadCheckoutEditAddress);
-user_router.post('/editCheckoutAddress',userAuth.isLogin,orderController.editCheckoutAddress);
+user_router.get('/editCheckoutAddress',userAuth.isLogin, userAuth.is_blocked, orderController.loadCheckoutEditAddress);
+user_router.post('/editCheckoutAddress',userAuth.isLogin, userAuth.is_blocked, orderController.editCheckoutAddress);
 
 module.exports = user_router;
