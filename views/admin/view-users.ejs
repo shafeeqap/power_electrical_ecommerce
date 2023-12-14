@@ -31,8 +31,10 @@
                 </tr>
               </thead>
               <tbody>
+                
                 <% let counter = 1; %>
                 <% userData.forEach(user=>{%>
+                  <% if (user.is_admin === 0) { %>
                 <tr>
                   <td>
                     <p class="text-xs font-weight-bold mb-0"><%= counter %></p>
@@ -76,8 +78,9 @@
                     </td>
                     <% } %>
 
-                  <% counter++; %>
-              <%});%>
+                    <% } %>
+                    <% counter++; %>
+                    <%});%>
                   
                 </tr>
                 

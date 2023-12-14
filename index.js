@@ -9,17 +9,7 @@ const session = require('express-session');
 require('dotenv').config();
 
 
-app.use(session({
-  secret:process.env.SESSION_SECRET,
-  resave:false,
-  saveUninitialized:false,
-}));
-
-
 const port = process.env.port || 3000;
-
-// const cookieParser = require('cookie-parser');
-// const logger = require('morgan');
 
 
 // view engine setup
@@ -31,6 +21,17 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 // app.use(cookieParser());
+
+
+
+// Cache Contoling 
+const disable = (req, res, next) => {
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '1');
+  next(); 
+}
+app.use(disable);
 
 
 // for user routes

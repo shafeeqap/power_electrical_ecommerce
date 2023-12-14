@@ -102,11 +102,14 @@
                       <a href="/admin/view-ordersDetails?orderId=<%=data.orderDetails._id%>&productId=<%=data.product._id%>">
                       <span class="badge badge-sm bg-gradient-danger">Manage</span></a>
                     </td>
-                    </tr>
                     <% count++ %>
                     <% }); %>
-                    <% } %>
-                  
+                    <% }else{ %>
+                    <td>
+                      <p class="text-xs font-weight-bold mb-0">Order not found</p>
+                    </td>
+                  </tr>
+                  <% }%>
                 </tbody>
               </table>
             </div>

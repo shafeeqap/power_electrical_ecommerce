@@ -227,32 +227,52 @@ body {
 
 <script>
 
-    function removeProduct(productId){
-
-        $.ajax({
-            url:'/remove-product',
-            method:'post',
-            data:{
-                product:productId
-            },
-        }).done(data=>{
-            if(data){
-
-                $('#reloadDiv').load('/cart #reloadDiv')
-
+function removeProduct(productId) {
+    Swal.fire({
+        icon: 'warning',
+        title: 'Are you sure?',
+        text: 'You won\'t be able to revert this!',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, remove it!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // User clicked the "Yes" button
+            $.ajax({
+                url: '/remove-product',
+                method: 'post',
+                data: {
+                    product: productId
+                },
+            }).done(data => {
+                if (data) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Item Removed Successfully',
+                        showConfirmButton: false,
+                        timer: 1500
+                    }).then(() => {
+                        $('#reloadDiv').load('/cart #reloadDiv');
+                    });
+                } else {
+                    console.log('Item remove failed');
+                }
+            }).fail(error => {
+                // Error handling
+                console.error('Error removing product:', error);
+                // Optionally, display an error message to the user
                 Swal.fire({
-                    
-                    icon:'success',
-                    title:'Item Romoved Successfully',
-                    showConfirmButton:false,
-                    timer:1500
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to remove the item. Please try again.',
+                    showConfirmButton: true,
                 });
+            });
+        }
+    });
+}
 
-            }else{
-                console.log('Item remove failed')
-            }
-        })
-    }
 
     // Function cart count
     function cartCount(productId, userId, count){

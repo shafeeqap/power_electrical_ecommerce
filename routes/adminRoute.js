@@ -12,7 +12,13 @@ const multer = require('multer');
 admin_route.set('view engine', 'ejs');
 admin_route.set('views', './views/admin');
 
-admin_route.use(session({secret:config.sessionSecret}));
+admin_route.use(session({
+    secret:process.env.SESSION_SECRET,
+    resave:false,
+    saveUninitialized:false,
+  }));
+
+
 admin_route.use(express.static(path.join(__dirname,'public')));
 admin_route.use(express.json());
 admin_route.use(express.urlencoded({extended:true}));
@@ -28,14 +34,6 @@ const storage = multer.diskStorage({
     }
 });
 
-// const fileFilter = (req, file, cb) => {
-//     // Allow only image files
-//     if (file.mimetype.startsWith('image/')) {
-//       cb(null, true);
-//     } else {
-//       cb(new Error('Only image files are allowed!'), false);
-//     }
-//   };
 
 const upload = multer({
     storage:storage,

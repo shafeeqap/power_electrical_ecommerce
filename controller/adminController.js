@@ -1,3 +1,4 @@
+const Admin = require('../models/adminModel');
 const User = require('../models/userModel');
 const Order = require('../models/orderModel');
 const Product = require('../models/productModel');
@@ -238,8 +239,8 @@ const loadViewOrders = async(req, res)=>{
 
                 const productData  = await Product.findById(productId)
 
-                const userDetails = await User.findById(orders.userId)
-                // console.log('productData',productData);
+                const userDetails = await User.findById(orders.user)
+                console.log('userDetails',userDetails);
 
                 if(productData){
                     

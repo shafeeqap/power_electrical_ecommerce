@@ -18,10 +18,12 @@
 								<p class="text-danger mt-3">Time left: <span id="timer">60</span></p>
                                 <button type="submit" class="btn btn-primary" 
                                 style="border-radius: 40px 40px 40px 40px; width: 160px; height: 40px; font-weight: 700;" ><i class="fa fa-envelope"></i>  Submit </button>
-								<button  id="resendButton" class="newsletter-btn">
-                                    <a id="resendButtonLink" href=""></a>
-                                    <i class="fa fa-envelope" onclick="resendOTP()"></i>Resend OTP</button>
+								<button id="resendButton" onclick="resendOTP()" class="newsletter-btn" disabled>
+                                    <a id="resendButtonLink" href="javascript:void(0);"></a>
+                                    <i class="fa fa-envelope" ></i> Resend OTP</button>
+                                
 							</form>
+
 							<ul class="newsletter-follow">
 								<li>
 									<a href="#"><i class="fa fa-facebook"></i></a>
@@ -70,13 +72,13 @@
         clearInterval(countdownInterval);
         timerElement.textContent = '0 seconds';
         document.getElementById('resendButton').removeAttribute('disabled');
-        document.getElementById('resendButtonLink').setAttribute('href', '/resendOtp');
+        document.getElementById('resendButtonLink').setAttribute('href', '/resend-otp');
     }
 }
 
         // Function to resend OTP
         function resendOTP() {
-          
+          console.log('resend');
             // Reset the timer
             countdown = 60;
             timerElement.textContent = countdown + ' seconds';
@@ -84,6 +86,7 @@
 
             // Start the countdown again
             countdownInterval = setInterval(updateTimer, 1000);
+            console.log('tttttt');
         }
 
         // Initial countdown start
@@ -145,6 +148,7 @@
             });
         });
     });
+
 
 
 	</script>

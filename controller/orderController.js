@@ -72,9 +72,9 @@ const placeOrder = async(req, res)=>{
         const uniNum = Math.floor(Math.random()*900000)+100000;
         const status = paymentMethod==='COD' ? 'placed':'pending';
         const statusLevel = status==='placed' ? 1 : 0;
-        const walletBalance = userData.wallet;
-        let totalWalletBalance = userData.wallet-total
-        const productId = req.query.productId
+        // const walletBalance = userData.wallet;
+        // let totalWalletBalance = userData.wallet-total
+        // const productId = req.query.productId
         // console.log(productId);
         // const code = req.body.code
         
@@ -88,9 +88,9 @@ const placeOrder = async(req, res)=>{
             orderStatus:'Placed',
             statusLevel:1,
             paymentStatus:'Success',
-            'returnOrderStatus.status':'none',
-            'returnOrderStatus.reason':'none',
-            'cancelOrderStatus.reason':'none'
+            // 'returnOrderStatus.status':'none',
+            // 'returnOrderStatus.reason':'none',
+            // 'cancelOrderStatus.reason':'none'
         }))
 
         const order = new Order({
@@ -125,62 +125,62 @@ const placeOrder = async(req, res)=>{
                 }
                 res.json({success:true, orderid})
 
-            }else{
+            // }else{
             
-                const orderId = orderData._id;
+                // const orderId = orderData._id;
                 // console.log('Order Id',orderId);
-                const totalAmount = orderData.totalAmount;
+                // const totalAmount = orderData.totalAmount;
                 // console.log('Total Amount',totalAmount);
-                if(paymentMethod==='onlinePayment'){
+                // if(paymentMethod==='onlinePayment'){
                     // console.log('OnlinePayment');
-                    var option ={
-                        amount:totalAmount*100,
-                        crrency:"INR",
-                        receipt:""+orderId
-                    };
-                    instance.orders.create(option,(error, order)=>{
-                        res.json({order});
-                    });
+                    // var option ={
+                    //     amount:totalAmount*100,
+                    //     crrency:"INR",
+                    //     receipt:""+orderId
+                    // };
+                    // instance.orders.create(option,(error, order)=>{
+                    //     res.json({order});
+                    // });
 
-                }else if(paymentMethod==='wallet'){
-                    if(walletBalance>=totalAmount){
+                // }else if(paymentMethod==='wallet'){
+                    // if(walletBalance>=totalAmount){
                         
-                        const result = await User.findOneAndUpdate({_id:userId},
-                            {$inc:{wallet:-totalAmount},
-                            $push:{walletHistory:{
-                            transactionDate:new Date(),
-                            transactionAmount:total,
-                            transactionDetails:"Purchased Product Amount.",
-                            transactionType:"Debit",
-                            currentBalance:totalWalletBalance
-                        }}},{new:true});
+                        // const result = await User.findOneAndUpdate({_id:userId},
+                        //     {$inc:{wallet:-totalAmount},
+                        //     $push:{walletHistory:{
+                        //     transactionDate:new Date(),
+                        //     transactionAmount:total,
+                        //     transactionDetails:"Purchased Product Amount.",
+                        //     transactionType:"Debit",
+                        //     currentBalance:totalWalletBalance
+                        // }}},{new:true});
 
                         // console.log('Result',result);
 
-                        const orderUpdate = await Order.findByIdAndUpdate({_id:orderId},
-                            {$set:{"products.$[].paymentStatus":"success"}});
+                        // const orderUpdate = await Order.findByIdAndUpdate({_id:orderId},
+                        //     {$set:{"products.$[].paymentStatus":"success"}});
 
-                            // console.log('orderupdate',orderUpdate);
+                        //     // console.log('orderupdate',orderUpdate);
 
-                            if(result){
-                                const updated = await Cart.deleteOne({userId:req.session.user_id});
-                                for(let i=0; i<cartProducts.length;i++){
-                                    const productId = cartProducts[i].productId;
-                                    const quantity = cartProducts[i].quantity;
-                                    await Product.findOneAndUpdate({_id:productId},
-                                        {$inc:{qty:-quantity}});
+                        //     if(result){
+                        //         const updated = await Cart.deleteOne({userId:req.session.user_id});
+                        //         for(let i=0; i<cartProducts.length;i++){
+                        //             const productId = cartProducts[i].productId;
+                        //             const quantity = cartProducts[i].quantity;
+                        //             await Product.findOneAndUpdate({_id:productId},
+                        //                 {$inc:{qty:-quantity}});
 
-                                }
-                                res.json({success:true, orderid})
-                                // console.log('updated',updated);
-                            };
+                        //         }
+                        //         res.json({success:true, orderid})
+                        //         // console.log('updated',updated);
+                        //     };
                            
 
-                    }else{
-                        res.json({walletFailed:true});
-                    }
+                    // }else{
+                    //     res.json({walletFailed:true});
+                    // }
 
-                }
+                // }
                 
             }
 

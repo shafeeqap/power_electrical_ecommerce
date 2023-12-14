@@ -15,7 +15,13 @@ const userAuth = require('../middlewares/userAuth');
 user_router.set('view engine', 'ejs');
 user_router.set('views','./views/users');
 
-user_router.use(session({secret:config.sessionSecret}));
+user_router.use(session({
+  secret:process.env.SESSION_SECRET,
+  resave:false,
+  saveUninitialized:false,
+}));
+
+
 user_router.use(express.static(path.join(__dirname, 'public')));
 user_router.use(express.json());
 user_router.use(express.urlencoded({extended:true}));
@@ -37,9 +43,9 @@ const upload = multer({storage:storage});
 
 user_router.get('/register', userAuth.isLogout,userController.loadRegister);
 user_router.post('/register',userController.verifyOtp);
-user_router.get('/user-otp',userAuth.isLogout,userController.loadOtp);
+user_router.get('/user-otp',userController.loadOtp);
 user_router.post('/user-otp',userController.insertUser);
-user_router.get('/resend-otp',userAuth.isLogout,userController.resendOtp);
+user_router.get('/resend-otp',userController.resendOtp);
 
 user_router.get('/', userAuth.isLogout, userController.loginLoad)
 user_router.get('/login', userAuth.isLogout,userController.loginLoad);
@@ -52,9 +58,9 @@ user_router.post('/forget-password',userController.forgetVerify);
 user_router.get('/reset-password',userAuth.isLogout,userController.resetPasswordLoad)
 user_router.post('/reset-password',userController.resetPassword)
 
-user_router.get('/home', userAuth.isLogin, userController.loadHome);
+user_router.get('/home', userAuth.isLogin, userAuth.is_blocked, userController.loadHome);
 
-user_router.get('/product',userAuth.isLogin,userController.productLoad);
+user_router.get('/product',userAuth.isLogin, userAuth.is_blocked, userController.productLoad);
 
 user_router.get('/cart',userAuth.isLogin,cartController.cartLoad);
 user_router.post('/addToCart',userAuth.isLogin,cartController.addToCart);

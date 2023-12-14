@@ -97,16 +97,14 @@ const verifyOtp = async (req, res) => {
 
         // Check if the email already exists in the database.
         const emailCheck = await User.findOne({ email: req.body.email });
-        const mobileCheck = await User.findOne({mobile:req.body.mobile});
+        const mobileCheck = await User.findOne({mobile: req.body.mobile});
 
-        let emailMessage = '';
-        let mobileMessage = '';
 
         if (emailCheck || mobileCheck) {
 
             res.render('register',{
                 message:'Your registration is failed.',
-                emailMessage: emailCheck ? 'Email is already exist' : '',
+                emailMessage: emailCheck ? 'User is already exist' : '',
                 mobileMessage: mobileCheck ? 'Mobile is already exist' : '',
             });
 
@@ -218,9 +216,10 @@ const insertUser = async(req,res)=>{
 //  Resend OTP after expire time
 const resendOtp = async(req,res)=>{ 
     try {
+        console.log(req.body);
         const currentTime = Date.now() / 1000;
 
-        if(req.session.otp && req.session.otp.expire != null){
+        if(req.session.otp.expire != null){
             if(currentTime>req.session.otp.expire){
                 const newDigit = otpGenerator.generate(6,{
                     digits: true,
@@ -231,23 +230,32 @@ const resendOtp = async(req,res)=>{
                 });
                 req.session.otp.code=newDigit;
                 const newExpiry=currentTime+60;
-                req.session.otp.expire=newExpiry;
-                sendVerifyMail(req.body.name, req.body.email,req.body.mobile, req.session.otp.code);
-                res.redirect('user-otp', { message: 'New OTP send into your Email', user: req.session.user_id });
+                req.session.otp.expiry=newExpiry;
+                sendVerifyMail(req.session.email, req.session.otp.code);
+
+                res.render('user-otp', { 
+                    message: 'New OTP send into your Email', 
+                    user: req.session.user_id 
+                });
 
 
             }else{
-                res.render('user-otp', { message: 'Email Verified', _req:session.user_id });
+                res.render('user-otp', { 
+                    message: 'You can request a new otp after old otp expires', 
+                    user: req.session.user_id 
+                });
             }
         }else{
-            res.render('user-otp',{message:'Already registerd'})
+            res.render('user-otp',{message:'Already registerd'
+        })
         }
 
         
     } catch (error) {
         console.log(error);
+        
     }
-}
+};
 
 
 //for reset password send mail
