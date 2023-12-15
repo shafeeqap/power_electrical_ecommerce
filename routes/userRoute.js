@@ -74,6 +74,8 @@ user_router.get('/addAddress',userAuth.isLogin, userAuth.is_blocked, userControl
 user_router.post('/addAddress',userAuth.isLogin,userController.addAddress);
 user_router.get('/editAddress',userAuth.isLogin, userAuth.is_blocked, userController.loadEditAddress);
 user_router.post('/editAddress',userAuth.isLogin,userController.updateUserAddress);
+user_router.get('/changePassword', userAuth.isLogin, userAuth.is_blocked, userController.loadChangePassword);
+user_router.post('/changePassword',userController.changePasswordVerify);
 
 
 user_router.get('/checkout',userAuth.isLogin, userAuth.is_blocked, orderController.loadCheckOut);

@@ -482,7 +482,7 @@ const userLogout = async(req,res)=>{
     }
 }
 
-// Forget Password
+// ----------------------------------------Forget Password-------------------------------------------------
 const forgetPassword = async(req,res)=>{
     try {
 
@@ -498,7 +498,7 @@ const forgetPassword = async(req,res)=>{
     }
 }
 
-// Forget Password Verify
+// -----------------------------------------------Forget Password Verify----------------------------------
 const forgetVerify = async(req,res)=>{
     try {
         const email = req.body.email;
@@ -539,7 +539,7 @@ const forgetVerify = async(req,res)=>{
     }
 }
 
-// Reset Password Load
+// ----------------------------------------------Reset Password Load----------------------------------------
 const resetPasswordLoad = async(req,res)=>{
     try {
         
@@ -570,18 +570,18 @@ const resetPasswordLoad = async(req,res)=>{
     }
 }
 
-// Reset Password
+// -----------------------------------------Reset Password----------------------------------------------
 const resetPassword = async(req,res)=>{
     try {
         const password = req.body.password;
         const user_id = req.body.user_id;
-        console.log('New password',password);
+        // console.log('New password',password);
 
         const secure_password = await securePassword(password); 
 
         const updatedData = await User.findByIdAndUpdate({_id:user_id},{$set:{password:secure_password,token:''}})
 
-        console.log('updatepassword',updatedData)
+        // console.log('updatepassword',updatedData)
 
         res.redirect('/');
 
@@ -590,7 +590,7 @@ const resetPassword = async(req,res)=>{
     }
 }
 
-// Load profile
+// -------------------------------------------Load profile-----------------------------------------------
 const loadProfile = async(req, res)=>{
     try {
 
@@ -735,7 +735,86 @@ const updateUserAddress = async(req, res)=>{
         console.log(error);
         res.status(500).send('Internal Server Error');
     }
-}
+};
+
+// ----------------------------------------------Change Password (userprofilePage)---------------------------------------
+const loadChangePassword = async(req, res)=>{
+    try {
+        const userId = req.session.user_id
+        const userData = await User.findById({_id:userId});
+        // console.log('UserData',userData);
+
+        res.render('changePassword',{user:userData});
+        
+    } catch (error) {
+        console.log(error);
+        res.status(500).send('Internal Server Error');
+    }
+};
+
+
+// ----------------------------------Change Password Verify--------------------------------------------------
+const changePasswordVerify = async(req,res)=>{
+    try {
+
+        const currentpassword = req.body.currentpassword;
+        // console.log('currentpassword',currentpassword);
+        const newpassword = req.body.newpassword;
+        const confirmpassword = req.body.confirmpassword;
+        const userId = req.session.user_id;
+        const userData = await User.findById(userId)
+        // console.log(userData);
+
+        if (!userData) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found.',
+            });
+        }
+
+        const oldPassword = userData.password
+
+        const passwordMatch = await bcrypt.compare(currentpassword, oldPassword);
+        // console.log(passwordMatch);
+            if(passwordMatch){
+                if(newpassword===confirmpassword){
+
+                    const sec_password = await securePassword(newpassword)
+
+                    const updatedPassword = await User.updateOne(
+                        {_id:userId},
+                        {$set:{password:sec_password}});
+
+                        return res.json({success:true});
+
+                }else{
+                    return res.status(400).json({
+                        success:false,
+                        message: 'New password and confirm password do not match.'
+                    });
+                }
+                
+            }else{
+                return res.status(400).json({
+                    success:false,
+                    message:'Your old password does not match'});
+            }
+            
+        
+    } catch (error) {
+        console.log(error);
+        res.render('error', { 
+            message: 'New password and confirm password do not match.', 
+            status: 500 
+        });
+    }
+};
+
+
+
+
+
+
 
 
 module.exports ={
@@ -760,4 +839,7 @@ module.exports ={
     addAddress,
     loadEditAddress,
     updateUserAddress,
+    loadChangePassword,
+    changePasswordVerify,
+
 }

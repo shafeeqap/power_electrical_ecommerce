@@ -79,21 +79,20 @@
         </ol>
       </nav>
 
+      <!-- sadiBar -->
       <div class="row gutters-sm">
         <div class="col-md-4 mb-3">
           <div class="card">
             <div class="card-body ">
               <div class="d-flex flex-column align-items-center text-center">
                 <img
-                  src="https://bootdey.com/img/Content/avatar/avatar7.png"
+                  src="/images/person-circle.svg"
                   alt="user"
                   class="rounded-circle"
                   width="100"
                 />
-                <div class="mt-3">
+                <div class="mt-3 ">
                   <h5 style="margin-top: 5px;"><%=user.name%></h5>
-                  <!-- <button class="btn btn-primary">Follow</button> -->
-                  <!-- <button class="btn btn-outline-primary">Message</button> -->
                 </div>
               </div>
             </div>
@@ -104,7 +103,7 @@
                 class="list-group-item d-flex justify-content-between align-items-center flex-wrap"
               >
                 <h5 class="mb-0">
-                    <div class='fas fa-shopping-bag'></div><a href=""> My Orders</a>
+                    <div class='fas fa-shopping-bag'></div><a href="/orders"> My Orders</a>
                 </h5>
                 <!-- <span class="text-secondary">https://bootdey.com</span> -->
               </li>
@@ -124,14 +123,18 @@
             </h5>
                 <!-- <span class="text-secondary">bootdey</span> -->
               </li>
-              <li
-                class="list-group-item d-flex justify-content-between align-items-center flex-wrap"
-              >
+              <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
               <h5 class="mb-0">
                 <div class='fas fa-tag'></div><a href="/address"> Manage Address</a>
             </h5>
                 <!-- <span class="text-secondary">@bootdey</span> -->
               </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                <h5 class="mb-0">
+                  <div class='fas fa-key'></div><a href="/changePassword"> Change Password</a>
+              </h5>
+                  <!-- <span class="text-secondary">@bootdey</span> -->
+                </li>
               <li
                 class="list-group-item d-flex justify-content-between align-items-center flex-wrap"
               >
@@ -151,6 +154,7 @@
             </ul>
           </div>
         </div>
+<!-- end_sadiBar -->
 
         <div class="col-md-8">
             <div class="card mb-3">
@@ -208,10 +212,9 @@
                                             </div>
 
                                             <!-- Submit Button -->
-                                            <div class="d-flex justify-content-between" style="display: flex; justify-content: space-between;">
+                                            <div class="d-flex justify-content-between" style="display: flex; justify-content: space-around;">
                                             <button type="submit" class="btn btn-primary" style="width: 30%;">Update</button>
                                             <button type="button" class="btn btn-danger" style="width: 30%;" onclick="cancelAction()">Cancel</button>
-                                            <button type="button" class="btn btn-warning" style="width: 30%;">Change Password</button>
                                           </div>
                                             <input type="hidden" name="id" value="<%=address[0]._id%>">
                                         </form>
