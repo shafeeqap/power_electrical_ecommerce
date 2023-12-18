@@ -148,17 +148,17 @@
                       <!-- product List/Unlist -->
                     <% if(products.is_active===true){%>
                     <td class=" text-sm">
-                      <a href="/admin/is_activeProduct?id=<%= products._id %>">
-                      <span class="badge badge-sm bg-gradient-success">List</span></a>
+                      <a href="#" class="badge badge-sm bg-gradient-success list-unlist" data-product-id="<%= products._id %>">List</a>
                     </td>
 
                     <% }else{ %>
                       
                       <td class=" text-sm">
-                        <a href="/admin/is_activeProduct?id=<%= products._id %>">
-                        <span class="badge badge-sm bg-gradient-danger">Unlist</span></a>
+                        <a href="#" class="badge badge-sm bg-gradient-danger list-unlist" data-product-id="<%= products._id %>">Unlist</a>
                       </td>
                       <% } %>
+                    <!--end product List/Unlist -->
+
 
                     <% counter++; %>
                 
@@ -200,5 +200,85 @@
     </div>
   </div>
 </div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+
+<!-- block the product -->
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var listUnlistLinks = document.querySelectorAll('.list-unlist');
+
+    for (var i = 0; i < listUnlistLinks.length; i++) {
+      listUnlistLinks[i].addEventListener('click', async function (event) {
+        event.preventDefault();
+
+        var productId = this.dataset.productId;
+        var isBlocked = this.classList.contains('bg-gradient-success');
+
+        try {
+          const result = await Swal.fire({
+            title: 'Are you sure?',
+            text: 'You are listing/unlisting the product!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, List/Unlist it!'
+          });
+
+          if (result.isConfirmed) {
+            // using fetch API
+            const response = await fetch(`/admin/is_activeProduct?id=${productId}`, {
+              method: 'GET',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            });
+
+            const data = await response.json();
+
+            // Handle the response from the server
+            const successAlert = Swal.fire({
+              title: 'List/Unlist!',
+              text: 'The product has been listed/unlisted.',
+              icon: 'success',
+              showConfirmButton: false,
+              timer: 1500
+            });
+
+            // Wait for the success message to close before proceeding
+            await successAlert;
+
+            // Reload the page
+            location.reload();
+
+            // Update the UI based on the response
+            if (isBlocked) {
+              this.classList.remove('bg-gradient-success');
+              this.classList.add('bg-gradient-danger');
+            } else {
+              this.classList.remove('bg-gradient-danger');
+              this.classList.add('bg-gradient-success');
+            }
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          // Close the loading indicator and show an error message
+          Swal.fire({
+            title: 'Error!',
+            text: 'An error occurred while listing/unlisting the product.',
+            icon: 'error'
+          });
+        }
+      });
+    }
+  });
+</script>
+
+  
+
 
 <%- include('../admin/adminLayout/footer.ejs') %>

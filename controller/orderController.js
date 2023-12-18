@@ -87,7 +87,7 @@ const placeOrder = async(req, res)=>{
             quantity:productItem.quantity,
             orderStatus:'Placed',
             statusLevel:1,
-            paymentStatus:'Success',
+            paymentStatus:'Pending',
             // 'returnOrderStatus.status':'none',
             // 'returnOrderStatus.reason':'none',
             // 'cancelOrderStatus.reason':'none'
@@ -223,7 +223,7 @@ const loadOrderPage = async(req, res)=>{
         
         const orderData = await Order.find({userId:userId})
 
-        // console.log('orderData',orderData);
+        console.log('orderData',orderData);
 
         res.render('orders',{user:userData, orderData})
         
@@ -241,7 +241,7 @@ const orderDetails = async(req, res)=>{
         const userData = await User.findOne({_id:userId})
         const orderData = await Order.findOne({_id:id}).populate('products.productId');
         
-        // console.log('Order Data',orderData);
+        console.log('Order Data',orderData);
 
         res.render('orderDetails',{user:userData, orders:orderData})
         

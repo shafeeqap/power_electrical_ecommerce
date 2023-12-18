@@ -71,7 +71,7 @@ admin_route.get('/reset-password',adminAuth.isLogout,adminController.resetPasswo
 admin_route.post('/reset-password',adminController.resetPassword);
 
 admin_route.get('/view-users',adminAuth.isLogin,adminController.viewUsers);
-admin_route.get('/is_blockUser',adminController.userBlockorActive);
+admin_route.get('/is_blockedUser',adminController.userBlockorActive);
 
 admin_route.get('/view-product',adminAuth.isLogin,productController.viewProduct);
 admin_route.get('/add-product',adminAuth.isLogin,productController.loadAddProduct);
@@ -79,6 +79,7 @@ admin_route.post('/add-product',upload.array('image',4),productController.addPro
 admin_route.get('/edit-product',adminAuth.isLogin,productController.editProductLoad);
 admin_route.post('/edit-product',upload.array('image',4),productController.editProduct);
 admin_route.get('/is_activeProduct',adminAuth.isLogin,productController.productListorUnlist);
+admin_route.post('/remove-image',productController.removeImage)
 
 admin_route.get('/view-category',adminAuth.isLogin,categoryController.viewCategory);
 admin_route.get('/add-category',adminAuth.isLogin,categoryController.addCategoryLoad);

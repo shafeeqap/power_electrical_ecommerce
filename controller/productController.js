@@ -1,8 +1,11 @@
 const Product = require('../models/productModel');
 const Category = require('../models/categoryModel');
 const Brand = require('../models/brandModel');
-// const sharp = require('sharp');
-// const { path } = require('../routes/adminRoute');
+const path = require('path');
+const sharp = require('sharp');
+const fs = require('fs');
+
+
 
 
 // View Product page
@@ -77,7 +80,7 @@ const addProduct = async(req,res)=>{
 
          
         const image = []
-        for(i=0;i<req.files.length && i<4;i++){
+        for(let i=0;i<req.files.length && i<4;i++){
             image[i] = req.files[i].filename;
             
         //     await sharp(path.join(__dirname,'../public/adminAssets/images',filename))
@@ -117,7 +120,7 @@ const addProduct = async(req,res)=>{
 // Edit product Load
 const editProductLoad = async(req,res)=>{
     try {
-        const id = req.query.id;
+        const id = req.query.id; 
 
         const productData = await Product.findById({_id:id});
         // console.log(productData);
@@ -136,28 +139,49 @@ const editProduct = async(req,res)=>{
         const id = req.body.id;
         // console.log(id);
         const productName = req.body.productName;
-        const categoryName = req.body.categoryName;
-        const brandName = req.body.brandName;
+        const categoryName = req.body.category;
+        const brandName = req.body.brand;
         const qty = req.body.qty;
         const description = req.body.description;
         const price = req.body.price;
-        const image = [];
 
-        for(i=0;i<req.files.length;i++){
-            image[i] = req.files[i].filename;
+        
+        let image = [];
 
-            // image[i] = filename;
+        // Check if files are uploaded
+        if (req.files && req.files.length > 0) {
+            for (let i = 0; i < req.files.length; i++) {
+                const filename = req.files[i].filename;
 
-            // await sharp(path.join(__dirname, '../public/adminAssets/images', filename))
-            //     .resize(300, 300)
-            //     .toFile(path.join(__dirname, '../public/adminAssets/images', 'resized-' + filename));
+                // Resize image to 300x300 pixels
+                await sharp(path.join(__dirname, '../public/adminAssets/images', filename))
+                    .resize(300, 300)
+                    .toFile(path.join(__dirname, '../public/adminAssets/images', 'resized-' + filename));
+            
+                image[i] = 'resized-' + filename;
 
-            //     image[i] = 'resized-' + filename;
-        };
+            }
+        } else {
+            // No new files uploaded, maintain existing image
+            const existingProduct = await Product.findOne({_id:id});
 
-        const updatedData = await Product.findByIdAndUpdate({_id:id},
+            if (existingProduct && existingProduct.image) {
+                if(Array.isArray(existingProduct.image)){
+
+                    image = existingProduct.image;
+                }else{
+                    image = [existingProduct.image];
+                }
+            }
+        }
+
+        // console.log("Images:", image); // Corrected this line to log the 'image' variable
+
+
+        const updatedData = await Product.findByIdAndUpdate(
+            {_id:id},
             {$set:{
-                productName:productName,
+                name:productName,
                 categoryName:categoryName,
                 brandName:brandName,
                 qty:qty,
@@ -165,19 +189,21 @@ const editProduct = async(req,res)=>{
                 price:price,
                 image:image,
                 is_active:req.body.is_active
-            }});
-            // console.log(req.body);
+            }},{new:true});
+
+            // console.log(updatedData);
+
             if(updatedData){
                 res.redirect('/admin/view-product');
             }else{
                 res.render('edit-product',{message:'Something went wrong'});
             }
-
-
-    } catch (error) {
-        console.log(error);        
+        
+        }catch (error) {
+            console.error('Error in editProduct:', error);
+            res.status(500).send('Internal Server Error');
     }
-}
+};
 
 // Product List/Unlist
 const productListorUnlist = async(req,res)=>{
@@ -188,21 +214,88 @@ const productListorUnlist = async(req,res)=>{
         const productData = await Product.findById({_id:id});
         // console.log(productData);
 
+        if (!productData) {
+            // If the product is not found
+            return res.status(404).json({ success: false, message: 'Product not found' });
+        }
+
+        let newIsActivated;
+
         if(productData.is_active===true){
             await Product.updateOne({_id:id},{$set:{is_active:false}});
+
+            newIsActivated = false;
             
-            res.redirect('/admin/view-product');
+            // res.redirect('/admin/view-product');
         }else{
             await Product.updateOne({_id:id},{$set:{is_active:true}});
+
+            newIsActivated = true;
             
-            res.redirect('/admin/view-product');
+            // res.redirect('/admin/view-product');
         }
+
+        res.status(200).json({
+            success: true,
+            message: `Product ${newIsActivated ? 'listed' : 'unlisted'} successfully`,
+            is_active: newIsActivated,
+        });
+
+
+
 
 
     } catch (error) {
         console.log(error);
+        res.status(500).json({ success: false, message: 'Internal Server Error' });
     }
-}
+};
+
+// Remove Images
+const removeImage = async (req, res) => {
+    try {
+      const imageName = req.body.imageName;
+      console.log('Image name', imageName);
+  
+      const imagePath = path.join(__dirname, 'public', 'adminAssets', 'images', imageName);
+      console.log('imagePath', imagePath);
+  
+      const resizedImageName = 'resized-' + imageName;
+      const resizedImagePath = path.join(__dirname, 'public', 'adminAssets', 'images', resizedImageName);
+      console.log('resizedImagePath', resizedImagePath);
+  
+      const removeImageFile = (imagePath) => {
+        fs.access(imagePath, fs.constants.F_OK, (err) => {
+          if (!err) {
+            // The file exists, so remove it
+            fs.unlink(imagePath, (unlinkErr) => {
+              if (!unlinkErr) {
+                console.log(`Image removed successfully at: ${imagePath}`);
+              } else {
+                console.error(`Error removing image at ${imagePath}: ${unlinkErr}`);
+              }
+            });
+          } else {
+            console.log(`Image does not exist at: ${imagePath}`);
+          }
+        });
+      };
+  
+      // Call the removeImageFile function for both paths
+      removeImageFile(imagePath);
+      removeImageFile(resizedImagePath);
+  
+      // Send success response
+      return res.status(200).json({ message: 'Image removed successfully.' });
+  
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: 'Internal server error.' });
+    }
+  };
+  
+
+
 
 module.exports={
     viewProduct,
@@ -210,6 +303,7 @@ module.exports={
     addProduct,
     editProductLoad,
     editProduct,
-    productListorUnlist
+    productListorUnlist,
+    removeImage
 
 }

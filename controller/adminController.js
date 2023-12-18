@@ -210,7 +210,6 @@ const userBlockorActive = async(req,res)=>{
         await User.updateOne({_id:user_id},{$set:{is_block:true}});
         res.redirect('/admin/view-users');
     }
-
         
     } catch (error) {
         console.log(error);

@@ -1,16 +1,14 @@
-<%-include('../admin/adminLayout/sidebar.ejs')%>
-
-<%- include('../admin/adminLayout/navbar.ejs')%>
-
-
-
+<%-include('../admin/adminLayout/sidebar.ejs')%> <%-
+include('../admin/adminLayout/navbar.ejs')%>
 
 <div class="container-fluid py-4">
   <div class="row">
     <div class="col-12">
       <div class="card my-4">
         <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-          <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
+          <div
+            class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3"
+          >
             <h6 class="text-white text-capitalize ps-3"><%=message%></h6>
           </div>
         </div>
@@ -19,22 +17,50 @@
             <table class="table align-items-center mb-4">
               <thead>
                 <tr style="background-color: rgb(227, 225, 225);">
-                  <th class="text-uppercase text-xxs font-weight-bolder  ps-2" style="color: black;">No</th>
-                  <th class="text-uppercase text-xxs font-weight-bolder  ps-2" style="color: black;">User Name</th>
-                  <th class="text-uppercase text-xxs font-weight-bolder  ps-2" style="color: black;">Email</th>
-                  <th class="text-uppercase text-xxs font-weight-bolder  ps-2" style="color: black;">Mobile</th>
+                  <th
+                    class="text-uppercase text-xxs font-weight-bolder ps-2"
+                    style="color: black;"
+                  >
+                    No
+                  </th>
+                  <th
+                    class="text-uppercase text-xxs font-weight-bolder ps-2"
+                    style="color: black;"
+                  >
+                    User Name
+                  </th>
+                  <th
+                    class="text-uppercase text-xxs font-weight-bolder ps-2"
+                    style="color: black;"
+                  >
+                    Email
+                  </th>
+                  <th
+                    class="text-uppercase text-xxs font-weight-bolder ps-2"
+                    style="color: black;"
+                  >
+                    Mobile
+                  </th>
                   <!-- <th class="text-uppercase text-xxs font-weight-bolder  ps-2" style="color: black;">Image</th> -->
                   <!-- <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">Update</th> -->
-                  <th class="text-uppercase text-xxs font-weight-bolder  ps-2" style="color: black;">Status</th>
-                  <th class="text-uppercase text-xxs font-weight-bolder  ps-2" style="color: black;">Action</th>
-                  
+                  <th
+                    class="text-uppercase text-xxs font-weight-bolder ps-2"
+                    style="color: black;"
+                  >
+                    Status
+                  </th>
+                  <th
+                    class="text-uppercase text-xxs font-weight-bolder ps-2"
+                    style="color: black;"
+                  >
+                    Action
+                  </th>
                 </tr>
               </thead>
               <tbody>
-                
-                <% let counter = 1; %>
-                <% userData.forEach(user=>{%>
-                  <% if (user.is_admin === 0) { %>
+                <% let counter = 1; %> 
+                <% userData.forEach(user=>{%> <% if
+                (user.is_admin === 0) { %>
                 <tr>
                   <td>
                     <p class="text-xs font-weight-bold mb-0"><%= counter %></p>
@@ -46,7 +72,9 @@
                     <p class="text-xs font-weight-bold mb-0"><%=user.email%></p>
                   </td>
                   <td>
-                    <p class="text-xs font-weight-bold mb-0"><%=user.mobile%></p>
+                    <p class="text-xs font-weight-bold mb-0">
+                      <%=user.mobile%>
+                    </p>
                   </td>
                   <!-- <td>
                     <img src="/userImages/<%=user.image %>" class="avatar avatar-sm me-3 border-radius-lg" alt="">
@@ -55,35 +83,36 @@
                   <!-- Verified/Not Verified -->
                   <% if(user.is_varified==0){%>
                   <td>
-                    <p class="text-xs text-danger font-weight-bold mb-0">Not Verified</p>
+                    <p class="text-xs text-danger font-weight-bold mb-0">
+                      Not Verified
+                    </p>
                   </td>
                   <%}else{%>
-                    <td>
-                      <p class="text-xs text-success font-weight-bold mb-0">Verified</p>
-                    </td>
-                    <%}%>
+                  <td>
+                    <p class="text-xs text-success font-weight-bold mb-0">
+                      Verified
+                    </p>
+                  </td>
+                  <%}%>
 
-                    <!-- User Active/Blocked -->
+                  <!-- User Active/Blocked -->
                   <% if(user.is_block===true){%>
-                  <td class=" text-sm">
-                    <a href="/admin/is_blockUser?id=<%= user._id %>">
-                    <span class="badge badge-sm bg-gradient-danger">Blocked</span></a>
+                  <td class="text-sm">
+                    <a href="/admin/is_blockedUser?id=<%= user._id %>" class="block-unblock-link">
+                      <span class="badge badge-sm bg-gradient-danger">Blocked</span></a>
                   </td>
 
                   <% }else{ %>
-                    
-                    <td class=" text-sm">
-                      <a href="/admin/is_blockUser?id=<%= user._id %>">
-                      <span class="badge badge-sm bg-gradient-success">Active</span></a>
-                    </td>
-                    <% } %>
 
-                    <% } %>
-                    <%});%>
-                    <% counter++; %>
-                  
+                  <td class="text-sm">
+                    <a href="/admin/is_blockedUser?id=<%= user._id %>" class="block-unblock-link">
+                      <span class="badge badge-sm bg-gradient-success">Active</span></a>
+                  </td>
+                  <% } %> 
+                  <% counter++; %>
+                  <% } %> 
+                  <%});%> 
                 </tr>
-                
               </tbody>
             </table>
           </div>
@@ -92,5 +121,61 @@
     </div>
   </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    let blockUnblockList = document.querySelectorAll(".block-unblock-link");
+
+    for (let i = 0; i < blockUnblockList.length; i++) {
+      blockUnblockList[i].addEventListener("click", function (event) {
+        event.preventDefault();
+
+        let link = this;
+        let userId = link.href.split("=")[1]; // Extracting user ID from the link
+
+        const successAlert = Swal.mixin({
+          customClass: {
+            confirmButton: "btn btn-success",
+            cancelButton: "btn btn-danger",
+          },
+          buttonsStyling: false,
+        });
+        successAlert.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Blocke/Active!",
+            cancelButtonText: "No, cancel!",
+            reverseButtons: true,
+
+          }).then((result) => {
+            if (result.isConfirmed) {
+              window.location.href = link.href;
+              
+              successAlert.fire({
+                title: "Blocked!",
+                text: "User has been blocked.",
+                icon: "success",
+                
+              });
+            } else if (
+              /* Read more about handling dismissals below */
+              result.dismiss === Swal.DismissReason.cancel
+              ) {
+                successAlert.fire({
+                  title: "Cancelled",
+                  text: "User safe :)",
+                  icon: "error",
+                });
+            }
+          });
+
+      });
+    }
+  });
+</script>
 
 <%-include('../admin/adminLayout/footer.ejs')%>
