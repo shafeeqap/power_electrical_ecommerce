@@ -47,9 +47,8 @@
 		</div>
 		<!-- /NEWSLETTER -->
 
-    <%-include('../layout/footer.ejs')%>
-
-
+        
+        
 <!-- SweetAlert library -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
@@ -64,7 +63,7 @@
         let countdownInterval;
 
         // Function to update the countdown timer
-    function updateTimer() {
+        function updateTimer() {
         timerElement.textContent = countdown + ' seconds';
         countdown--;
 
@@ -78,15 +77,29 @@
 
         // Function to resend OTP
         function resendOTP() {
-          console.log('resend');
+            
+          console.log('Resend button clicked');
+
             // Reset the timer
             countdown = 60;
             timerElement.textContent = countdown + ' seconds';
             resendButton.disabled = true;
-
+            
             // Start the countdown again
             countdownInterval = setInterval(updateTimer, 1000);
             console.log('tttttt');
+
+                // AJAX request to resend the OTP
+                $.ajax({
+                    type: "GET",
+                    url: "/resend-otp",
+                    success: function (data) {
+                        console.log('New OTP sent successfully');
+                    },
+                    error: function () {
+                        console.log('Error resending OTP');
+                    }
+                });
         }
 
         // Initial countdown start
@@ -99,12 +112,12 @@
     if (invalidMsg) {
       invalidMsg.style.display = "none";
     }
-  }, 3000);
+}, 3000);
 
 
 
-  $(document).ready(function () {
-        $("form").submit(function (event) {
+$(document).ready(function () {
+    $("form").submit(function (event) {
             event.preventDefault();
 
             console.log("Form submitted!");
@@ -113,9 +126,9 @@
 
             // Make an AJAX request to verify the OTP
             $.ajax({
+                data: { otp: otp },
                 type: "POST",
                 url: "/user-otp",
-                data: { otp: otp },
                 success: function (data) {
                     if (data.success) {
                         // OTP verification was successful
@@ -155,3 +168,7 @@
 
 </body>
 </html>
+                        
+
+
+<%-include('../layout/footer.ejs')%>

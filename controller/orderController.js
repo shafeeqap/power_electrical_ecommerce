@@ -223,7 +223,7 @@ const loadOrderPage = async(req, res)=>{
         
         const orderData = await Order.find({userId:userId})
 
-        console.log('orderData',orderData);
+        // console.log('orderData',orderData);
 
         res.render('orders',{user:userData, orderData})
         

@@ -186,7 +186,7 @@
                     <% productData.forEach(product=> {%>
                     <div class="col-md-4 col-xs-6 product-item" data-brand="<%= product.brandName %>" >
                         <div class="product">
-                            <div class="product-img">
+                            <a href="/productDetails?id=<%=product._id%>"><div class="product-img">
                                 <% if(product.image.length >0) {%>
                                 <img src="/adminAssets/images/<%=product.image[0]%>" alt="">
                                 <% };%>
@@ -194,7 +194,7 @@
                                     <span class="sale">-30%</span>
                                     <span class="new">NEW</span>
                                 </div>
-                            </div>
+                            </div></a>
                             <div class="product-body">
                                 <p class="product-category"><%=product.category%></p>
                                 <p class="product-brand warning"><%=product.brandName%></p>

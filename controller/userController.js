@@ -216,7 +216,8 @@ const insertUser = async(req,res)=>{
 //  Resend OTP after expire time
 const resendOtp = async(req,res)=>{ 
     try {
-        console.log(req.body);
+        console.log('Resend OTP',req.body);
+
         const currentTime = Date.now() / 1000;
 
         if(req.session.otp.expire != null){
@@ -238,13 +239,15 @@ const resendOtp = async(req,res)=>{
                     user: req.session.user_id 
                 });
 
-
+                
             }else{
                 res.render('user-otp', { 
                     message: 'You can request a new otp after old otp expires', 
                     user: req.session.user_id 
                 });
             }
+            console.log("New OTP sent to email successfully");
+
         }else{
             res.render('user-otp',{message:'Already registerd'
         })
@@ -252,7 +255,8 @@ const resendOtp = async(req,res)=>{
 
         
     } catch (error) {
-        console.log(error);
+        console.log("Error sending OTP:",error);
+        res.status(500).send("Error sending OTP");
         
     }
 };
@@ -443,7 +447,7 @@ const productLoad = async(req,res)=>{
             ]
         }).countDocuments()
 
-
+        // console.log('productData', productData);
         res.render('product', {
             user,
             productData,
@@ -464,7 +468,23 @@ const productLoad = async(req,res)=>{
 const loadProductDetails = async(req, res)=>{
     try {
 
-        res.render('productDetails')
+        const productId = req.query.id;
+        // console.log('productId',productId);
+        
+        const userData = await User.findById(req.session.user_id);
+        const productData = await Product.findById({_id:productId});
+        // console.log('ProductData',productData);
+
+        if(productData){
+
+            res.render('productDetails',{
+                user:userData,
+                product:productData 
+            });
+        }else{
+            res.render('productDetails',{message:'Product Details not available'});
+        }
+
         
     } catch (error) {
         console.log(error);

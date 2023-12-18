@@ -121,7 +121,7 @@ const addProduct = async(req,res)=>{
 const editProductLoad = async(req,res)=>{
     try {
         const id = req.query.id; 
-
+        
         const productData = await Product.findById({_id:id});
         // console.log(productData);
         const category = await Category.find();
@@ -255,14 +255,14 @@ const productListorUnlist = async(req,res)=>{
 const removeImage = async (req, res) => {
     try {
       const imageName = req.body.imageName;
-      console.log('Image name', imageName);
+    //   console.log('Image name', imageName);
   
       const imagePath = path.join(__dirname, 'public', 'adminAssets', 'images', imageName);
-      console.log('imagePath', imagePath);
+    //   console.log('imagePath', imagePath);
   
       const resizedImageName = 'resized-' + imageName;
       const resizedImagePath = path.join(__dirname, 'public', 'adminAssets', 'images', resizedImageName);
-      console.log('resizedImagePath', resizedImagePath);
+    //   console.log('resizedImagePath', resizedImagePath);
   
       const removeImageFile = (imagePath) => {
         fs.access(imagePath, fs.constants.F_OK, (err) => {
