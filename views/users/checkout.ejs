@@ -117,17 +117,17 @@
                 <!-- /Billing Details -->
 
                 <!-- Shiping Details -->
-                <div class="shiping-details">
-                    <!-- <div class="section-title">
-                        <h3 class="title">Shiping address</h3>
-                    </div> -->
+                <!-- <div class="shiping-details">
+                    <div class="section-title">
+                        <h5 class="title">Add new shipping address</h5>
+                    </div>
                     <div class="input-checkbox">
                         <input type="checkbox" id="shiping-address">
                         <label for="shiping-address">
                             <span></span>
                             Ship to a diffrent address?
                         </label>
-                        <!-- <div class="caption">
+                        <div class="caption">
                             <form action="/checkoutAddrss" method="post">
                             <div class="form-group">
                                 <input class="input" type="text" id="FullName" name="fullName" placeholder="Full name">
@@ -149,15 +149,15 @@
                             </div>
                             <button class="btn btn-danger" type="submit">Submit</button>
                         </form>
-                        </div> -->
+                        </div>
                     </div>
-                </div>
+                </div> -->
                 <!-- /Shiping Details -->
 
                 <!-- Order notes -->
-                <div class="order-notes">
+                <!-- <div class="order-notes">
                     <textarea class="input" placeholder="Order Notes"></textarea>
-                </div>
+                </div> -->
                 <!-- /Order notes -->
             </div>
            
@@ -179,19 +179,44 @@
                         </div>
                         <%})%>
                     </div>
+
+                    <!-- coupon details-->
+                    <div class="coupon-details">
+                        <div class="section-title">
+                            <h5 class="title">Have a coupon?</h5>
+                        </div>
+                        <div class="input-checkbox">
+                            <input type="checkbox" id="coupon-details" onchange="toggleCouponInput()">
+                            <label for="coupon-details">
+                                <span></span>
+                                Enter your code below.
+                            </label>
+                            <div class="caption" id="couponInputContainer" style="display: none;">
+                                <div class="form-group">
+                                    <input class="input" type="text" id="code" name="code" placeholder="Enter your coupon">
+                                </div>
+                                <button id="apply" class="btn btn-primary" onclick="applyCoupon()">Apply</button>
+                                <button id="unApply" class="btn btn-danger" onclick="unApplyCoupon()">Unapply</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!--end coupon details-->
+
                     <div class="order-col">
                         <div>Shiping</div>
                         <div><strong>FREE</strong></div>
                     </div>
+                    
                     <div class="order-col">
                         <div><strong>TOTAL</strong></div>
                         <div><strong class="order-total" id="total"><%=total%></strong></div>
                     </div>
-                </div>
                 <div class="payment-method">
                     <h5>Payment Method</h5>
                     <div class="input-radio">
-                        <input type="radio" name="payment" id="COD" value="COD" checked>
+                        <input type="radio" 
+                        name="payment" 
+                        id="COD" value="COD">
                         <label for="COD">
                             <span></span>
                             Cash on delivery
@@ -201,7 +226,7 @@
                         </div>
                     </div>
                     <div class="input-radio">
-                        <input type="radio" name="payment" id="payment" value="onlinePayment">
+                        <input type="radio" name="payment" id="payment" value="onlinePayment" checked>
                         <label for="payment">
                             <span></span>
                             Online Payment
@@ -229,7 +254,8 @@
                     </label>
                 </div>
                 <a href="">
-                <button type="submit" class="btn btn-danger" style="width: 100%; border-radius: 20px;">Place order</button>
+                <button type="submit" class="btn btn-danger btn-order" style="width: 100%; border-radius: 20px;">Place order
+                </button>
                     </a>
             </div>
         </form>
@@ -243,55 +269,106 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
-
-
-<Script>
-
-$(document).ready(function () {
+<script>
+  $(document).ready(function () {
     $("#checkout-form").on("submit", function (e) {
-        e.preventDefault();
-        // $(this).find("button[type='submit']").prop('disabled', true);
+      e.preventDefault();
 
-        console.log('clicked');
+      console.log('clicked');
 
-        var address = $("input[name='address']:checked").val();
-        var total = $("#total").text();
-        var payment = $("input[name=payment]:checked").val();
+      var address = $("input[name='address']:checked").val();
+      var total = $("#total").text();
+      var payment = $("input[name=payment]:checked").val();
 
-        console.log("buttonClicked");
-        console.log('before AJAX request');
-        console.log('Selected Address:', address);
+      console.log("buttonClicked");
+      console.log('before AJAX request');
+      console.log('Selected Address:', address);
 
-        $.ajax({
-            type: "POST",
-            url: "/placeOrder",
-            // contentType: "application/json",
-            data: { total: total, address: address, payment: payment },
-            success: function (response) {
-                if (response.success === true) {
-                    window.location.href = `/orderPlaced/${response.orderid}`;
-                } else if(response.walletFailed==true){
-                    swal.fire({
-                        icon: "error",
-                        title: "Insufficient Balance In Your Wallet",
-                        showConfirmButton: false,
-                        showCancelButton: false,
-                        timer: 1500,
-                    });
-                }
-            },
+      $.ajax({
+        type: "POST",
+        url: "/placeOrder",
+        data: { total: total, address: address, payment: payment },
+        success: function (response) {
+          console.log('After AJAX request');
+          console.log('Total:', total);
+          console.log('Address:', address);
+          console.log('Payment:', payment);
 
-        });
-
-        console.log('After AJAX request');
-        console.log('Total:', total);
-        console.log('Address:', address);
-        console.log('Payment:', payment);
+          if (response.success === true) {
+            window.location.href = `/orderPlaced/${response.orderid}`;
+          } else if (response.walletFailed == true) {
+            swal.fire({
+              icon: "error",
+              title: "Insufficient Balance In Your Wallet",
+              showConfirmButton: false,
+              showCancelButton: false,
+              timer: 1500,
+            });
+          } else {
+            razorPayment(response.order);
+            console.log('Order:', response.order);
+          }
+        },
+      });
     });
-});
+  });
 
-</Script>
+  function razorPayment(order) {
+    console.log('entered to razorpay', order);
+
+    var options = {
+      key: 'rzp_test_2bImS12F9bn0vK',
+      amount: order.amount * 100,
+      currency: 'INR',
+      name: 'Power_Eelectricals',
+      description: 'Test Transaction',
+      image: '/images/my_Logo.png',
+      order_id: order.id,
+      handler: function (response) {
+        verifyPaymetn(response, order);
+        console.log(response);
+      },
+      prefill: {
+        name: 'Customer Name',
+        email: 'customer@example.com',
+        contact: '1234567890',
+      },
+      notes: {
+        address: order.address,
+      },
+      theme: {
+        color: '#F37254',
+      },
+    };
+
+    var razorpayInstance = new Razorpay(options);
+    razorpayInstance.open();
+  }
+</script>
+
+
+<script>
+    function toggleCouponInput() {
+        var couponInputContainer = document.getElementById('couponInputContainer');
+        var checkbox = document.getElementById('coupon-details');
+
+        if (checkbox.checked) {
+            couponInputContainer.style.display = 'block';
+        } else {
+            couponInputContainer.style.display = 'none';
+        }
+    }
+
+    function applyCoupon() {
+        // Implement your apply coupon logic here
+    }
+
+    function unApplyCoupon() {
+        // Implement your unapply coupon logic here
+    }
+</script>
 
 
 

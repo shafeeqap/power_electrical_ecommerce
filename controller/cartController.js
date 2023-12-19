@@ -104,24 +104,8 @@ const cartLoad = async(req,res)=>{
         const user = await User.findById(req.session.user_id);
         // console.log('User', user);
 
-        // const userId = new ObjectId(user._id);
-        // cart Quantity    //
-        // const cartTotal = await Cart.aggregate([
-        //     {
-        //         $match:{userId:userId}
-        //     },
-        //     {
-        //         $unwind:'$products'
-        //     },
-        //     {
-        //         $group:{_id:null, totalQuantity:{$sum:'$products.quantity'}}
-        //     }
-        // ])
-
-        // const cartQuantity = cartTotal.length> 0 ? cartTotal[0].totalQuantity:0;
-        // console.log('TotalQuntity:',totalQuantity);
-        
-
+      
+  
         if (!user) {
             return res.render('cart', { message: "User not found", cart: [], total: 0 });
         }

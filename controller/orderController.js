@@ -3,7 +3,18 @@ const User = require('../models/userModel');
 const Product = require('../models/productModel');
 const Address = require('../models/addressModel');
 const Order = require('../models/orderModel');
+const Razorpay = require('razorpay');
+const crypto = require('crypto');
 const { ObjectId } = require('mongodb');
+const { log } = require('console');
+
+
+// Create Razorpay instance
+var instance = new Razorpay({
+    key_id: process.env.key_id,
+    key_secret: process.env.key_secret
+});
+
 
 
 
@@ -39,6 +50,12 @@ const loadCheckOut = async(req,res)=>{
 
         ]).exec();
         // console.log('Total',total);
+
+        if (!total || !total[0] || total[0].total === undefined) {
+            console.log('Total not found in aggregation result');
+            return res.status(400).send('Total not found in aggregation result');
+        }
+
 
         Total=total[0].total
         // console.log(Total);
@@ -112,7 +129,7 @@ const placeOrder = async(req, res)=>{
         if(orderData){
             // console.log(cartData);
             if(paymentMethod==='COD'){
-                // console.log('COD');
+                console.log('COD');
                 // console.log(cartData);
                 for(const item of cartData.products){
                     const productId = item.productId._id;
@@ -125,25 +142,34 @@ const placeOrder = async(req, res)=>{
                 }
                 res.json({success:true, orderid})
 
-            // }else{
+            }else{
             
-                // const orderId = orderData._id;
-                // console.log('Order Id',orderId);
-                // const totalAmount = orderData.totalAmount;
-                // console.log('Total Amount',totalAmount);
-                // if(paymentMethod==='onlinePayment'){
-                    // console.log('OnlinePayment');
-                    // var option ={
-                    //     amount:totalAmount*100,
-                    //     crrency:"INR",
-                    //     receipt:""+orderId
-                    // };
-                    // instance.orders.create(option,(error, order)=>{
-                    //     res.json({order});
-                    // });
+                const orderId = orderData._id;
+                console.log('Order Id',orderId);
+                const totalAmount = orderData.totalAmount;
+                console.log('Total Amount',totalAmount);
+                if(paymentMethod==='onlinePayment'){
+                    console.log('OnlinePayment');
+                    var option ={
+                        amount:totalAmount*100,
+                        currency:"INR",
+                        receipt: "" + orderId
+                    };
+                    instance.orders.create(option, (error, order) =>{
+                        
+                        if (error) {
+                            console.error('Razorpay API error:', error);
+                            res.status(500).json({ success: false, error: 'Razorpay API error' });
+                        } else {
+                            console.log('Razorpay Order:', order);
+                            res.json({ order });
+                        }
 
-                // }else if(paymentMethod==='wallet'){
-                    // if(walletBalance>=totalAmount){
+                    });
+
+                }
+                // else if(paymentMethod==='wallet'){
+                //     if(walletBalance>=totalAmount){
                         
                         // const result = await User.findOneAndUpdate({_id:userId},
                         //     {$inc:{wallet:-totalAmount},
@@ -189,13 +215,13 @@ const placeOrder = async(req, res)=>{
 
         }else {
             // Handle the case when orderData is not available
-            res.status(400).send('Failed to place the order');
+            res.status(400).json({ error: 'Failed to place the order' });
         }
 
 
     } catch (error) {
         console.log(error);
-        res.status(500).send('Internal Server Error');
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 
 };

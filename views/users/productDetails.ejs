@@ -6,9 +6,30 @@
 <!-- Include jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 
+
+<!-- Include magnifier.js library -->
+<script src="https://unpkg.com/magnifierjs/dist/magnifier.min.js"></script>
+
+
 <!-- Include Elevate Zoom script and stylesheet -->
-<script src="https://cdn.jsdelivr.net/npm/elevatezoom@3.0.8/dist/jquery.elevatezoom.min.js"></script>
+<!-- <script src="https://cdn.jsdelivr.net/npm/elevatezoom@3.0.8/dist/jquery.elevatezoom.min.js"></script> -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/elevatezoom@3.0.8/dist/jquery.elevatezoom.css" />
+
+
+<style>
+    .zoomThumb{
+        width: 100px;
+        height: 100px;
+        margin: 5px;
+    }
+
+    #zoom_01{
+        width: 500px;
+        height: 500px;
+    }
+
+</style>
+
 
 <!-- SECTION -->
 <div class="section">
@@ -19,25 +40,11 @@
             <!-- Product main img -->
             <div class="col-md-5 col-md-push-2">
                 <div id="product-main-img">
-                
                     <% if(product.image.length>0){%>
-                    <div class="product-preview">
-                        <img src="/adminAssets/images/<%=product.image[0]%>" alt="" data-zoom-image="/adminAssets/images/<%=product.image[0]%>">
+                    <div class="magnifier-container">
+                        <img id="zoom_01" src="/adminAssets/images/<%= product.image[0] %>" alt="">
                     </div>
-                    <% } %>
-                    
-
-                    <!-- <div class="product-preview">
-                        <img src="./img/product03.png" alt="">
-                    </div>
-
-                    <div class="product-preview">
-                        <img src="./img/product06.png" alt="">
-                    </div>
-
-                    <div class="product-preview">
-                        <img src="./img/product08.png" alt="">
-                    </div> -->
+                    <% } %> 
                 </div>
             </div>
             <!-- /Product main img -->
@@ -45,24 +52,14 @@
             <!-- Product thumb imgs -->
             <div class="col-md-2  col-md-pull-5">
                 <div id="product-imgs">
-                
                     <% if(product.image.length>0){%>
-                    <div class="product-preview">
-                        <img src="/adminAssets/images/<%=product.image[0]%>" alt="" >
+                    <% product.image.forEach((image, index)=>{%>
+                        <div class="product-preview-thumb" data-image="/adminAssets/images/<%= image %>">
+                        <img class="zoomThumb"  src="/adminAssets/images/<%= image %>" alt="">
                     </div>
+                
+                    <% }); %>
                     <% } %>
-                    
-                    <!-- <div class="product-preview">
-                        <img src="./img/product03.png" alt="">
-                    </div>
-
-                    <div class="product-preview">
-                        <img src="./img/product06.png" alt="">
-                    </div>
-
-                    <div class="product-preview">
-                        <img src="./img/product08.png" alt="">
-                    </div> -->
                 </div>
             </div>
             <!-- /Product thumb imgs -->
@@ -427,20 +424,35 @@
 
 }
   
+
+  
 </script>
 
 <!-- Initialize Elevate Zoom -->
+
 <script>
-    $(document).ready(function() {
-        // Set the zoom options (you can customize as needed)
-        $('#product-main-img .product-preview img').elevateZoom({
-            gallery: 'product-imgs',
-            cursor: 'pointer',
-            galleryActiveClass: 'active',
-            imageCrossfade: true,
-            loadingIcon: 'https://www.elevateweb.co.uk/spinner.gif'
+    document.addEventListener('DOMContentLoaded', function () {
+        var magnifier = new Magnifier({
+            magnifier: '#product-main-img',
+            width: 300,
+            height: 300,
+        });
+    
+        // Add click event listener for thumbnail images
+        var thumbs = document.querySelectorAll('.product-preview-thumb');
+        thumbs.forEach(function (thumb) {
+            thumb.addEventListener('click', function () {
+                var imageUrl = this.getAttribute('data-image');
+                document.getElementById('zoom_01').src = imageUrl;
+    
+                // Update magnifier with the new image
+                magnifier.setTargetImage(imageUrl);
+            });
         });
     });
-</script>
+    </script>
+    
+
+
 
 <%-include('../layout/footer.ejs')%>

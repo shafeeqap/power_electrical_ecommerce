@@ -8,9 +8,19 @@ const Product = require('../models/productModel');
 const Brand = require('../models/brandModel');
 const Cart = require('../models/cartModel');
 const Address = require('../models/addressModel');
+const Razorpay = require('razorpay');
+const crypto = require('crypto');
 const { ObjectId } = require('mongodb');
 
 const config = require('../config/config');
+
+var instance = new Razorpay({
+    key_id:process.env.key_id,
+    key_secret:process.env.key_secret
+})
+
+
+
 
 // securePassword (bcrypt)----------------------//
 const securePassword = async(password)=>{
@@ -473,7 +483,7 @@ const loadProductDetails = async(req, res)=>{
         
         const userData = await User.findById(req.session.user_id);
         const productData = await Product.findById({_id:productId});
-        // console.log('ProductData',productData);
+        console.log('ProductData',productData);
 
         if(productData){
 
