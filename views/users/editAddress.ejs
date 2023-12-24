@@ -172,42 +172,42 @@
                                             <!-- Name Input -->
                                             <div class="mb-3">
                                                 <label for="FullName" class="form-label">Name:</label>
-                                                <input type="text" class="form-control" id="FullName" name="fullName" required value="<%=address[0].fullName%>">
+                                                <input type="text" class="form-control" id="FullName" name="fullName" value="<%=address[0].fullName%>">
                                                 <span class="error-message text-danger" id="fullNameError"></span>
                                             </div>
                     
                                             <!-- Mobile Input -->
                                             <div class="mb-3">
                                                 <label for="mobile" class="form-label">Mobile:</label>
-                                                <input type="tel" class="form-control" id="mobile" name="mobile" required value="<%=address[0].mobile%>">
+                                                <input type="tel" class="form-control" id="mobile" name="mobile" value="<%=address[0].mobile%>">
                                                 <span class="error-message text-danger" id="phoneError"></span>
                                             </div>
 
                                             <!-- City Input -->
                                             <div class="mb-3">
                                                 <label for="city" class="form-label">City:</label>
-                                                <input type="text" class="form-control" id="city" name="city" required value="<%=address[0].city%>">
+                                                <input type="text" class="form-control" id="city" name="city" value="<%=address[0].city%>">
                                                 <span class="error-message text-danger" id="cityError"></span>
                                             </div>
 
                                             <!-- State Input -->
                                             <div class="mb-3">
                                                 <label for="state" class="form-label">State:</label>
-                                                <input type="text" class="form-control" id="state" name="state" required value="<%=address[0].state%>">
+                                                <input type="text" class="form-control" id="state" name="state" value="<%=address[0].state%>">
                                                 <span class="error-message text-danger" id="stateError"></span>
                                             </div>
 
                                             <!-- State Input -->
                                             <div class="mb-3">
                                                 <label for="country" class="form-label">Country:</label>
-                                                <input type="text" class="form-control" id="country" name="country" required value="<%=address[0].country%>">
+                                                <input type="text" class="form-control" id="country" name="country" value="<%=address[0].country%>">
                                                 <span class="error-message text-danger" id="countryError"></span>
                                             </div>
                     
                                             <!-- Pincode Input -->
                                             <div class="mb-3">
                                                 <label for="pincode" class="form-label">Pincode:</label>
-                                                <input type="text" class="form-control" id="pinCode" name="pincode" required value="<%=address[0].pincode%>">
+                                                <input type="text" class="form-control" id="pinCode" name="pincode" value="<%=address[0].pincode%>">
                                                 <span class="error-message text-danger" id="pinCodeError"></span>
                                             </div>
 
@@ -322,8 +322,7 @@
     function cancelAction() {
         
         // document.getElementById("editAddress").reset();
-        window.history.back();
-        
+        window.history.back(); 
     }
 
 

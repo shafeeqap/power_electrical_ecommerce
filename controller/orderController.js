@@ -81,7 +81,8 @@ const placeOrder = async(req, res)=>{
         const address = req.body.address
         // console.log('address',address);
         const cartData = await Cart.findOne({userId:userId});
-        const total = parseInt(req.body.total);
+        const totalAmountString = req.body.total.replace('₹', ''); // remove ₹ symbol
+        const total = parseInt(totalAmountString);
         const paymentMethod = req.body.payment;
         const userData = await User.findOne({_id:userId});
         const name = userData.name
@@ -226,77 +227,67 @@ const placeOrder = async(req, res)=>{
 };
 
 // Checkout Verify Payment
-const verifyPayment = async(req, res)=>{
+const verifyPayment = async (req, res) => {
     try {
-
-        const details = req.body;
-        // console.log('paymentDetails',details);
-        const cartData = await Cart.findOne({userId:req.session.user_id});
-        // console.log('Cart Data',cartData);
-        const products = cartData.products;
-        const hmac = crypto.createHmac('sha256', process.env.KEY_SECRET); // HMAC (Hash-based Message Authentication Code). 
-
-        hmac.update(details.payment.razorpay_order_id + '|'+ details.payment.razorpay_payment_id)
-        const hmacValue = hmac.digest('hex')
-
-        if(hmacValue===details.payment.razorpay_signature){
-            for(let i=0;i<products.length;i++){
-                const productId = products[i].productId
-                const quantity = products[i].qty
-
-                await Product.findByIdAndUpdate(
-                    {_id:productId},
-                    { $inc:{qty:-quantity}}
-                );
-            };
-
-            const result = await Order.findByIdAndUpdate(
-                {_id:details.order.receipt},
-                {$set:{'products.$[].paymentStatus':'success'}}
-            );
-
-
-            const dec = await Coupon.updateOne(
-                {couponCode:req.session.code},
-                {$inc:{usersLimit:-1}}
-            );
-
-            const userUsed = await Coupon.updateOne(
-                {couponCode:req.session.code},
-                {$push:{usedUsers:req.session.user_id}}
-            );
-
-            await Order.findByIdAndUpdate(
-                {_id:details.order.receipt},
-                {$set:{paymentId:details.payment.razorpay_payment_id}}
-            );
-
-            await Cart.deleteOne({userId:req.session.user_id})
-            const orderid = details.order.receipt;
-            
-            if(req.session.code){
-                const coupon = await Coupon.findOne({couponCode:req.session.code});
-                const disAmount = coupon.discountAmount;
-                await Order.updateOne(
-                    {_id:orderid},
-                    {$set:{discount:disAmount}},
-                    {upsert:true}
-                );
-                res.json({codsuccess:true, orderid});
-            }
-
-            res.json({codsuccess:true, orderid});
-            
-
-        }else{
-            console.log(details.order.receipt);
+      const details = req.body;
+      const cartData = await Cart.findOne({ userId: req.session.user_id });
+      const products = cartData.products;
+      const hmac = crypto.createHmac('sha256', process.env.KEY_SECRET);
+      hmac.update(details.payment.razorpay_order_id + '|' + details.payment.razorpay_payment_id);
+      const hmacValue = hmac.digest('hex');
+  
+      if (hmacValue === details.payment.razorpay_signature) {
+        for (let i = 0; i < products.length; i++) {
+          const productId = products[i].productId;
+          const quantity = products[i].qty;
+  
+          await Product.findByIdAndUpdate({ _id: productId }, { $inc: { qty: -quantity } });
         }
-
-        
+  
+        const result = await Order.findByIdAndUpdate(
+          { _id: details.order.receipt },
+          { $set: { 'products.$[].paymentStatus': 'success' } }
+        );
+  
+        const dec = await Coupon.updateOne(
+          { couponCode: req.session.code },
+          { $inc: { usersLimit: -1 } }
+        );
+  
+        const userUsed = await Coupon.updateOne(
+          { couponCode: req.session.code },
+          { $push: { usedUsers: req.session.user_id } }
+        );
+  
+        await Order.findByIdAndUpdate(
+          { _id: details.order.receipt },
+          { $set: { paymentId: details.payment.razorpay_payment_id } }
+        );
+  
+        await Cart.deleteOne({ userId: req.session.user_id });
+        const orderid = details.order.receipt;
+  
+        if (req.session.code) {
+          const coupon = await Coupon.findOne({ couponCode: req.session.code });
+          const disAmount = coupon.discountAmount;
+          await Order.updateOne(
+            { _id: orderid },
+            { $set: { discount: disAmount } },
+            { upsert: true }
+          );
+          return res.json({ codsuccess: true, orderid });
+        }
+  
+        return res.json({ codsuccess: true, orderid });
+      } else {
+        console.log(details.order.receipt);
+      }
     } catch (error) {
-        console.log(error);
+      console.log(error);
+      res.status(500).json({ error: 'Internal Server Error' });
     }
-};
+  };
+  
 
 // Order Placed Page Load
 const orderPlacedPageLoad = async(req, res)=>{

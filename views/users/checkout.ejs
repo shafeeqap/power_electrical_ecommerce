@@ -66,54 +66,62 @@
         <!-- row -->
         <div class="row">
 
-            <div class="col-md-7">
+            <div class="col-md-6">
                 <!-- Billing Details -->
                 <div class="billing-details">
                     <div class="section-title">
-                        <h3 class="title">Shiping address</h3>
+                        <h3 class="title">Shipping address</h3>
                     </div>
-                    <div class="row" style="background-color: rgb(239,239,239); border-radius: 5px; width: 650px;">
-                        <div >
-                    <form id="checkout-form">
-                        <div class="col-md-10" >
-
-                                <% if( address && address.addresses && address.addresses.length>0){%>
-                                <% address.addresses.forEach((address)=>{%>
-
-                                <!-- Address Details -->
-                                <div class="card mb-3 rounded shadow">
-                                    <div style="padding: 5px; margin: 15px; margin-left: 40px;">
-                                        <a href="/editCheckoutAddress?id=<%=address._id %>"><button type="button" class="close" aria-label="Edit" style="position: relative; top: 45px; left: 100px;">
-                                            <i class="fa fa-pencil"  aria-hidden="true" ></i>
-                                        </button></a>
-                                        <div class="custom-label p-3 m-2">
-                                            <div class="form-check d-flex align-item-center mx-4">
-                                                <input class="form-check-input" type="radio" name="address" id="flexRadioDefault" style="position:absolute; top: 65px; left: 30px;" 
-                                                value="<%= address.fullName %>, <%= address.city %>,<%= address.state %>,<%= address.country %>,<%= address.pincode %>,<%= address.mobile %>" checked>
-                                                <span class="error-message text-danger" id="addressError"></span>
-                                                <div class="mx-3 mx-md-5">
-                                                    <h6 style="text-transform: uppercase;"><%= address.fullName %></h6>
-                                                    <p>
-                                                        <%= address.city %>,<br>
-                                                        <%= address.state %>,
-                                                        <%= address.country %>, <br>
-                                                        <%= address.pincode %><br>
-                                                        <%= address.mobile %>
-                                                    </p>
+                    <div class="row">
+                        <form id="checkout-form">
+                            <% if (address && address.addresses && address.addresses.length > 0) { %>
+                                <% address.addresses.forEach((address) => { %>
+                                    <div class="col-md-12">
+                                        <div class="card">
+                                            <div class="card-body" style="display: flex; background-color: #f5f5f5; margin-bottom: 10px;">
+                                                <!-- Address Details -->
+                                                <div style="padding: 5px; margin: 15px; margin-left: 40px;">
+                                                    <div class="custom-label p-3 m-2">
+                                                        <div class="form-check d-flex align-item-center mx-4">
+                                                            <input class="form-check-input" type="radio" name="address" id="flexRadioDefault" 
+                                                            style="position:absolute; top: 65px; left: 30px;" value="<%= address.fullName %>, 
+                                                            <%= address.city %>,<%= address.state %>,<%= address.country %>,<%= address.pincode %>,<%= address.mobile %>" checked>
+                                                            <span class="error-message text-danger" id="addressError"></span>
+                                                            <div class="mx-3 mx-md-5">
+                                                                <h6 style="text-transform: uppercase;"><%= address.fullName %></h6>
+                                                                <p>
+                                                                    <%= address.city %>,<br>
+                                                                    <%= address.state %>,
+                                                                    <%= address.country %>, <br>
+                                                                    <%= address.pincode %><br>
+                                                                    <%= address.mobile %>
+                                                                </p>
+                                                                <div class="col-md-12">
+                                                                    <!-- 'Edit' button -->
+                                                                    <button type="button" class="btn btn-primary"> 
+                                                                        <a href="/editCheckoutAddress?id=<%=address._id %>">Edit
+                                                                    </button></a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
+
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                                <% });%>
 
-                                <% }else{ %>
-                                    <h6 style="padding:10px; margin-top: 5px;">No address fount.</h6>
-                                <% } %>
-                        </div>
-                    </div>
-                    </div>
+                                <% }); %>
+                            <% } else { %>
+                                <h6 style="padding:10px; margin-top: 5px;">No address found.</h6>
+                            <% } %>
+                        <!-- </form> -->
+            
                 </div>
+                </div>
+                
+                
+                
                 <!-- /Billing Details -->
 
                 <!-- Shiping Details -->
@@ -162,7 +170,7 @@
             </div>
            
             <!-- Order Details -->
-            <div class="col-md-5 order-details">
+            <div class="col-md-6 order-details">
                 <div class="section-title text-center">
                     <h3 class="title">Your Order</h3>
                 </div>
