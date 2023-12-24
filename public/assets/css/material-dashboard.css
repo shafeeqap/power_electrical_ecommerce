@@ -1818,10 +1818,10 @@ progress {
   font-size: 0.875rem;
   font-weight: 400;
   line-height: 1.5rem;
-  color: #495057;
+  color: #020b14;
   background-color: transparent;
   background-clip: padding-box;
-  border: 1px solid #d2d6da;
+  border: 1px solid #121518;
   -webkit-appearance: none;
      -moz-appearance: none;
           appearance: none;
@@ -1836,9 +1836,9 @@ progress {
       cursor: pointer; }
   .form-control:focus {
     color: #495057;
-    background-color: transparent;
-    border-color: transparent;
-    outline: 0;
+    background-color: #f0eeee;
+    border-color: black;
+    outline: 1;
     box-shadow: none; }
   .form-control::-webkit-date-and-time-value {
     height: 1.5rem; }
@@ -1864,7 +1864,7 @@ progress {
     pointer-events: none;
     border-color: black;
     border-style: solid;
-    border-width: 0;
+    border-width: 1;
     border-inline-end-width: 1px;
     border-radius: 0;
     transition: all 0.15s ease-in; }
@@ -1894,6 +1894,8 @@ progress {
         transition: none; } }
   .form-control:hover:not(:disabled):not([readonly])::-webkit-file-upload-button {
     background-color: rgba(0, 0, 0, 0.05); }
+
+
 
 .form-control-plaintext {
   display: block;

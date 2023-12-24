@@ -1,15 +1,19 @@
 <%- include('../admin/adminLayout/header.ejs')%>
 <%- include('../admin/adminLayout/navbar.ejs')%>
-
+<style>
+    input[type=text], select{
+    padding: 12px 20px;
+    background-color: rgb(236, 234, 234);
+  }
+</style>
 
 <!-- saideNaveBar -->
-
-
 
 <body class="g-sidenav-show  bg-gray-200">
   <aside class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3   bg-gradient-dark" id="sidenav-main">
     <div class="sidenav-header" style="margin: 15px;">
       <i class="fas fa-times p-3 cursor-pointer text-white opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
+
       <a class="navbar-brand m-0" href=" https://demos.creative-tim.com/material-dashboard/pages/dashboard " target="_blank"></a>
         <img src="/assets/img/logo-ct.png" class="navbar-brand-img h-100" alt="main_logo">
         <span class="ms-1 font-weight-bold text-white">Material Dashboard</span>
@@ -106,7 +110,6 @@
     
 <!-- endSaidNavBar -->
 
-
 <div class="container-fluid py-4">
     <div class="row">
       <div class="col-12">
@@ -116,6 +119,34 @@
               <h6 class="text-white text-capitalize ps-3"><%=message%></h6>
             </div>
           </div>
+
+          <!-- Search and filter -->
+
+        <div class="row mt-5 ml-1" style="margin-top: 50px;margin-left: 5px;">
+          <div class="col-md-8 mt-5 ml-1" style="margin-top: 50px;">
+             <!-- Centered Search Form -->
+            <form action="/admin/view-orders" method="GET" class="d-inline-flex" style="width:80%; align-items: baseline;">
+              <input type="text" name="search" class="form-control me-2" placeholder=" Search..." value="<%= searchQuery %>">
+              <input type="hidden" name="page" value="<%= pagination.page %>">
+              <input type="hidden" name="limit" value="<%= pagination.limit %>">
+              <button type="submit" class="btn btn-primary" style="width: 140px;">Search</button>
+          </form>
+            
+
+          </div>
+          <div class="col-md-4">
+            <% if (searchQuery) { %>
+              <p class="mb-3"><strong>Search Results for:</strong> <%= searchQuery %></p>
+    
+            <% } %>
+    
+            <p class="mb-3"><strong>Total Order:</strong> <%= orders.length %></p>
+          </div>
+
+        </div>
+
+        <!-- End Search and filter -->
+
           <div class="card-body px-0 pb-2">
             <div class="table-responsive p-0">
               <table class="table align-items-center mb-4">
@@ -215,6 +246,33 @@
                   <% }%>
                 </tbody>
               </table>
+
+<!-- start pagination -->
+<div class="d-flex justify-content-center">
+  <nav aria-label="Page navigation">
+      <ul class="pagination">
+          <% if (pagination.page > 1) { %>
+              <li class="page-item">
+                  <a class="page-link" href="?page=<%= pagination.page - 1 %>&limit=<%= pagination.limit %>&search=<%= searchQuery %>">Previous</a>
+              </li>
+          <% } %>
+
+          <% for (let i = 1; i <= pagination.totalPages; i++) { %>
+              <li class="page-item <%= i === pagination.page ? 'active' : '' %>">
+                  <a class="page-link" href="?page=<%= i %>&limit=<%= pagination.limit %>&search=<%= searchQuery %>"><%= i %></a>
+              </li>
+          <% } %>
+
+          <% if (pagination.page < pagination.totalPages) { %>
+              <li class="page-item">
+                  <a class="page-link" href="?page=<%= pagination.page + 1 %>&limit=<%= pagination.limit %>&search=<%= searchQuery %>">Next</a>
+              </li>
+          <% } %>
+      </ul>
+  </nav>
+</div>
+<!-- End pagination -->
+
             </div>
           </div>
         </div>

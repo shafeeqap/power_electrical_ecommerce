@@ -25,13 +25,13 @@
       background-color: #fff;
       background-clip: border-box;
       border: 0 solid rgba(0, 0, 0, 0.125);
-      border-radius: 0.25rem;
+      border-radius: 1rem;
     }
 
     .card-body {
       flex: 1 1 auto;
       min-height: 1px;
-      padding: 1rem;
+      padding: 1.5rem;
     }
 
     .gutters-sm {
@@ -61,6 +61,51 @@
     .h5{
       margin-top: 5px;
     }
+    .rectangle-box {
+      width: initial; /* Set the width of the rectangle */
+      height: auto; /* Set the height of the rectangle */
+      border: 1px solid #000; /* Set the border color and thickness */
+      border-radius: .5rem;
+      padding: 1rem;
+      margin-top: 5px;
+    }
+    hr {
+      height: 1px; /* Adjust the line height */
+      background-color: #333; /* Set the line color */
+      border: none;
+      margin: 2px 0; 
+    }
+    .img-body {
+    width: 200px; 
+    height: auto; 
+  }
+
+  .img-body img {
+    width: 100%; 
+    height: auto; 
+    display: block; 
+  }
+  .coupon-details{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .Valid-to{
+    background-color: aliceblue;
+  
+  }
+  /* .coupon-code{
+    display: flex;
+    justify-content: center;
+  } */
+
+
+
+
+
+
+
   </style>
 <!-- navBar -->
 <div class="container">
@@ -167,7 +212,7 @@
                   <%=address.addresses[0].fullName%>
                 </div>
               </div>
-              <hr />
+              <!-- <hr /> -->
               <div class="row">
                 <div class="col-sm-3">
                   <h6 class="mb-0">Email</h6>
@@ -177,7 +222,7 @@
                 </div>
               </div>
               <!-- <hr /> -->
-              <hr />
+              <!-- <hr /> -->
               <div class="row">
                 <div class="col-sm-3">
                   <h6 class="mb-0">Mobile</h6>
@@ -186,7 +231,7 @@
                   <%=address.addresses[0].mobile%>
                 </div>
               </div>
-              <hr />
+              <!-- <hr /> -->
               <div class="row">
                 <div class="col-sm-3">
                   <h6 class="mb-0">State</h6>
@@ -194,8 +239,8 @@
                 <div class="col-sm-9 text-secondary">
                   <%=address.addresses[0].state%>
                 </div>
-              </div>
-              <hr />
+                <!-- <hr /> -->
+                </div>
               <div class="row">
                 <div class="col-sm-3">
                   <h6 class="mb-0">Pincode</h6>
@@ -204,7 +249,7 @@
                   <%=address.addresses[0].pincode%>
                 </div>
               </div>
-              <hr />
+              <!-- <hr /> -->
               <% }%>
               <!-- <div class="row">
                 <div class="col-sm-12">
@@ -218,138 +263,67 @@
               </div> -->
             </div>
           </div>
-          <!-- <div class="row gutters-sm">
+          <div class="row gutters-sm">
+            <% if(couponData.length>0){%>
+              <% couponData.forEach((coupon)=>{%>
+                
+                <% let redeemed = null;%>
+
+                <% for(let i=0; i<coupon.usedUsers.length; i++){%>
+                  <% let usersId = coupon.usedUsers[i]%>
+                  <% redeemed =usersId%>
+                  <% break %>
+                  <% } %>
+
+                  <% if (coupon.validTo >= new Date()) {%>
             <div class="col-sm-6 mb-3">
               <div class="card h-100">
+                <!-- card-body -->
                 <div class="card-body">
-                  <h6 class="d-flex align-items-center mb-3">
-                    <i class="material-icons text-info mr-2">assignment</i
-                    >Project Status
-                  </h6>
-                  <small>Web Design</small>
-                  <div class="progress mb-3" style="height: 5px;">
-                    <div
-                      class="progress-bar bg-primary"
-                      role="progressbar"
-                      style="width: 80%;"
-                      aria-valuenow="80"
-                      aria-valuemin="0"
-                      aria-valuemax="100"
-                    ></div>
+                  <div class="coupon-details">
+                    <h5 class="d-flex align-items-center mb-3" style="background-color: #f1f2f3; padding: 10px;">Available Coupons</h5>
+                    <% if(redeemed==null){%>
+                    <small class="Valid-to">Valid till : <%=coupon.validTo.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })%></small>
+                  <% } %>
                   </div>
-                  <small>Website Markup</small>
-                  <div class="progress mb-3" style="height: 5px;">
-                    <div
-                      class="progress-bar bg-primary"
-                      role="progressbar"
-                      style="width: 72%;"
-                      aria-valuenow="72"
-                      aria-valuemin="0"
-                      aria-valuemax="100"
-                    ></div>
+                  <div class="coupon-code">
+                    <h5 class="coupon-body" style="display: flex; justify-content: space-between;">
+                      Coupon Code: <i class="text-danger"><%=coupon.couponCode%></i>
+                      <div class="ml-auto" style="align-items: end;"> 
+                        <div class="badge badge-sm bg-gradient-danger" onclick="copyCouponCode('<%= coupon.couponCode%>')"><a href="" style="color: #fff;">Copy Code</a></div>
+                      </div>
+                    </h5>
                   </div>
-                  <small>One Page</small>
-                  <div class="progress mb-3" style="height: 5px;">
-                    <div
-                      class="progress-bar bg-primary"
-                      role="progressbar"
-                      style="width: 89%;"
-                      aria-valuenow="89"
-                      aria-valuemin="0"
-                      aria-valuemax="100"
-                    ></div>
-                  </div>
-                  <small>Mobile Template</small>
-                  <div class="progress mb-3" style="height: 5px;">
-                    <div
-                      class="progress-bar bg-primary"
-                      role="progressbar"
-                      style="width: 55%;"
-                      aria-valuenow="55"
-                      aria-valuemin="0"
-                      aria-valuemax="100"
-                    ></div>
-                  </div>
-                  <small>Backend API</small>
-                  <div class="progress mb-3" style="height: 5px;">
-                    <div
-                      class="progress-bar bg-primary"
-                      role="progressbar"
-                      style="width: 66%;"
-                      aria-valuenow="66"
-                      aria-valuemin="0"
-                      aria-valuemax="100"
-                    ></div>
+                  <hr>
+                    <i class="h5 material-icons text-info mr-2 text-success">Discount: ₹ <%=coupon.discountAmount%></i><br>
+                    <div class="rectangle-box">
+                  <div class="img-body">
+                    <img src="/images/coupon_2.png" alt="">
                   </div>
                 </div>
-              </div>
-            </div>
-            <div class="col-sm-6 mb-3">
-              <div class="card h-100">
-                <div class="card-body">
-                  <h6 class="d-flex align-items-center mb-3">
-                    <i class="material-icons text-info mr-2">assignment</i
-                    >Project Status
-                  </h6>
-                  <small>Web Design</small>
-                  <div class="progress mb-3" style="height: 5px;">
-                    <div
-                      class="progress-bar bg-primary"
-                      role="progressbar"
-                      style="width: 80%;"
-                      aria-valuenow="80"
-                      aria-valuemin="0"
-                      aria-valuemax="100"
-                    ></div>
-                  </div>
-                  <small>Website Markup</small>
-                  <div class="progress mb-3" style="height: 5px;">
-                    <div
-                      class="progress-bar bg-primary"
-                      role="progressbar"
-                      style="width: 72%;"
-                      aria-valuenow="72"
-                      aria-valuemin="0"
-                      aria-valuemax="100"
-                    ></div>
-                  </div>
-                  <small>One Page</small>
-                  <div class="progress mb-3" style="height: 5px;">
-                    <div
-                      class="progress-bar bg-primary"
-                      role="progressbar"
-                      style="width: 89%;"
-                      aria-valuenow="89"
-                      aria-valuemin="0"
-                      aria-valuemax="100"
-                    ></div>
-                  </div>
-                  <small>Mobile Template</small>
-                  <div class="progress mb-3" style="height: 5px;">
-                    <div
-                      class="progress-bar bg-primary"
-                      role="progressbar"
-                      style="width: 55%;"
-                      aria-valuenow="55"
-                      aria-valuemin="0"
-                      aria-valuemax="100"
-                    ></div>
-                  </div>
-                  <small>Backend API</small>
-                  <div class="progress mb-3" style="height: 5px;">
-                    <div
-                      class="progress-bar bg-primary"
-                      role="progressbar"
-                      style="width: 66%;"
-                      aria-valuenow="66"
-                      aria-valuemin="0"
-                      aria-valuemax="100"
-                    ></div>
-                  </div>
                 </div>
+                <!-- end card-body -->
               </div>
             </div>
-          </div> -->
+            <% } %>
+
+            <% }); %>
+            <% }else{ %>
+              
+              <div class="col-sm-12 mb-3">
+                <div class="error-content text-center">
+                  <div class="card h-100">
+                    <div class="card-body">
+
+                      <h4 class="error-title" style="margin-top: 15px;">No Coupons Available !</h4>
+                      <img src="/images/Gif/coupon_Animation - 1703333128824.gif" alt="">
+                    </div>
+                  </div>
+                    
+                </div>
+            <% } %>
+              </div>
+          </div>
         </div>
       </div>
     </div>
@@ -374,4 +348,31 @@
     </div>
   </div>
 
+  <!-- link for ajax -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- CDN link for sweetalert -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <script>
+
+    function copyCouponCode(couponCode){
+    const tempInput = document.createElement('input');
+    tempInput.value = couponCode;
+    document.body.appendChild(tempInput);
+    tempInput.select();
+    document.execCommand('copy');
+    document.body.removeChild(tempInput);
+
+    // Use SweetAlert for feedback
+    Swal.fire({
+        icon: 'success',
+        title: 'Copied!',
+        text: `Coupon code ${couponCode} has been copied to the clipboard.`,
+        timer: 2000, // Display the alert for 2 seconds
+        timerProgressBar: true,
+        showConfirmButton: false
+      });
+    }
+  </script>
 <%- include('../layout/footer.ejs') %>

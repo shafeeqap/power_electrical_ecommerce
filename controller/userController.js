@@ -8,6 +8,7 @@ const Product = require('../models/productModel');
 const Brand = require('../models/brandModel');
 const Cart = require('../models/cartModel');
 const Address = require('../models/addressModel');
+const Coupon = require('../models/couponModel');
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
 const { ObjectId } = require('mongodb');
@@ -512,7 +513,7 @@ const userLogout = async(req,res)=>{
     }
 }
 
-// ----------------------------------------Forget Password-------------------------------------------------
+// ----------------------------------------Forget Password-------------------------------------------------//
 const forgetPassword = async(req,res)=>{
     try {
 
@@ -528,7 +529,7 @@ const forgetPassword = async(req,res)=>{
     }
 }
 
-// -----------------------------------------------Forget Password Verify----------------------------------
+// -----------------------------------------------Forget Password Verify----------------------------------//
 const forgetVerify = async(req,res)=>{
     try {
         const email = req.body.email;
@@ -569,7 +570,7 @@ const forgetVerify = async(req,res)=>{
     }
 }
 
-// ----------------------------------------------Reset Password Load----------------------------------------
+// ----------------------------------------------Reset Password Load----------------------------------------//
 const resetPasswordLoad = async(req,res)=>{
     try {
         
@@ -600,7 +601,7 @@ const resetPasswordLoad = async(req,res)=>{
     }
 }
 
-// -----------------------------------------Reset Password----------------------------------------------
+// -----------------------------------------Reset Password----------------------------------------------//
 const resetPassword = async(req,res)=>{
     try {
         const password = req.body.password;
@@ -620,7 +621,7 @@ const resetPassword = async(req,res)=>{
     }
 }
 
-// -------------------------------------------Load profile-----------------------------------------------
+// -------------------------------------------Load profile-----------------------------------------------//
 const loadProfile = async(req, res)=>{
     try {
 
@@ -640,7 +641,15 @@ const loadProfile = async(req, res)=>{
         const address = await Address.findOne({userId:userId})
         // console.log(address);
 
-        res.render('profile',{user:userData, address})
+        const couponData = await Coupon.find({status:true});
+        // console.log('couponData',couponData);
+
+
+        res.render('profile',{
+            user:userData, 
+            address,
+            couponData
+        });
         
     } catch (error) {
         console.log(error);

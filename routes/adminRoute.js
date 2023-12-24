@@ -58,6 +58,7 @@ const adminController = require('../controller/adminController');
 const categoryController = require('../controller/categoryController');
 const productController = require('../controller/productController');
 const brandController = require('../controller/brandController');
+const couponController = require('../controller/couponController');
 
 
 admin_route.get('/',adminAuth.isLogout,adminController.loadLogin);
@@ -98,7 +99,21 @@ admin_route.get('/is_blockBrand',brandController.brandListorUnlist);
 
 admin_route.get('/view-orders',adminAuth.isLogin,adminController.loadViewOrders);
 admin_route.get('/view-ordersDetails',adminAuth.isLogin,adminController.viewOrderDetails);
-admin_route.post('/view-ordersDetails/changeStatus',adminController.changeOrderStatus)
+admin_route.post('/view-ordersDetails/changeStatus',adminController.changeOrderStatus);
+
+admin_route.get('/view-coupon', adminAuth.isLogin, couponController.loadViewCoupon);
+admin_route.get('/add-coupon', adminAuth.isLogin, couponController.loadAddCoupon);
+admin_route.post('/add-coupon', couponController.AddCoupon);
+admin_route.get('/edit-coupon', adminAuth.isLogin, couponController.loadEditCoupon);
+admin_route.post('/edit-coupon', couponController.editCoupon);
+admin_route.get('/delete-coupon', adminAuth.isLogin, couponController.deletecoupon);
+
+
+
+
+
+
+admin_route.get('/sample',adminController.sample)
 
 
 

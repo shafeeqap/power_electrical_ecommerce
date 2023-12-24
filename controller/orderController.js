@@ -3,10 +3,12 @@ const User = require('../models/userModel');
 const Product = require('../models/productModel');
 const Address = require('../models/addressModel');
 const Order = require('../models/orderModel');
+const Coupon = require('../models/couponModel');
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
 const { ObjectId } = require('mongodb');
 const { log } = require('console');
+
 
 
 // Create Razorpay instance
@@ -77,23 +79,24 @@ const placeOrder = async(req, res)=>{
     try {
         const userId = req.session.user_id
         const address = req.body.address
+        // console.log('address',address);
         const cartData = await Cart.findOne({userId:userId});
         const total = parseInt(req.body.total);
         const paymentMethod = req.body.payment;
         const userData = await User.findOne({_id:userId});
         const name = userData.name
-        // console.log(name);
-        // console.log('Total',total);
-        // console.log('Address',address);
         
         const uniNum = Math.floor(Math.random()*900000)+100000;
         const status = paymentMethod==='COD' ? 'placed':'pending';
         const statusLevel = status==='placed' ? 1 : 0;
-        // const walletBalance = userData.wallet;
-        // let totalWalletBalance = userData.wallet-total
+        const walletBalance = userData.wallet;
+        let totalWalletBalance = userData.wallet-total
         // const productId = req.query.productId
         // console.log(productId);
-        // const code = req.body.code
+        const code = req.body.code
+        console.log('code',code);
+
+        const couponData = await Coupon.findOne({couponCode:code});
         
         const today = new Date();
         const deliveryDate = new Date(today);
@@ -127,15 +130,11 @@ const placeOrder = async(req, res)=>{
         const orderid = order._id
         // console.log(cartData);
         if(orderData){
-            // console.log(cartData);
             if(paymentMethod==='COD'){
-                console.log('COD');
-                // console.log(cartData);
+                // console.log('COD');
                 for(const item of cartData.products){
                     const productId = item.productId._id;
-                    // console.log('productId',productId);
                     const quantity = parseInt(item.quantity,10);
-                    // console.log('quantity',quantity);
                     const result = await Product.updateOne({_id:productId},
                         {$inc:{qty:-quantity}}) //it will subtract the specified quantity from the existing value of the 'qty' field.
                         // console.log('Result',result);
@@ -145,11 +144,11 @@ const placeOrder = async(req, res)=>{
             }else{
             
                 const orderId = orderData._id;
-                console.log('Order Id',orderId);
+                // console.log('Order Id',orderId);
                 const totalAmount = orderData.totalAmount;
-                console.log('Total Amount',totalAmount);
+                // console.log('Total Amount',totalAmount);
                 if(paymentMethod==='onlinePayment'){
-                    console.log('OnlinePayment');
+                    // console.log('OnlinePayment');
                     var option ={
                         amount:totalAmount*100,
                         currency:"INR",
@@ -161,7 +160,7 @@ const placeOrder = async(req, res)=>{
                             console.error('Razorpay API error:', error);
                             res.status(500).json({ success: false, error: 'Razorpay API error' });
                         } else {
-                            console.log('Razorpay Order:', order);
+                            // console.log('Razorpay Order:', order);
                             res.json({ order });
                         }
 
@@ -226,6 +225,79 @@ const placeOrder = async(req, res)=>{
 
 };
 
+// Checkout Verify Payment
+const verifyPayment = async(req, res)=>{
+    try {
+
+        const details = req.body;
+        // console.log('paymentDetails',details);
+        const cartData = await Cart.findOne({userId:req.session.user_id});
+        // console.log('Cart Data',cartData);
+        const products = cartData.products;
+        const hmac = crypto.createHmac('sha256', process.env.KEY_SECRET); // HMAC (Hash-based Message Authentication Code). 
+
+        hmac.update(details.payment.razorpay_order_id + '|'+ details.payment.razorpay_payment_id)
+        const hmacValue = hmac.digest('hex')
+
+        if(hmacValue===details.payment.razorpay_signature){
+            for(let i=0;i<products.length;i++){
+                const productId = products[i].productId
+                const quantity = products[i].qty
+
+                await Product.findByIdAndUpdate(
+                    {_id:productId},
+                    { $inc:{qty:-quantity}}
+                );
+            };
+
+            const result = await Order.findByIdAndUpdate(
+                {_id:details.order.receipt},
+                {$set:{'products.$[].paymentStatus':'success'}}
+            );
+
+
+            const dec = await Coupon.updateOne(
+                {couponCode:req.session.code},
+                {$inc:{usersLimit:-1}}
+            );
+
+            const userUsed = await Coupon.updateOne(
+                {couponCode:req.session.code},
+                {$push:{usedUsers:req.session.user_id}}
+            );
+
+            await Order.findByIdAndUpdate(
+                {_id:details.order.receipt},
+                {$set:{paymentId:details.payment.razorpay_payment_id}}
+            );
+
+            await Cart.deleteOne({userId:req.session.user_id})
+            const orderid = details.order.receipt;
+            
+            if(req.session.code){
+                const coupon = await Coupon.findOne({couponCode:req.session.code});
+                const disAmount = coupon.discountAmount;
+                await Order.updateOne(
+                    {_id:orderid},
+                    {$set:{discount:disAmount}},
+                    {upsert:true}
+                );
+                res.json({codsuccess:true, orderid});
+            }
+
+            res.json({codsuccess:true, orderid});
+            
+
+        }else{
+            console.log(details.order.receipt);
+        }
+
+        
+    } catch (error) {
+        console.log(error);
+    }
+};
+
 // Order Placed Page Load
 const orderPlacedPageLoad = async(req, res)=>{
     try {
@@ -267,12 +339,13 @@ const orderDetails = async(req, res)=>{
         const userData = await User.findOne({_id:userId})
         const orderData = await Order.findOne({_id:id}).populate('products.productId');
         
-        console.log('Order Data',orderData);
+        // console.log('Order Data',orderData);
 
         res.render('orderDetails',{user:userData, orders:orderData})
         
     } catch (error) {
         console.log(error);
+        res.status(500).render('error', { error: 'Internal Server Error' });
     }
 };
 
@@ -321,6 +394,8 @@ const editCheckoutAddress = async(req, res)=>{
     }
 };
 
+
+
 //Load Order Status Page
 const loadOrderStatus = async(req, res)=>{
     try {
@@ -337,11 +412,11 @@ const loadOrderStatus = async(req, res)=>{
 
         const userData = await User.findById({_id:userId});
         const orderData = await Order.find({_id:id});
-        console.log('Order Data',orderData);
+        // console.log('Order Data',orderData);
         // console.log('UserData',userData);
 
         if(!orderData){
-            console.log('Order Data not found');
+            // console.log('Order Data not found');
             return res.status(404).send('Order Data not found');
         };
 
@@ -360,5 +435,6 @@ module.exports={
     orderDetails,
     loadCheckoutEditAddress,
     editCheckoutAddress,
+    verifyPayment,
     loadOrderStatus
 }

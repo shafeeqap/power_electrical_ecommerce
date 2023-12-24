@@ -5,9 +5,12 @@ const session = require('express-session');
 
 const config = require('../config/config');
 
+//------------------------------------------------------------//
 const userController = require('../controller/userController');
 const cartController = require('../controller/cartController');
 const orderController = require('../controller/orderController');
+const couponController = require('../controller/couponController');
+//------------------------------------------------------------//
 
 const path = require('path');
 const userAuth = require('../middlewares/userAuth');
@@ -84,6 +87,9 @@ user_router.get('/orderPlaced/:id', userAuth.is_blocked, orderController.orderPl
 user_router.get('/orders',userAuth.isLogin, userAuth.is_blocked, orderController.loadOrderPage);
 user_router.get('/orderDetails',userAuth.isLogin, userAuth.is_blocked, orderController.orderDetails);
 user_router.get('/orderStatus',orderController.loadOrderStatus)
+user_router.post('/verifyPayment',orderController.verifyPayment);
+user_router.post('/couponApply', userAuth.isLogin, couponController.applyCoupon);
+user_router.post('/deleteCoupon', userAuth.isLogin, couponController.deleteAppliedCoupon);
 
 
 user_router.get('/editCheckoutAddress',userAuth.isLogin, userAuth.is_blocked, orderController.loadCheckoutEditAddress);

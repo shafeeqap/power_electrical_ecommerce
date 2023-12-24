@@ -220,8 +220,35 @@ const userBlockorActive = async(req,res)=>{
 // Load View Orders Page
 const loadViewOrders = async(req, res)=>{
     try {
-        const orderData = await Order.find();
+
+         //Pagination
+         let query = {};
+
+         // Check if there is a search query in the URL
+         if (req.query.search) {
+             const searchRegex = new RegExp(req.query.search, 'i');
+             query = {
+                 $or: [
+                    { 'user.name': searchRegex },
+                    { 'orderDetails.date': searchRegex },
+                    { 'orderDetails.totalAmount': searchRegex },
+                    { 'orderDetails.orderStatus': searchRegex },
+                    { 'orderDetails.paymentStatus': searchRegex },
+
+                 ]
+             };
+         }
+
+         const page = parseInt(req.query.page) || 1;
+         const limit = parseInt(req.query.limit) || 5;
+         const skip = (page-1) * limit;
+
+        const orderData = await Order.find(query).skip(skip).limit(limit);
         // console.log('Order Data',orderData);
+        const totalCount = await Order.countDocuments(query);
+        
+        const totalPages = Math.ceil(totalCount/limit);
+
 
         const productsArray=[];
 
@@ -266,6 +293,13 @@ const loadViewOrders = async(req, res)=>{
         res.render('view-orders',{
             message:'View Orders',
             orders:productsArray,
+            searchQuery:req.query.search || '',
+            pagination:{
+                page,
+                limit,
+                totalCount,
+                totalPages
+            }
         });
         
     } catch (error) {
@@ -364,6 +398,15 @@ const changeOrderStatus = async(req, res)=>{
     }
 }
 
+// Sample checking
+const sample =async(req,res)=>{
+    try {
+        res.render('sample')
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 
 
 module.exports={
@@ -380,6 +423,10 @@ module.exports={
     userBlockorActive,
     loadViewOrders,
     viewOrderDetails,
-    changeOrderStatus
+    changeOrderStatus,
+
+
+
+    sample // Only for checking
     
 }
