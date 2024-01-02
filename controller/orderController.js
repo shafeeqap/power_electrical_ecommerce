@@ -626,7 +626,48 @@ const deleteCheckoutaddress = async(req, res)=>{
     } catch (error) {
         console.log(error);
     }
-}
+};
+
+//--------------------------------- Add Checkout Address --------------------------------------------//
+const addCheckoutAddress = async(req, res)=>{
+    try {
+
+        let userAddress = await Address.findOne({userId:req.session.user_id});
+        if(!userAddress){
+
+            userAddress = new Address({
+                userId:req.session.user_id,
+                addresses:[
+                    {
+                        fullName:req.body.fullName,
+                        mobile:req.body.mobile,
+                        city:req.body.city,
+                        state:req.body.state,
+                        country:req.body.country,
+                        pincode:req.body.pincode
+                    }
+                ]
+            })
+        }else{
+            userAddress.addresses.push({
+                fullName:req.body.fullName,
+                mobile:req.body.mobile,
+                city:req.body.city,
+                state:req.body.state,
+                country:req.body.country,
+                pincode:req.body.pincode
+
+            })
+        }
+        await userAddress.save();
+
+        res.redirect('/checkout');
+        
+    } catch (error) {
+        console.log(error);
+        res.status(500).send('Internal Server Error');
+    }
+};
 
 
 //Load Order Status Page
@@ -668,6 +709,7 @@ module.exports={
     loadCheckoutEditAddress,
     editCheckoutAddress,
     deleteCheckoutaddress,
+    addCheckoutAddress,
     verifyPayment,
     loadOrderStatus,
     cancelOrder,

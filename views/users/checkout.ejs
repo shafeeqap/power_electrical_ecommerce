@@ -90,6 +90,7 @@
                         <h5 class="title">Shipping address</h5>
                         <!-- <div class="col-md-6"> -->
                             <a href="#" class="badge bg-success rounded-pill" data-bs-toggle="modal" data-bs-target="#exampleModal">AVAILABLE COUPON</a>
+                            <a href="#" class="badge bg-primary rounded-pill" data-bs-toggle="modal" data-bs-target="#exampleModal_addAddress">Add Address</a>
 
                         <!-- </div> -->
                     </div>
@@ -122,10 +123,10 @@
                                                                 </div>
                                                             </div>
                                                         
-                                                                <div class="col-md-4" style="position: absolute; top: 0; right: 0;">
-                                                                    <div class="d-flex align-items-end">
+                                                                <div class="col-md-4" style="position: absolute; top: 0; right: 0; text-align: end;">
+                                                                    
                                                                         <div class="dropdown dropend">
-                                                                            <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" style="background-color: #ffffff; padding: 10px;">
+                                                                            <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown">
                                                                                 <i class="fas fa-ellipsis-v"></i>
                                                                             </button>
                                                                             <ul class="dropdown-menu">
@@ -133,11 +134,10 @@
                                                                                 <a class="dropdown-item" href="#" onclick="confirmDelete('<%= address._id %>')">Delete</a>
                                                                             </ul>
                                                                         </div>
-                                                                    </div>
+                                                        
                                                                 </div>
                                                             </div>
                                                     
-                                                   
                                                 </div>
                                             </div>
                                         </div>
@@ -175,7 +175,7 @@
                     <!-- coupon details-->
                     <div class="coupon-details">
                         <div class="section-title mb-0">
-                            <h5 class="title">Have a coupon?</h5>
+                            <h6 class="title">Have a coupon?</h6>
                         </div>
                         <div class="input-checkbox">
                             <input type="checkbox" id="coupon-details" onchange="toggleCouponInput()">
@@ -185,7 +185,7 @@
                             </label>
                             <div class="caption" id="couponInputContainer" style="display: none;">
                                 <div class="form-group">
-                                    <input class="input" type="text" id="code" name="code" placeholder="Enter your coupon code">
+                                    <input class="input" type="text" id="code" name="code" placeholder="Apply your coupon code">
                                 </div>
                                 <button id="apply" type="button" class="btn btn-primary" onclick="applyCoupon($('#code').val())">Apply</button>
                                 <button id="unApply" type="button" class="btn btn-danger" onclick="unApplyCoupon($('#code').val())" style="display: none;">Unapply</button>
@@ -272,12 +272,11 @@
 <!-- /SECTION -->
 
 
-<!-- Button trigger modal -->
-<!-- <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-    Launch demo modal
-  </button> -->
+
+
   
-  <!-- Modal -->
+  <!--------------------------- Modal avialabel coupon ------------------------------------>
+
   <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -293,35 +292,32 @@
                   <div class="row">
                     <div class="col-md-12">
                         <div class="card mb-3 p-3" style="background-color: #f5f5f5;">
-                            <div class="cared-body">
-                                <div class="rectangle-box">
-                                    <div class="coupon-details">
-                                      <h6 class="d-flex align-items-center ">Available Coupons</h6>
-                                      <small class="Valid-to">Valid till : <%=coupon.validTo.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })%></small>
+                            <div class="badge badge-sm bg-gradient-danger" onclick="setCouponCode('<%= coupon.couponCode %>')" data-coupon-code="<%= coupon.couponCode %>">
+                                <a href="#" class="text-danger">
+                                    <div class="cared-body">
+                                        <div class="rectangle-box">
+                                            <div class="coupon-details">
+                                                <h6 class="d-flex align-items-center">Available Coupons</h6>
+                                                <small class="Valid-to">Valid till : <%=coupon.validTo.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })%></small>
+                                            </div>
+                                            <hr>
+                                            <div class="coupon-code d-flex justify-content-between">
+                                                <p class="coupon-body d-flex mb-0">Coupon Code:</p>
+                                                <i class="text-danger"><%=coupon.couponCode%></i>
+                                            </div>
+                                            <hr>
+                                            <div class="d-flex justify-content-between">
+                                                <i class="h6 material-icons text-info mr-2 text-danger">Discount: ₹ <%=coupon.discountAmount%></i>
+                                                <i class="h6 material-icons text-info mr-2 text-dark">Min-spend: ₹ <%=coupon.minimumSpend%></i><br>
+                                            </div>
+                                        </div>
+                                        <div class="img-body">
+                                            <!-- <img src="/images/coupon_3.png" alt=""> -->
+                                        </div>
                                     </div>
-                                    <hr>
-                                    <div class="coupon-code d-flex justify-content-between">
-                                      <p class="coupon-body d-flex mb-0">
-                                        Coupon Code: 
-                                        </p>
-                                        <i class="text-danger"><%=coupon.couponCode%></i>
-                                        <!-- <div class="ml-auto ">  -->
-                                          <div class="badge badge-sm bg-gradient-danger" onclick="setCouponCode('<%= coupon.couponCode %>')" data-coupon-code="<%= coupon.couponCode %>">
-                                              <a href="#" class="text-danger">Apply Code</a>
-                                          </div>
-                                      </div>                        
-                                    <hr>
-                                    <div class="d-flex justify-content-between">
-                                        <i class="h6 material-icons text-info mr-2 text-danger">Discount: ₹ <%=coupon.discountAmount%></i>
-                                        <i class="h6 material-icons text-info mr-2 text-dark">Min-spend: ₹ <%=coupon.minimumSpend%></i><br>
-                                    </div>
+                                </a>
                                 </div>
-              
-                                  
-                                    <div class="img-body">
-                                        <!-- <img src="/images/coupon_3.png" alt=""> -->
-                                    </div>
-                                </div>
+                            
                             </div>
                         </div>
                     </div>
@@ -339,6 +335,74 @@
     </div>
   </div>
 </div>
+
+
+<!------------------------------------ modal add address ------------------------------------->
+  
+  <!-- Modal -->
+  <div class="modal fade" id="exampleModal_addAddress" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Add a new address</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <form action="addCheckoutAddress" onsubmit="return validateForm()" method="post">
+                <!-- Name Input -->
+                <div class="mb-3">
+                    <label for="name" class="form-label">Name:</label>
+                    <input type="text" class="form-control" id="FullName" name="fullName">
+                    <span class="error-message text-danger" id="fullNameError"></span>
+                </div>
+
+                <!-- Mobile Input -->
+                <div class="mb-3">
+                    <label for="mobile" class="form-label">Mobile:</label>
+                    <input type="tel" class="form-control" id="mobile" name="mobile">
+                    <span class="error-message text-danger" id="phoneError"></span>
+                </div>
+
+                <!-- City Input -->
+                <div class="mb-3">
+                    <label for="city" class="form-label">City:</label>
+                    <input type="text" class="form-control" id="city" name="city">
+                    <span class="error-message text-danger" id="cityError"></span>
+                </div>
+
+                <!-- State Input -->
+                <div class="mb-3">
+                    <label for="state" class="form-label">State:</label>
+                    <input type="text" class="form-control" id="state" name="state">
+                    <span class="error-message text-danger" id="stateError"></span>
+                </div>
+
+                <!-- State Input -->
+                <div class="mb-3">
+                    <label for="country" class="form-label">Country:</label>
+                    <input type="text" class="form-control" id="country" name="country">
+                    <span class="error-message text-danger" id="countryError"></span>
+                </div>
+
+                <!-- Pincode Input -->
+                <div class="mb-3">
+                    <label for="pincode" class="form-label">Pincode:</label>
+                    <input type="text" class="form-control" id="pinCode" name="pincode">
+                    <span class="error-message text-danger" id="pinCodeError"></span>
+                </div>
+
+            </div>
+            <div class="modal-footer justify-content-around">
+              
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+        
+        </div>
+      </div>
+    </div>
+  </div>
+
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
@@ -606,14 +670,108 @@
   <script>
     // Function to set coupon code in the input field
     function setCouponCode(code) {
-        // Select the coupon input field and set its value
+        
         document.getElementById('code').value = code;
         
+         // Optional: Close the modal after setting the coupon code
+        $('#couponInputContainer').show();  // Show the coupon input container if it was hidden
         // Optional: Close the modal after setting the coupon code
         $('#exampleModal').modal('hide');
+
+        // Prevent the default behavior of the link
+        return false;
     }
 </script>
 
+
+<!------------------------------------- Validation add address ---------------------------------------------->
+<script>
+    function validateForm() {
+        var fullName = document.getElementById("FullName").value;
+        var country = document.getElementById("country").value;
+        var city = document.getElementById("city").value;
+        var state = document.getElementById("state").value;
+        var pincode = document.getElementById("pinCode").value;
+        var mobile = document.getElementById("mobile").value.trim();
+
+        // Function to display an error message
+        function showError(inputElement, errorMessage, errorId) {
+            var errorElement = document.getElementById(errorId);
+            errorElement.textContent = errorMessage;
+            errorElement.style.display = "block";
+        }
+
+        // Function to hide the error message
+        function hideError(errorId) {
+            var errorElement = document.getElementById(errorId);
+            errorElement.textContent = "";
+            errorElement.style.display = "none";
+        }
+
+        // Validation for Full Name (non-empty)
+        if (fullName === "") {
+            showError(document.getElementById("FullName"), "Full Name must be filled out", "fullNameError");
+            return false;
+        } else {
+            hideError("fullNameError"); // Hide the error if the field is not empty
+        }
+
+        // Validation for Country (non-empty)
+        if (country === "") {
+            showError(document.getElementById("country"), "Country must be filled out", "countryError");
+            return false;
+        } else {
+            hideError("countryError"); // Hide the error if the field is not empty
+        }
+
+        // Validation for City (non-empty)
+        if (city === "") {
+            showError(document.getElementById("city"), "City must be filled out", "cityError");
+            return false;
+        } else {
+            hideError("cityError"); // Hide the error if the field is not empty
+        }
+
+        // Validation for State (non-empty)
+        if (state === "") {
+            showError(document.getElementById("state"), "State must be filled out", "stateError");
+            return false;
+        } else {
+            hideError("stateError"); // Hide the error if the field is not empty
+        }
+
+        // Validation for Pin Code (non-empty, only numbers)
+        var pinCodePattern = /^\d+$/;
+        if (pincode === "") {
+            showError(document.getElementById("pinCode"), "Pin Code must be filled out", "pinCodeError");
+            return false;
+        } else if (!pinCodePattern.test(pincode)) {
+            showError(document.getElementById("pinCode"), "Pin Code should only contain numbers", "pinCodeError");
+            return false;
+        } else {
+            hideError("pinCodeError"); // Hide the error if the field is not empty and valid
+        }
+
+        // Validation for Mobile Number (10 digits with the pattern "1111111111")
+        var mobilePattern = /^\d{10}$/;
+        if (!mobile.match(mobilePattern)) {
+            showError(document.getElementById("mobile"), "Mobile Number should be 10 digits in the format '1111111111'", "phoneError");
+            return false;
+        } else {
+            hideError("phoneError"); // Hide the error if the field is valid
+        }
+
+        return true; // Form is valid
+    }
+
+  // function Cancel Button  
+  function cancelAction() {
+      
+      // document.getElementById("editAddress").reset();
+      window.history.back(); 
+  }
+
+</script>
 
 
 <%-include('../layout/footer.ejs') %>

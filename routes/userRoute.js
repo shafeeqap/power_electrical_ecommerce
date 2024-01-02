@@ -86,6 +86,7 @@ user_router.post('/verifyPayment',userAuth.isLogin, userAuth.is_blocked, orderCo
 user_router.get('/editCheckoutAddress',userAuth.isLogin, userAuth.is_blocked, orderController.loadCheckoutEditAddress);
 user_router.post('/editCheckoutAddress',userAuth.isLogin, userAuth.is_blocked, orderController.editCheckoutAddress);
 user_router.get('/deleteCheckoutaddress',userAuth.isLogin, orderController.deleteCheckoutaddress);
+user_router.post('/addCheckoutAddress',orderController.addCheckoutAddress);
 
 
 user_router.post('/placeOrder',userAuth.isLogin, userAuth.is_blocked, orderController.placeOrder);
