@@ -34,11 +34,11 @@
         <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
           <div class="ms-md-auto pe-md-3 d-flex align-items-center">
             <div class="input-group input-group-outline">
-              <label class="form-label">Type here...</label>
-            
-              
-              
-              <input type="text" class="form-control">
+              <!-- search -->
+              <form action="" id="searchForm">
+                <input type="text" class="form-control" placeholder="Type here..." name="search" id="searchInput">
+              </form>
+               <!-- end search -->
             </div>
           </div>
           <ul class="navbar-nav  justify-content-end">
@@ -140,5 +140,14 @@
       </div>
     </nav>
     <!-- End Navbar -->
+
+    <!-- <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script> -->
+    <!-- <script>
+      $(document).ready(function(){
+          $('#searchInput').on('input', function(){
+            $('#searchForm').submit();
+          });
+      });
+    </script> -->
 </body>
 </html>

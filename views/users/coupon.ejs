@@ -91,23 +91,21 @@
     justify-content: space-between;
     align-items: center;
   }
-  .Valid-to{
-    background-color: aliceblue;
-  }
-  h5, h6{
-    color: black;
-  }
-
-  .fas, .fa-solid{
-    color: black;
-  }
+  
   /* .coupon-code{
     display: flex;
     justify-content: center;
   } */
 
-  </style>
+  h5, h6, a, .fas{
+    color: black;
+  }
 
+  .badge{
+    background-color: red;
+  }
+
+  </style>
 
 
 
@@ -122,7 +120,7 @@
             <a href="javascript:void(0)">User</a>
           </li>
           <li class="breadcrumb-item active" aria-current="page">
-            User Profile
+            <a href="/profile">User Profile</a>
           </li>
         </ol>
       </nav>
@@ -138,7 +136,7 @@
                   src="/images/person-circle.svg"
                   alt="user"
                   class="rounded-circle"
-                  width="80"
+                  width="100"
                 />
                 <div class="mt-3 ">
                   <h5 style="margin-top: 5px;"><%=user.name%></h5>
@@ -168,7 +166,7 @@
             class="list-group-item d-flex justify-content-between align-items-center flex-wrap"
           >
           <h5 class="mb-0">
-            <div class='fa-solid fa-wallet'></div><a href="/wallet"> My Wallet</a>
+            <div class='fas fa-wallet'></div><a href="/wallet"> My Wallet</a>
         </h5>
             <!-- <span class="text-secondary">bootdey</span> -->
           </li>
@@ -214,80 +212,97 @@
 <!-- end_sadiBar -->
 
         <div class="col-md-8">
-          <div class="card mb-3">
-            <div class="card-body">
-              <div class="row">
-                <% if (address.addresses && address.addresses) { %>
-                <div class="col-sm-3">
-                  <h6 class="mb-0">Full Name</h6>
-                </div>
-                <div class="col-sm-9 text-secondary">
-                  <%=address.addresses[0].fullName%>
-                </div>
-              </div>
-              <!-- <hr /> -->
-              <div class="row">
-                <div class="col-sm-3">
-                  <h6 class="mb-0">Email</h6>
-                </div>
-                <div class="col-sm-9 text-secondary">
-                    <%=user.email%>
-                </div>
-              </div>
-              <!-- <hr /> -->
-              <!-- <hr /> -->
-              <div class="row">
-                <div class="col-sm-3">
-                  <h6 class="mb-0">Mobile</h6>
-                </div>
-                <div class="col-sm-9 text-secondary">
-                  <%=address.addresses[0].mobile%>
-                </div>
-              </div>
-              <!-- <hr /> -->
-              <div class="row">
-                <div class="col-sm-3">
-                  <h6 class="mb-0">State</h6>
-                </div>
-                <div class="col-sm-9 text-secondary">
-                  <%=address.addresses[0].state%>
-                </div>
-                <!-- <hr /> -->
-                </div>
-              <div class="row">
-                <div class="col-sm-3">
-                  <h6 class="mb-0">Pincode</h6>
-                </div>
-                <div class="col-sm-9 text-secondary">
-                  <%=address.addresses[0].pincode%>
-                </div>
-              </div>
-              <!-- <hr /> -->
-              <% }%>
-              <div class="row">
-                <div class="col-sm-12">
-                  <!-- <a
-                    class="btn btn-danger"
-                    target="__blank"
-                    href="#"
-                    >Edit</a
-                  > -->
-                </div>
-                <img src="	https://static-assets-web.flixcart.com/fk-p-linchpin-web/fk-cp-zion/img/myProfileFooter_4e9fe2.png" alt="">
-              </div>
-             
-        
-            </div>
-          </div>
-          <div class="row gutters-sm">
-              
+  
+          <% if(couponData.length > 0){%>
+            <% couponData.forEach((coupon)=>{%>
+          <div class="row gutters-sm d-flex">
+            <div class="col-sm-10 mb-3">
+              <div class="card ">
+                <!-- card-body -->
+                <div class="card-body">
+                  <div class="rectangle-box">
+                      <div class="coupon-details">
+                        <h6 class="d-flex align-items-center ">Available Coupons</h6>
+                        <small class="Valid-to">Valid till : <%=coupon.validTo.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })%></small>
+                      </div>
+                      <hr>
+                      <div class="coupon-code d-flex justify-content-between">
+                        <p class="coupon-body d-flex mb-0">
+                          Coupon Code: <i class="text-danger"><%=coupon.couponCode%></i>
+                          <!-- <div class="ml-auto ">  -->
+                            <div class="badge badge-sm bg-gradient-danger" onclick="copyCouponCode('<%= coupon.couponCode %>')">
+                                <a href="#" class="text-white">Copy Code</a>
+                            </div>
+                        <!-- </div>                         -->
+                      </p>
+                      </div>
+                      <hr>
+                      <div class="d-flex justify-content-between">
+                        <i class="h6 material-icons text-info mr-2 text-success">Discount: ₹ <%=coupon.discountAmount%></i>
+                        <i class="h6 material-icons text-info mr-2 text-warning">Min-spend: ₹ <%=coupon.minimumSpend%></i><br>
+                    </div>
 
-          </div>
+                    
+                      <div class="img-body">
+                          <!-- <img src="/images/coupon_3.png" alt=""> -->
+                      </div>
+                  </div>
 
+                    </div>
+                    <!-- end card-body -->
+                  </div>
+                </div>
+              </div>
+
+              <!-- loop end -->
+              <% }); %>
+              <% } else { %>
+                <div class="col-sm-12 mb-3">
+                    <div class="error-content text-center">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h4 class="error-title" style="margin-top: 15px;">No Coupons Available !</h4>
+                                <img src="/images/Gif/coupon_Animation - 1703333128824.gif" alt="">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <% } %>
+          </div>
         </div>
       </div>
     </div>
   </div>
+
+
+
+  <!-- link for ajax -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- CDN link for sweetalert -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <script>
+
+    function copyCouponCode(couponCode){
+    const tempInput = document.createElement('input');
+    tempInput.value = couponCode;
+    document.body.appendChild(tempInput);
+    tempInput.select();
+    document.execCommand('copy');
+    document.body.removeChild(tempInput);
+
+    // Use SweetAlert for feedback
+    Swal.fire({
+        icon: 'success',
+        title: 'Copied!',
+        text: `Coupon code ${couponCode} has been copied to the clipboard.`,
+        timer: 2000, // Display the alert for 2 seconds
+        timerProgressBar: true,
+        showConfirmButton: false
+      });
+    }
+  </script>
 
 
 

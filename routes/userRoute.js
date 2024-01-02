@@ -74,25 +74,37 @@ user_router.post('/remove-product',userAuth.isLogin,cartController.removeProduct
 user_router.get('/profile',userAuth.isLogin, userAuth.is_blocked, userController.loadProfile);
 user_router.get('/address',userAuth.isLogin, userAuth.is_blocked, userController.loadAddress);
 user_router.get('/addAddress',userAuth.isLogin, userAuth.is_blocked, userController.loadAddAddress);
-user_router.post('/addAddress',userAuth.isLogin,userController.addAddress);
+user_router.post('/addAddress',userAuth.isLogin, userAuth.is_blocked, userController.addAddress);
 user_router.get('/editAddress',userAuth.isLogin, userAuth.is_blocked, userController.loadEditAddress);
-user_router.post('/editAddress',userAuth.isLogin,userController.updateUserAddress);
+user_router.post('/editAddress',userAuth.isLogin, userAuth.is_blocked, userController.updateUserAddress);
 user_router.get('/changePassword', userAuth.isLogin, userAuth.is_blocked, userController.loadChangePassword);
 user_router.post('/changePassword',userController.changePasswordVerify);
 
 
 user_router.get('/checkout',userAuth.isLogin, userAuth.is_blocked, orderController.loadCheckOut);
-user_router.post('/placeOrder',userAuth.isLogin,orderController.placeOrder);
+user_router.post('/verifyPayment',userAuth.isLogin, userAuth.is_blocked, orderController.verifyPayment);
+user_router.get('/editCheckoutAddress',userAuth.isLogin, userAuth.is_blocked, orderController.loadCheckoutEditAddress);
+user_router.post('/editCheckoutAddress',userAuth.isLogin, userAuth.is_blocked, orderController.editCheckoutAddress);
+user_router.get('/deleteCheckoutaddress',userAuth.isLogin, orderController.deleteCheckoutaddress);
+
+
+user_router.post('/placeOrder',userAuth.isLogin, userAuth.is_blocked, orderController.placeOrder);
 user_router.get('/orderPlaced/:id', userAuth.is_blocked, orderController.orderPlacedPageLoad);
 user_router.get('/orders',userAuth.isLogin, userAuth.is_blocked, orderController.loadOrderPage);
 user_router.get('/orderDetails',userAuth.isLogin, userAuth.is_blocked, orderController.orderDetails);
-user_router.get('/orderStatus',orderController.loadOrderStatus)
-user_router.post('/verifyPayment',orderController.verifyPayment);
+user_router.get('/orderStatus', userAuth.isLogin ,orderController.loadOrderStatus);
+user_router.post('/orderCancel', userAuth.isLogin, orderController.cancelOrder);
+user_router.post('/orderReturn',userAuth.isLogin, orderController.returnOrder);
+
+
+user_router.get('/coupon', userAuth.isLogin, couponController.couponUserPageLoad);
 user_router.post('/couponApply', userAuth.isLogin, couponController.applyCoupon);
 user_router.post('/deleteCoupon', userAuth.isLogin, couponController.deleteAppliedCoupon);
 
 
-user_router.get('/editCheckoutAddress',userAuth.isLogin, userAuth.is_blocked, orderController.loadCheckoutEditAddress);
-user_router.post('/editCheckoutAddress',userAuth.isLogin, userAuth.is_blocked, orderController.editCheckoutAddress);
+user_router.get('/wallet', userAuth.isLogin ,userAuth.is_blocked, userController.getWallet);
+user_router.post('/profile/addMoneyToWallet',userAuth.isLogin, userController.addMoneyToWallet);
+user_router.post('/verifyWalletpayment',userAuth.isLogin, userController.verifyWalletpayment);
+user_router.get('/walletHistory', userAuth.isLogin, userAuth.is_blocked, userController.walletHistory)
 
 module.exports = user_router;

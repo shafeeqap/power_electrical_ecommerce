@@ -3,6 +3,11 @@
 
 <%-include('../layout/navigation.ejs')%>
 
+<style>
+    h3 {
+        color: black;
+    }
+</style>
 <!-- BREADCRUMB -->
 <div id="breadcrumb" class="section">
     <!-- container -->
@@ -37,26 +42,30 @@
                     <th scope="col">Amount</th>
                     <th scope="col">Payment</th>
                     <th scope="col">Expected Devlivery</th>
+                    <th scope="col">Order Status</th>
                     <th scope="col">Tracking Number</th>
                     <th scope="col">Details</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <% if(orderData.length>0){%>
-                  <% let count = 1; %>
-                  <% orderData.forEach((data)=>{%>
-                  <tr>
-                    <th scope="row" style="padding: 13px;"><%=count%></th>
-                    <td><%=data.date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit' }).replace(/\//g, '-')%></td>
-                    <td>₹<%=data.totalAmount%></td>
-                    <td><%=data.paymentMethod%></td>
-                    <td><%=data.expectedDelivery.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit' }).replace(/\//g, '-')%></td>
-                    <td><%=data.uniqueId%></td>
-                    <td><a href="/orderDetails?id=<%=data._id%>" class="btn btn-primary">View Details</a></td>
-                  </tr>
-                  <% count++ %>
-                  <%})%>
-                  <% }else{;%>
+                    <% if(orderData.length > 0) { %>
+                        <% let count = 1; %>
+                        <% orderData.forEach((data) => { %>
+                            <% data.products.forEach((product) => { %>
+                                <tr>
+                                    <th scope="row" style="padding: 13px;"><%= count %></th>
+                                    <td><%= data.date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit' }).replace(/\//g, '-') %></td>
+                                    <td>₹<%= data.totalAmount %></td>
+                                    <td><%= data.paymentMethod %></td>
+                                    <td><%= data.expectedDelivery.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit' }).replace(/\//g, '-') %></td>
+                                    <td><%= product.orderStatus %></td>
+                                    <td><%= data.uniqueId %></td>
+                                    <td><a href="/orderDetails?id=<%= data._id %>" class="btn btn-primary">View Details</a></td>
+                                </tr>
+                                <% count++ %>
+                            <% }); %>
+                        <% }); %>
+                    <% } else { %>
                     <tr>
                       <td colspan="7" class="text-center">
                           <div class="error-content text-center">
@@ -83,5 +92,6 @@
 <!-- section end-->
 
 
+      
 
 <%-include('../layout/footer.ejs') %>

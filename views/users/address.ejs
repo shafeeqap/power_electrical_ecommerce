@@ -1,7 +1,7 @@
 <%- include('../layout/header.ejs') %>
 <%- include('../layout/navigation.ejs') %>
 
-<!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"> -->
+
 
 <style type="text/css">
     body {
@@ -72,12 +72,16 @@
  
     }
 
+    .dropdown-toggle::after{
+      content: none;
+    }
+
     .dropdown-menu {
-      position: absolute;
+      /* position: absolute; */
       right: 0;
       top: 100%;
       display: none;
-      background-color: #fff;
+      background-color: #f3f1f1;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
       min-width: 100px;
       z-index: 1;
@@ -86,16 +90,20 @@
     .dropdown-menu a {
       display: block;
       padding: 10px;
-      color: #333;
+      color: #020101;
       text-decoration: none;
     }
 
     .dropdown-menu a:hover {
-      background-color: #f5f5f5;
+      background-color: #cecbcb;
     }
 
     .show {
       display: block !important;
+    }
+
+    h4, h5, h6,.fas{
+      color: black;
     }
 
   </style>
@@ -146,7 +154,7 @@
               class="list-group-item d-flex justify-content-between align-items-center flex-wrap"
             >
             <h5 class="mb-0">
-              <div class='fa fa-shopping-cart'></div><a href="/cart"> My Cart</a>
+              <div class='fas fa-shopping-cart'></div><a href="/cart"> My Cart</a>
           </h5>
               <!-- <span class="text-secondary">bootdey</span> -->
             </li>
@@ -174,7 +182,7 @@
                 class="list-group-item d-flex justify-content-between align-items-center flex-wrap"
               >
               <h5 class="mb-0">
-                <div class='fas fa-gift' ></div><a href=""> Coupons</a>
+                <div class='fas fa-gift' ></div><a href="/coupon"> Coupons</a>
             </h5>
                 <!-- <span class="text-secondary">bootdey</span> -->
               </li>
@@ -182,7 +190,7 @@
                 class="list-group-item d-flex justify-content-between align-items-center flex-wrap"
               >
               <h5 class="mb-0">
-                <div class='fa fa-sign-out-alt' ></div><a href="/logout"> Logout</a>
+                <div class='fas fa-sign-out-alt' ></div><a href="/logout"> Logout</a>
             </h5>
                 <!-- <span class="text-secondary">bootdey</span> -->
               </li>
@@ -193,47 +201,30 @@
 
         <div class="col-md-8">
             <div class="card mb-3">
-              <div class="card-body shadow-sm p-3 mb-5 bg-body rounded">
-                <div class="row">
-                  <div class="col-sm-3 me-3">
-                    <h5 class="mb-0" style="width: 250px; padding-left: 20px;">
-                        <a href="/addAddress"> <div class='fas fa-plus'></div> <strong> ADD A NEW ADDRESS</strong></a>
+              <div class="card-body shadow-sm p-3 bg-body rounded">
+
+                    <h6 class="mb-0" style="letter-spacing: 2px;">
+                        <a href="/addAddress"> <div class='fas fa-plus'> ADD A NEW ADDRESS</a>
                         <!-- <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAddressModal"> -->
-                          </a>
-                          
-                    </h5>
-    
-                  </div>
-                </div>
-  
-                <!-- <div class="row">
-                  <div class="col-sm-12">
-                    <a
-                      class="btn btn-danger"
-                      target="__blank"
-                      href="https://www.bootdey.com/snippets/view/profile-edit-data-and-skills"
-                      >Edit</a
-                    >
-                  </div>
-                </div> -->
+                    </h6>
               </div>
             </div>
-          </div>
+        
 
 
-        <div class="col-md-8">
+        <div class="col-md-12">
           <div class="card mb-3">
-            <div class="card-body shadow-sm p-3 mb-5 bg-body rounded">
+            <div class="card-body shadow-sm p-3 bg-body rounded">
               <div class="row">
                 
-                <div class="col-sm-3 me-3">
+                <div class="col-sm-9">
                   <% if(address && address.addresses && address.addresses.length > 0){%>
                     <div style="margin-left: 20px;">
                         <h6 style="text-transform: uppercase;"><%=address.addresses[0].fullName%></h6>
                         <P>
-                          <%=address.addresses[0].city%>,
-                          <%=address.addresses[0].country%>,
-                          <%=address.addresses[0].mobile%>,
+                          <%=address.addresses[0].city%>,<br>
+                          <%=address.addresses[0].country%>,<br>
+                          <%=address.addresses[0].mobile%>,<br>
                           <%=address.addresses[0].pincode%>
                         </P>
                     </div>
@@ -242,7 +233,7 @@
                   <% } %>
                 </div>
                 
-                <div class="col-sm-3 me-3" style="margin-left: 65%; width: 5px; margin-top: 5%;">
+                <div class="col-sm-3 text-end">
 
                     
                     <div class="dropdown">
@@ -252,7 +243,7 @@
                         <ul class="dropdown-menu">
                           <% if (address && address.addresses && address.addresses.length > 0) { %>
                           <li><a class="dropdown-item" href="/editAddress?id=<%=address.addresses[0]._id%>">Edit</a></li>
-                          <li><a class="dropdown-item" href="#">Delete</a></li>
+                          <!-- <li><a class="dropdown-item" href="#">Delete</a></li> -->
                           <% } %>
                         </ul>
                       </div>
@@ -266,6 +257,27 @@
         </div>
       </div>
     </div>
-  
+</div>
+
+
+
+
+    <script>
+			$(document).ready(function(){
+			  $(".dropdown").mouseover(function(){
+				$(".dropdown-menu").show();
+			  }).mouseout(function(){
+				$(".dropdown-menu").hide();
+			  });
+		  
+			  $(document).on("click", function(event){
+				var dropdown = $(".dropdown");
+				if(!dropdown.is(event.target) && dropdown.has(event.target).length === 0){
+				  $(".dropdown-menu").hide();
+				}
+			  });
+			});
+		</script>
+		  
 
 <%- include('../layout/footer.ejs') %>

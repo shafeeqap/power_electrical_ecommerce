@@ -14152,48 +14152,62 @@ label,
     float: left; }
   .info-horizontal .description {
     overflow: hidden; }
+/* Bootstrap 5 color classes */
+.text-primary {
+  color: #EC407A;
+}
 
-svg.text-primary .color-foreground {
-  fill: #EC407A; }
+.bg-primary {
+  background-color: #D81B60;
+}
 
-svg.text-primary .color-background {
-  fill: #D81B60; }
+.text-secondary {
+  color: #747b8a;
+}
 
-svg.text-secondary .color-foreground {
-  fill: #747b8a; }
+.bg-secondary {
+  background-color: #495361;
+}
 
-svg.text-secondary .color-background {
-  fill: #495361; }
+.text-info {
+  color: #49a3f1;
+}
 
-svg.text-info .color-foreground {
-  fill: #49a3f1; }
+.bg-info {
+  background-color: #1A73E8;
+}
 
-svg.text-info .color-background {
-  fill: #1A73E8; }
+.text-warning {
+  color: #FFA726;
+}
 
-svg.text-warning .color-foreground {
-  fill: #FFA726; }
+.bg-warning {
+  background-color: #FB8C00;
+}
 
-svg.text-warning .color-background {
-  fill: #FB8C00; }
+.text-danger {
+  color: #EF5350;
+}
 
-svg.text-danger .color-foreground {
-  fill: #EF5350; }
+.bg-danger {
+  background-color: #E53935;
+}
 
-svg.text-danger .color-background {
-  fill: #E53935; }
+.text-success {
+  color: #66BB6A;
+}
 
-svg.text-success .color-foreground {
-  fill: #66BB6A; }
+.bg-success {
+  background-color: #43A047;
+}
 
-svg.text-success .color-background {
-  fill: #43A047; }
+.text-dark {
+  color: #42424a;
+}
 
-svg.text-dark .color-foreground {
-  fill: #42424a; }
-
-svg.text-dark .color-background {
-  fill: #191919; }
+.bg-dark {
+  background-color: #191919;
+}
 
 .blur {
   box-shadow: inset 0px 0px 2px #fefefed1;

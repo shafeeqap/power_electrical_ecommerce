@@ -100,6 +100,7 @@ admin_route.get('/is_blockBrand',brandController.brandListorUnlist);
 admin_route.get('/view-orders',adminAuth.isLogin,adminController.loadViewOrders);
 admin_route.get('/view-ordersDetails',adminAuth.isLogin,adminController.viewOrderDetails);
 admin_route.post('/view-ordersDetails/changeStatus',adminController.changeOrderStatus);
+admin_route.post('/adminCancelOrder',adminAuth.isLogin, adminController.adminCancelOrder);
 
 admin_route.get('/view-coupon', adminAuth.isLogin, couponController.loadViewCoupon);
 admin_route.get('/add-coupon', adminAuth.isLogin, couponController.loadAddCoupon);

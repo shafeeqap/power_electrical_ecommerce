@@ -1,5 +1,6 @@
 const Coupon = require('../models/couponModel');
-const Cart = require('../models/cartModel')
+const Cart = require('../models/cartModel');
+const User = require('../models/userModel');
 
 
 
@@ -36,7 +37,7 @@ const loadAddCoupon = async(req, res)=>{
 // Add Coupon
 const AddCoupon = async(req, res)=>{
     try {
-        // console.log(req.body);
+    
 const {
     couponName,
     couponCode,
@@ -49,13 +50,20 @@ const {
 
 }=req.body;
 
-const couponData = await Coupon.findOne({couponName:couponName});
 
-if(couponData){
-    return res.json({success:false, message:'Coupon allready exist'})
+// Check if coupon name is unique
+const existingCouponName = await Coupon.findOne({ couponName: couponName });
+if (existingCouponName) {
+  return res.json({ success: false, message: 'Coupon name already exists' });
 }
 
-if(!couponData){
+// Check if coupon code is unique
+const existingCouponCode = await Coupon.findOne({ couponCode: couponCode });
+if (existingCouponCode) {
+  return res.json({ success: false, message: 'Coupon code already exists' });
+}
+
+
     const coupon = new Coupon({
         couponName,
         couponCode,
@@ -68,19 +76,17 @@ if(!couponData){
     });
 
     const result = await coupon.save();
-    // console.log('Result',result);
+    
 
-    req.session.couponAdded=1
-    res.redirect('/admin/view-coupon')
+    req.session.couponAdded = 1;
+    return res.json({ success: true, message: 'Coupon added successfully' });
 
-}else{
-    req.session.couponAdded=1
-    res.redirect('/admin/view-coupon')
 
-}
+
         
     } catch (error) {
         console.log(error);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 
 };
@@ -92,8 +98,7 @@ const loadEditCoupon = async(req, res)=>{
         const couponId = req.query.id
 
         const couponData = await Coupon.findOne({_id:couponId});
-        // console.log('couponData',couponData);
-
+       
         res.render('edit-coupon',{
             message:'Edit Coupon',
             couponData
@@ -107,9 +112,7 @@ const loadEditCoupon = async(req, res)=>{
 // Edit Coupon and Update
 const editCoupon = async(req, res)=>{
     try {
-        // const id = req.query.id;
-        // console.log('id',id);
-
+        
         const {
             couponName,
             couponCode,
@@ -136,7 +139,7 @@ const editCoupon = async(req, res)=>{
             }});
             
             res.redirect('/admin/view-coupon');
-            // console.log('updatedCoupon',updatedCoupon);
+            
         
     } catch (error) {
         console.log(error);
@@ -147,11 +150,10 @@ const editCoupon = async(req, res)=>{
 // Delete Coupon by Admin
 const deletecoupon = async(req, res)=>{
     try {
-        // const id = req.query.id
-        // console.log(id);
+       
 
         const deleteCoupon = await Coupon.deleteOne({_id:req.query.id});
-        // console.log('deleteCoupon',deleteCoupon);
+       
 
         res.redirect('/admin/view-coupon')
 
@@ -161,6 +163,24 @@ const deletecoupon = async(req, res)=>{
     }
 };
 
+// ------------------------------------------------------- Coupon User Page Load --------------------------------------------------------------//
+const couponUserPageLoad = async(req, res)=>{
+    try {
+        const userId = req.session.user_id;
+        const userData = await User.findOne({_id:userId});
+     
+        const couponData = await Coupon.find({status:true});
+        
+        res.render('coupon',{
+            user:userData,
+            couponData,
+        });
+        
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 
 
 
@@ -169,17 +189,16 @@ const applyCoupon = async(req, res)=>{
 
     try {
         const userId = req.session.user_id;
-        // console.log('userId',userId);
+       
         const code = req.body.code
-        console.log("code",code);
+      
 
         req.session.code=code;
 
         const amount = Number(req.body.amount);
-        // console.log('amonut',amount);
-
+       
         const cartData = await Cart.findOne({userId:userId}).populate('products.productId');
-        // console.log('cartData',cartData);
+        
 
         let totalPrice=0;
 
@@ -187,64 +206,51 @@ const applyCoupon = async(req, res)=>{
             couponCode:code,
             usedUsers:{$in:[userId]}
         });
-        // console.log('userExist',userExist);
-
-        if(cartData){
-            if(cartData.products.length>0){
-                const products = cartData.products
-                // console.log('products',products);
-
-                for(const product of products){
-                    // console.log('products', product);
-                    totalPrice+=product.quantity*product.price;
-                    // console.log('totalPrice',totalPrice);
-                }
-
-            }
-        };
-
-        if(userExist){
-            res.json({user:true});
-        }else{
-            const couponData = await Coupon.findOne({couponCode:code});
-
-            if(couponData){
-                if(couponData.usersLimit<=0){
-                    res.json({limit:true});
-                }else{
-                    if(couponData.status==false){
-                        res.json({status:true});
-                    }else{
-                        if(couponData.expiryDate<=new Date()){
-                            res.json({date:true});
-                        }else if(couponData.activationDate>=new Date()){
-                            res.json({active:true});
-                        }else{
-                            if(couponData.minimumSpend>=amount){
-                                res.json({cartAmount:true});
-                            }else{
-                                const disAmount = couponData.discountAmount;
-
-                                const disTotal = Math.round(totalPrice-disAmount);
-
-                                req.session.Amount = disTotal;
-                                const applied = await Cart.updateOne({
-                                    userId:userId
-                                },{$set:{applied:'applied'}});
-
-                                return res.json({amountOkey:true, disAmount, disTotal});
-                            }
-                        }
-                    }
-                }
-            }else{
-                res.json({invalid: true});
+       
+        if (cartData && cartData.products.length > 0) {
+            const products = cartData.products;
+            for (const product of products) {
+                totalPrice += product.quantity * product.price;
             }
         }
 
-        
+        if (userExist) {
+            res.json({ user: true });
+        } else {
+            const couponData = await Coupon.findOne({ couponCode: code });
+
+            if (!couponData) {
+                res.json({ invalid: true });
+            } else {
+                const currentDate = new Date();
+
+                if (currentDate < couponData.validFrom || currentDate > couponData.validTo) {
+                    res.json({ dateExpired: true });
+                } else if (couponData.activationDate >= currentDate) {
+                    res.json({ notActivated: true });
+                } else if (couponData.minimumSpend > 0 && totalPrice < couponData.minimumSpend) {
+                    res.json({ insufficientAmount: true });
+                } else if (couponData.status === false) {
+                    res.json({ status: true });
+                } else {
+                    const disAmount = couponData.discountAmount;
+                    const disTotal = Math.round(totalPrice - disAmount);
+
+                    req.session.Amount = disTotal;
+                    const applied = await Cart.updateOne(
+                        { userId: userId },
+                        { $set: { applied: 'applied' } });
+
+                    res.json({ amountOkay: true, disAmount, disTotal });
+                }
+            }
+        }
+
+
+
     } catch (error) {
         console.log(error);
+        res.status(500).json({ error: true });
     }
 }
 
@@ -256,12 +262,13 @@ const deleteAppliedCoupon = async(req, res)=>{
 
         const userId = req.session.userId
         const code = req.body.code;
-        // console.log('code', code);
+        
 
         const couponData = await Coupon.findOne({couponCode:code})
         const amount = Number(req.body.amount);
         const disAmount = couponData.discountAmount;
         const disTotal = Math.round(amount + disAmount);
+
         const deletApplied = await Cart.updateOne(
             {userId:userId},
             {$set:{applied:'not'}}
@@ -285,5 +292,6 @@ module.exports={
     editCoupon,
     deletecoupon,
     applyCoupon,
-    deleteAppliedCoupon
+    deleteAppliedCoupon,
+    couponUserPageLoad
 }

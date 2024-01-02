@@ -34,6 +34,7 @@
       flex: 1 1 auto;
       min-height: 1px;
       padding: 1rem;
+    
     }
 
     .gutters-sm {
@@ -60,6 +61,18 @@
     .shadow-none {
       box-shadow: none !important;
     }
+
+    h5{
+      color: black;
+    }
+
+    /* Adjust button widths for smaller screens */
+    @media (max-width: 768px) {
+    .btn {
+      width: 35%;
+    }
+  }
+
 
   </style>
 
@@ -157,16 +170,12 @@
         </div>
 <!-- end_sadiBar -->
 
-        <div class="col-md-8">
+        <div class="col-md-6 sm-3">
             <div class="card mb-3">
-              <div class="card-body p-3 mb-5 bg-body rounded">
-                <div class="row">
-                  <div class="col-sm-3 me-3">
-                    <h5 style="width: 250px; padding-left: 20px; margin-top: 30px;">ADD A NEW ADDRESS</h5>
-
-                    <div class="container">
-                        <div class="row justify-content-center">
-                            <div class="col-md-6">
+              <div class="card-body p-3 bg-body rounded">
+           
+                    <h5 style="padding-left: 20px; margin-top: 30px;">ADD A NEW ADDRESS</h5>
+         
                                 <div class="card">
                                     <div class="card-body">
                                         <form action="addAddress" onsubmit="return validateForm()" method="post">
@@ -220,11 +229,7 @@
                                         </form>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                  </div>
-                </div>
+       
               </div>
             </div>
           </div>
@@ -313,7 +318,7 @@
           return true; // Form is valid
       }
 
-          // function Cancel Button  
+    // function Cancel Button  
     function cancelAction() {
         
         // document.getElementById("editAddress").reset();

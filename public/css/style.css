@@ -62,7 +62,7 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  color: #2B2D42;
+  color: #ffffff;
   font-weight: 700;
   margin: 0 0 10px;
 }
@@ -113,6 +113,7 @@ ul, ol {
 .primary-btn:hover, .primary-btn:focus {
   opacity: 0.9;
   color: #FFF;
+  background-color: #e40303da;
 }
 
 /*----------------------------*\
@@ -650,7 +651,7 @@ textarea.input {
 
 .main-nav>li>a:after {
   content: "";
-  display: block;
+  display: -webkit-box;
   width: 0%;
   height: 2px;
   background-color: #D10024;
@@ -702,7 +703,7 @@ textarea.input {
     float: none;
   }
   .main-nav>li {
-    display: block;
+    display: flex;
     float: none;
   }
   .main-nav>li+li {
@@ -1382,6 +1383,7 @@ textarea.input {
 
 .store-pagination li a {
   display: block;
+  text-decoration: none;
 }
 
 .store-qty {

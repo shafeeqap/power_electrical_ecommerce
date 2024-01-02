@@ -136,7 +136,8 @@
                     <th class="text-uppercase text-xxs font-weight-bolder  ps-2" style="color: black;">Price</th>
                     <th class="text-uppercase text-xxs font-weight-bolder  ps-2" style="color: black;">Total Amount</th>
                     <th class="text-uppercase text-xxs font-weight-bolder  ps-2" style="color: black;">Payment Status</th>
-                    <th class="text-uppercase text-xxs font-weight-bolder  ps-2" style="color: black;">Delivery Status</th>
+                    <th class="text-uppercase text-xxs font-weight-bolder  ps-2" style="color: black;">Order Status</th>
+                    <th class="text-uppercase text-xxs font-weight-bolder  ps-2" style="color: black;">Action</th>
                     <!-- <th class="text-uppercase text-secondary text-xxs font-weight-bolder  ps-2">Action</th> -->
                     
                   </tr>
@@ -168,16 +169,18 @@
                     <td>
                       <p class="text-xs font-weight-bold mb-0"><%=products.orderStatus%></p>
                     </td>
-<!--                     
+                  
+                    <% if(products.orderStatus !=='Cancelled' && products.orderStatus !=='Delivered'){%>
                     <td class=" text-sm">
-                      <a href="#">
-                      <span class="badge badge-sm bg-gradient-success">List</span></a>
+                      <!-- <button type="button" class="btn btn-danger" onclick="confirmCancel('<%=orderId%>','<%=productId%>')">Cancel</button> -->
+                      <a href="#" onclick="confirmCancel('<%=orderId%>','<%=productId%>')" ><span class="badge badge-sm bg-gradient-danger">Cancel</span></a>
                     </td>
+                    <% } %>
                     
-                      <td class=" text-sm">
+                      <!-- <td class=" text-sm">
                         <a href="#">
                         <span class="badge badge-sm bg-gradient-danger">Unlist</span></a>
-                      </td> -->
+                      </td>  -->
                   
                 </tbody>
               </table>
@@ -269,5 +272,59 @@
     </div>
   </div>
 </div>
+
+
+
+
+ 
+
+
+
+ <script>
+  function confirmCancel(orderId,productId){
+
+    Swal.fire({
+      title:'Are you sure?',
+      text:'You are about to cancel the order, This action cannot be undone!',
+      icon:'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, cancel it!'
+
+    }).then((result) => {
+         if (result.isConfirmed) {
+
+        
+            $.ajax({
+              url:'/admin/adminCancelOrder',
+              method:'POST',
+              data:{orderId: orderId,
+                    productId:productId 
+                  },
+              success: function(response){
+
+                if(response.status){
+                  
+                  Swal.fire('Cancelled!', 'The order has been cancelled.', 'success').then(()=>{
+
+                    location.reload();
+                  });
+                }else{
+                  Swal.fire('Error', response.message, 'error');
+                }
+
+              },
+              error:function (error){
+                console.error('Error:', error);
+                Swal.fire('Error', 'An error occurred while cancelling the order.', 'error');
+              }
+            
+            });
+         }
+      });
+
+  }
+ </script>
 
 <%-include('../admin/adminLayout/footer.ejs')%>

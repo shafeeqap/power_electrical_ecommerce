@@ -15,6 +15,7 @@ const { ObjectId } = require('mongodb');
 
 const config = require('../config/config');
 
+
 var instance = new Razorpay({
     key_id:process.env.key_id,
     key_secret:process.env.key_secret
@@ -425,7 +426,6 @@ const productLoad = async(req,res)=>{
 
         // Pagination
         var page=1;
-
         if(req.query.page){
             page =req.query.page;
         }
@@ -850,7 +850,153 @@ const changePasswordVerify = async(req,res)=>{
 };
 
 
+//------------------------------------------------- Get wallet Page-----------------------------------------//
+const getWallet = async(req, res )=>{
+    try {
+    
+        const userId = req.session.user_id;
+        // console.log(userId);
 
+        const userData = await User.findOne({_id:userId});
+        // console.log(userData);
+        res.render('wallet',{user:userData})
+
+        
+        
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+
+//--------------------------------------------- Add money to wallet ------------------------------------//
+const addMoneyToWallet = async(req, res)=>{
+    try {
+        const {amount}=req.body
+        // console.log('amonut',amount);
+        const id = crypto.randomBytes(8).toString('hex');
+        // console.log('id',id);
+        var options={
+            amount:amount*100,
+            currency:'INR',
+            receipt:'Hello'+id
+        }
+
+        instance.orders.create(options,(err, order)=>{
+            if(err){
+                res.json({status:false});
+            }else{
+                res.json({status:true, payment:order})
+            }
+        })
+
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+
+// ----------------------------------------Verify Wallet Payment--------------------------------------//
+const verifyWalletpayment = async(req, res)=>{
+    try {
+        const userId = req.session.user_id;
+        // console.log('userId',userId);
+        const details = req.body;
+        // console.log('details',details);
+        const amount = parseInt(details.order.amount)/100;
+        // console.log(amount);
+        let hmac = crypto.createHmac('sha256', process.env.KEY_SECRET)
+
+        hmac.update(details.payment.razorpay_order_id + '|' + details.payment.razorpay_payment_id);
+
+            hmac = hmac.digest('hex');
+            if(hmac===details.payment.razorpay_signature){
+                const user = await User.findById(userId);
+                const currentWalletBalance = user.wallet || 0;
+                // console.log('currentWalletBalance',currentWalletBalance);
+                const updatedBalance = currentWalletBalance + amount;
+                // console.log('updatedBalance',updatedBalance);
+
+                const walletHistory={
+                    transactionDate:new Date(),
+                    transactionDetails: 'Deposited via Razorpay',
+                    transactionType:"Credit",
+                    transactionAmount: amount,
+                    currentBalance: updatedBalance
+                    
+                }
+                // console.log('walletHistory',walletHistory);
+
+                await User.findByIdAndUpdate({_id:userId},
+                    {$inc:{wallet:amount},
+                    $push:{walletHistory}
+                });
+
+                return res.json({status:true});
+            }else{
+                return res.json({status:flase});
+            }
+        
+    } catch (error) {
+        console.log(error);
+        res.render('500')
+    }
+};
+
+//-------------------------------- Wallet History----------------------------//
+
+const walletHistory = async (req, res) => {
+    try {
+        // Search
+        var search = '';
+        if (req.query.search) {
+            search = req.query.search;
+        }
+
+        // Pagination
+        var page = 1;
+        if (req.query.page) {
+            page = parseInt(req.query.page, 10);
+        }
+
+        var limit = 6;
+
+        const userId = req.session.user_id;
+
+    
+        const user = await User.findById(userId);
+
+        // Access the walletHistory array and sort it by date in descending order
+        const walletHistoryData = user.walletHistory.sort((a, b) =>b.transactionDate - a.transactionDate);
+
+        // Perform search if applicable
+        const filteredData = walletHistoryData.filter(data =>
+            data.transactionDetails.includes(search) || data.transactionType.includes(search)
+        );
+
+        const startIndex = (page - 1) * limit;
+        const endIndex = startIndex + limit;
+        const paginatedData = filteredData.slice(startIndex, endIndex);
+            
+        // console.log('paginationdata',paginatedData);
+
+        const count = filteredData.length;
+
+        // Render the template with the paginated data
+        res.render('walletHistory', {
+            user,
+            walletHistory: paginatedData,
+            totalPages: Math.ceil(count / limit),
+            currentPage: page,
+            limit: limit,
+        });
+    } catch (error) {
+        console.log(error);
+        res.render('500');
+    }
+};
+
+  
 
 
 
@@ -880,5 +1026,9 @@ module.exports ={
     updateUserAddress,
     loadChangePassword,
     changePasswordVerify,
+    getWallet,
+    addMoneyToWallet,
+    verifyWalletpayment,
+    walletHistory
 
 }

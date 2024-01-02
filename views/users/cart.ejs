@@ -55,7 +55,13 @@ body {
 
 .col-sm-12{
     margin-bottom: 50px;
-} 
+}
+
+h3, h4, h5, h6 {
+    color: black;
+}
+
+
 </style>
 
 <!-- BREADCRUMB -->
@@ -102,42 +108,39 @@ body {
                                     </tr>
                                 </thead>
                                 <!-- Cart Table Body -->
-                                <tbody>
-                                    
-                                        <% cart.forEach((data) => { %>
-                                            <tr class="cart-table-item card">
-                                                <td style="display: flex; align-items: center;">
-                                                    <div class="product">
-                                                        <img src="/adminAssets/images/<%=data.productId.image[0]%>" alt="Product Image" class="img-fluid" style="width: 100px; height: 100px">
-                                                    </div>
-                                                    <div class="product-name" style="margin-left: 50px;">
-                                                        <h5><%=data.productId.name%></h5>
-                                                    </div>
-                                                </td>
-                                                <td>&#x20B9;<%=data.productId.price%></td>
+                                
+                                <% cart.forEach((data) => { %>
+                                    <tbody>
+                                        <td style="display: flex; align-items: center;">
 
-                                                <!-- Cart Count -->
-                                                <td class="quantity-col">
-                                                    <%if(data.productId.quantity != 0){%>
-                                                    <div class=" flex-w m-l-auto m-r-4" >
-                                                        <button type="button"
-                                                            class="btn btn-secondary"
-                                                            onclick="cartCount('<%=data.productId._id%>','<%=userId%>',-1)" 
-                                                            >-</button>
-                                                        <span   
-                                                            class="mtext-104 cl3 txt-center num-product "
-                                                            id="<%=data.productId._id%>"
-                                                            ><%=data.quantity%></span>
-                                                        <button
-                                                            class="btn btn-secondary"
-                                                            onclick="cartCount('<%=data.productId._id%>','<%=userId%>', 1)"
-                                                            >+</button>
-                                                    </div>
-                                                  <%}else{%>
-                                                    <p class="text-danger text-center">Out of Stock </p>
-                                                  <%}%>
-                                                  </td>
-                                                <!-- Cart Count -->
+                                            <!-- Product Image -->
+                                            <div class="product">
+                                                <img src="/adminAssets/images/<%=data.productId.image[0]%>" alt="Product Image" class="img-fluid" style="max-width: 100px; height: auto;">
+                                            </div>
+                                        
+                                            <!-- Product Name -->
+                                            <div class="product-name" style="margin-left: 10px;">
+                                                <h6 style="font-size: 14px; margin: 0;"><%=data.productId.name%></h6>
+                                            </div>
+                                        
+                                        </td>
+                                        
+                                        <td>&#x20B9;<%=data.productId.price%></td>
+                                        
+                                        <!-- Cart Count -->
+                                        <td class="quantity-col">
+                                            <% if (data.productId.quantity != 0) { %>
+                                                <div class="flex-w m-l-auto m-r-4">
+                                                    <button type="button" class="btn btn-secondary" onclick="cartCount('<%=data.productId._id%>','<%=userId%>',-1)">-</button>
+                                                    <span class="mtext-104 cl3 txt-center num-product" id="<%=data.productId._id%>"><%=data.quantity%></span>
+                                                    <button class="btn btn-secondary" onclick="cartCount('<%=data.productId._id%>','<%=userId%>', 1)">+</button>
+                                                </div>
+                                            <% } else { %>
+                                                <p class="text-danger text-center">Out of Stock </p>
+                                            <% } %>
+                                        </td>
+                                        <!-- Cart Count -->
+                                        
 
                                                 <td>&#x20B9;<%=data.totalPrice%></td>
                                                 
@@ -148,9 +151,9 @@ body {
                                                     </button>
                                                 </td>
                                             </tr>
+                                        </tbody>
                                         <% }) %>
                                     
-                                </tbody>
                             </table>
                             <!-- /Cart Table -->
                         </div>

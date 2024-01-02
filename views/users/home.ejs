@@ -3,6 +3,13 @@
 
 	<%-include('../layout/navigation.ejs')%>
 
+	<style>
+  	.cta-btn {
+    	text-decoration: none; /* This removes the underline */
+    
+  	}
+	</style>
+
     <!-- SECTION -->
 		<div class="section">
 			<!-- container -->
@@ -17,7 +24,7 @@
 									<img src="/adminAssets/images/<%=cat.image%>" alt="">
 								</div> 
 								<div class="shop-body">
-									<h3><%=cat.categoryName%><br>Collection</h3>
+									<h4><%=cat.categoryName%><br>Collection</h4>
 									<a href="/product" class="cta-btn">Shop now <i class="fa fa-arrow-circle-right"></i></a>
 								</div>
 							</div>

@@ -23,6 +23,18 @@
       padding: 12px 20px;
     }
 
+    /* Example CSS for success and error messages */
+.toastify-success {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.toastify-error {
+    background-color: #f44336;
+    color: white;
+}
+
+
 </style>
 
 <!-- saideNaveBar -->
@@ -96,14 +108,7 @@
               <span class="nav-link-text ms-1">Coupon</span>
             </a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link text-white " href="/admin/view-wallet">
-              <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-                <i class="material-icons opacity-10">account_balance_wallet</i>
-              </div>
-              <span class="nav-link-text ms-1">Wallet</span>
-            </a>
-          </li>
+
           <li class="nav-item mt-3">
             <h6 class="ps-4 ms-2 text-uppercase text-xs text-white font-weight-bolder opacity-8">Account pages</h6>
           </li>
@@ -155,7 +160,7 @@
                 </div>
                 <div class="card-body px-0 pb-2">
                     <div class="container-fluid">
-                        <form class="row g-3" action="" method="post" id="couponForm">
+                        <form class="row g-3" action="" id="couponForm">
                             <div class="col-md-6">
                               <label for="inputCouponName" class="form-label">Coupon Name</label>
                               <input type="text" name="couponName" class="form-control" id="couponName" placeholder="Coupon Name"> 
@@ -164,6 +169,7 @@
                             <div class="col-md-6">
                               <label for="inputCouponCode" class="form-label">Coupon Code</label>
                               <input type="text" class="form-control" id="couponCode" name="couponCode" placeholder="Coupon Code">
+                              <div id="couponCodeError" class="error-message text-danger"></div>
                             </div>
                             <div class="col-md-6">
                                 <label for="inputDiscountAmount" class="form-label">Discount Amount</label>
@@ -173,6 +179,7 @@
                               <div class="col-md-6">
                                 <label for="inputValidFrom" class="form-label">Valid From</label>
                                 <input type="date" class="form-control" id="validFrom" name="validFrom">
+                                <div id="couponValidFromError" class="error-message text-danger"></div>
                               </div>
                               <div class="col-md-6">
                                 <label for="inputValidTo" class="form-label">Valid To</label>
@@ -182,6 +189,7 @@
                               <div class="col-md-6">
                                 <label for="inputMiniMarginAmount" class="form-label">Minimum Margin Amount</label>
                                 <input type="number" class="form-control" id="minimumSpend" name="minimumSpend" placeholder="Margin Amount">
+                                <div id="couponMinimumSpendError" class="error-message text-danger"></div>
                               </div>
                               <div class="col-md-6">
                                 <label for="inputUserLimit" class="form-label">User Limit</label>
@@ -191,6 +199,7 @@
                               <div class="col-md-6">
                                 <label for="inputDescription" class="form-label">Description</label>
                                 <input type="text" class="form-control" id="description" name="description" placeholder="Description">
+                                <div id="descriptionError" class="error-message text-danger"></div>
                               </div>
                               <div class="btn-control">
                                 <button type="submit" class="btn btn-primary mr-2" id="submitBtn">Add coupon</button>
@@ -203,6 +212,131 @@
     </div>
 </div>
 
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<!-- Toastify Library  -->
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
 <script>
-  
+$(document).ready(function () {
+  // Enable submit button only if there are no errors
+  function enableSubmitButton() {
+      var hasErrors = $('.error-message:visible').length > 0;
+      $('#submitBtn').prop('disabled', hasErrors);
+  }
+
+
+$('#couponForm').submit(function (e) {
+    e.preventDefault();
+
+    // Validate required fields before sending the request
+    var couponCode = $('#couponCode').val();
+    var validFrom = $('#validFrom').val();
+    var validTo = $('#validTo').val();
+    var minimumSpend = $('#minimumSpend').val();
+    var usersLimit = $('#usersLimit').val();
+
+    if (!couponCode || !validFrom || !validTo || !minimumSpend || !usersLimit) {
+        // Handle validation error, show a message, or prevent the request
+        console.error('Validation error: Some required fields are missing');
+        return;
+    }
+
+    // Your form data
+    var formData = $(this).serialize();
+
+    // Continue with the AJAX request
+    $.ajax({
+        type: 'POST',
+        url: '/admin/add-coupon',
+        data: formData,
+        dataType: 'json',
+        success: function (response) {
+            // Handle the response from the server
+            if (response.success) {
+                // Coupon added successfully
+                // alert(response.message)
+                Swal.fire({
+                  icon: "success",
+                  title: "Your coupon has been saved",
+                  showConfirmButton: false,
+                  // timer: 1500
+              });
+
+                window.location.href = '/admin/view-coupon';
+
+            } else {
+                // Coupon addition failed
+                // alert(response.message)
+                Swal.fire({
+                  title: 'Warning!',
+                  text: response.message,
+                  icon: "warning",
+                  confirmButtonText: 'OK',
+                  confirmButtonColor: '#ffcc00'
+                });
+            }
+        },
+        error: function (error) {
+            // Handle the error if the request fails
+            console.error('Error:', error);
+            // You can show an error message or take appropriate action
+        }
+    });
+
+
+  });
+
+  // Validation for Coupon Name
+  $('#couponName').on('blur', function () {
+      var couponName = $(this).val();
+      var errorMessage = '';
+
+      if (couponName === '') {
+          errorMessage = 'Coupon name must be entered';
+          $('#couponNameError').text(errorMessage).toggle(errorMessage !== '');
+          enableSubmitButton();
+
+          // Set timeout to remove error message after 5 seconds
+          setTimeout(()=>{
+          $('#couponNameError').fadeOut();
+          },5000);
+
+        }else {
+        $('#couponNameError').text(errorMessage).toggle(errorMessage !== '');
+        enableSubmitButton();
+      }
+
+  });
+
+
+  // Validation for Coupon Code
+  $('#couponCode').on('blur', function () {
+      var couponCode = $(this).val();
+      var errorMessage = '';
+
+      if (couponCode === '') {
+          errorMessage = 'Coupon code must be entered';
+          $('#couponCodeError').text(errorMessage).toggle(errorMessage !== '');
+          enableSubmitButton();
+          // Set timeout to remove error message after 5 seconds
+          setTimeout(()=>{
+            $('#couponCodeError').fadeOut();
+          },5000);
+      }else{
+        $('#couponCodeError').text(errorMessage).toggle(errorMessage !== '');
+          enableSubmitButton();
+      }
+  });
+
+ 
+
+  // Hide error messages after 5 seconds
+  setTimeout(function () {
+      $('.error-message').fadeOut();
+  }, 5000);
+});
+
 </script>
+
+

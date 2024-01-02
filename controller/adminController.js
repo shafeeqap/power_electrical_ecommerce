@@ -6,6 +6,8 @@ const bcrypt = require('bcrypt');
 const randomstring = require('randomstring');
 const config = require('../config/config');
 const nodemailer = require('nodemailer');
+const { now } = require('mongoose');
+const { query } = require('express');
 
 
 // securePassword (bcrypt)----------------------//
@@ -182,10 +184,45 @@ const resetPassword = async(req,res)=>{
 const viewUsers = async(req,res)=>{
     try {
 
-        const userData = await User.find({ });
+        // search
+        var search='';
+        if(req.query.search){
+            search=req.query.search;
+        }
+
+        //Pagination
+        var page=1;
+        if(req.query.page){
+            page=parseInt(req.query.page);
+        }
+
+        const limit=6;
+
+        const userData = await User.find({ 
+            $or:[
+                {name:{$regex:'.*'+search+'.*', $options:'i'}},
+                {email:{$regex:'.*'+search+'.*', $options:'i'}},
+                {mobile:{$regex:'.*'+search+'.*', $options:'i'}}
+            ]
+        }).limit(limit*1).skip(Math.max((page-1)*limit,0)).exec();
         // console.log(userData);
 
-        res.render('view-users',{message:'View Users',userData })
+        // count
+        const count = await User.find({ 
+            $or:[
+                {name:{$regex:'.*'+search+'.*', $options:'i'}},
+                {email:{$regex:'.*'+search+'.*', $options:'i'}},
+                {mobile:{$regex:'.*'+search+'.*', $options:'i'}}
+            ]
+        }).countDocuments();
+
+
+        res.render('view-users',{
+            message:'View Users',
+            userData,
+            totalPages:Math.ceil(count/limit),  //Ex:- count of document/limit (9/6 = 1.5 => 2)
+            currentPage:page,   // page 1
+         })
         
     } catch (error) {
         console.log(error);
@@ -218,94 +255,53 @@ const userBlockorActive = async(req,res)=>{
 
 
 // Load View Orders Page
-const loadViewOrders = async(req, res)=>{
+const loadViewOrders = async (req, res) => {
     try {
+        const orderData = await Order.find()
+       
 
-         //Pagination
-         let query = {};
+        const productsArray = [];
 
-         // Check if there is a search query in the URL
-         if (req.query.search) {
-             const searchRegex = new RegExp(req.query.search, 'i');
-             query = {
-                 $or: [
-                    { 'user.name': searchRegex },
-                    { 'orderDetails.date': searchRegex },
-                    { 'orderDetails.totalAmount': searchRegex },
-                    { 'orderDetails.orderStatus': searchRegex },
-                    { 'orderDetails.paymentStatus': searchRegex },
+        for (let order of orderData) {
+            for (let productValue of order.products) {
+                const productId = productValue.productId;
+                const productData = await Product.findById(productId);
+                const userDetails = await User.findOne({ name: order.userName });
 
-                 ]
-             };
-         }
-
-         const page = parseInt(req.query.page) || 1;
-         const limit = parseInt(req.query.limit) || 5;
-         const skip = (page-1) * limit;
-
-        const orderData = await Order.find(query).skip(skip).limit(limit);
-        // console.log('Order Data',orderData);
-        const totalCount = await Order.countDocuments(query);
-        
-        const totalPages = Math.ceil(totalCount/limit);
-
-
-        const productsArray=[];
-
-        for(let orders of orderData){
-            // console.log('orders', orders);
-            for(let productsValue of orders.products){
-                // console.log('productsValue', productsValue);
-                const productId = productsValue.productId;
-                // console.log('ProductId',productId);
-
-                const productData  = await Product.findById(productId)
-
-                const userDetails = await User.findOne({name: orders.userName})
-                // console.log('userDetails..........',userDetails);
-
-                if(productData){
-                    
+                if (productData) {
                     productsArray.push({
-                        user:userDetails,
-                        product:productData,
-                        orderDetails:{
-                            _id:orders._id,
-                            userId:orders.userId,
-                            deliveryDetails:orders.deliveryDetails,
-                            date:orders.date,
-                            totalAmount:productsValue.quantity*orders.totalAmount,
-                            orderStatus:productsValue.orderStatus,
-                            paymentStatus:productsValue.paymentStatus,
-                            statusLevel:productsValue.statusLevel,
-                            paymentMethod:orders.paymentMethod,
-                            quantity:productsValue.quantity,
-
-                        }
-
-                    })
+                        user: userDetails,
+                        product: productData,
+                        orderDetails: {
+                            _id: order._id,
+                            userId: order.userId,
+                            deliveryDetails: order.deliveryDetails,
+                            date: order.date,
+                            totalAmount: productValue.quantity * order.totalAmount,
+                            orderStatus: productValue.orderStatus,
+                            paymentStatus: productValue.paymentStatus,
+                            statusLevel: productValue.statusLevel,
+                            paymentMethod: order.paymentMethod,
+                            quantity: productValue.quantity,
+                        },
+                    });
                 }
-                
             }
         }
-        // console.log('Product Array',productsArray);
 
-        res.render('view-orders',{
-            message:'View Orders',
-            orders:productsArray,
-            searchQuery:req.query.search || '',
-            pagination:{
-                page,
-                limit,
-                totalCount,
-                totalPages
-            }
-        });
         
+
+        res.render('view-orders', {
+            message: 'View Orders',
+            orders: productsArray,
+        });
     } catch (error) {
-        console.log(error);
+        console.error(error);
+        res.status(500).send('Internal Server Error');
     }
 };
+
+
 
 // View OrderDetails
 const viewOrderDetails = async(req, res)=>{
@@ -322,10 +318,7 @@ const viewOrderDetails = async(req, res)=>{
 
         const orderDetails = await Order.findById(orderId);
         const productData = await Product.findById(productId);
-        // console.log('Order Details',orderDetails);
-        // const productDetails = await Product.findById(productId);
-        // console.log('Product Details',productDetails);
-        // console.log('Order Id',orderId);
+
         const productDetails = orderDetails.products.find((product)=>product.productId.toString()===productId);
 
         const productOrder={
@@ -362,9 +355,6 @@ const viewOrderDetails = async(req, res)=>{
 const changeOrderStatus = async(req, res)=>{
     try {
         const {status, orderId, productId}=req.body;
-        // const orderId = req.body.orderId
-        // console.log('OrderId', orderId);
-        // console.log('Status',status);
         const orderDetails = await Order.findById(orderId);
         // console.log(orderDetails);
         if(!orderDetails){
@@ -396,7 +386,49 @@ const changeOrderStatus = async(req, res)=>{
     } catch (error) {
         console.log(error);
     }
-}
+};
+
+// ---------------------------------------------- cancel Order by admin-----------------------------------
+const adminCancelOrder = async(req, res)=>{
+    try {
+        
+        const orderId = req.body.orderId;
+        const productId = req.body.productId;
+        // console.log('orderId',orderId);
+        // console.log('productId',productId);
+
+
+        const orderData = await Order.findById(orderId);
+        // console.log('orderData',orderData);
+
+        if (!orderData) {
+            return res.status(404).json({ status: false, message: 'Order not found' });
+        }
+
+            const productInfo = orderData.products.find((product)=>product.productId.toString()===productId);
+            // console.log('productInfo',productInfo);
+
+            if (!productInfo) {
+                return res.status(404).json({ status: false, message: 'Product not found in the order' });
+            }
+        
+        
+            productInfo.orderStatus='Cancelled';
+            productInfo.paymentStatus='Cancelled';
+            productInfo.updatedAt= Date.now();
+
+            await orderData.save();
+
+            return res.json({status:true, message:'Order successfully cancelled'});
+    
+
+   
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ status: false, message: 'Internal Server Error' });
+    }
+
+};
 
 // Sample checking
 const sample =async(req,res)=>{
@@ -424,6 +456,7 @@ module.exports={
     loadViewOrders,
     viewOrderDetails,
     changeOrderStatus,
+    adminCancelOrder,
 
 
 

@@ -2,7 +2,15 @@
 <%- include('../admin/adminLayout/navbar.ejs')%>
 
 <!-- saideNaveBar -->
+<style>
+  .custom-confirm-button {
+    margin-right: 50px; 
+}
 
+.custom-cancel-button {
+    margin-left: 50px; 
+}
+</style>
 
 
 <body class="g-sidenav-show  bg-gray-200">
@@ -176,9 +184,7 @@
                     <p class="text-xs font-weight-bold mb-0"><%=user.email%></p>
                   </td>
                   <td>
-                    <p class="text-xs font-weight-bold mb-0">
-                      <%=user.mobile%>
-                    </p>
+                    <p class="text-xs font-weight-bold mb-0"><%=user.mobile%></p>
                   </td>
                   <!-- <td>
                     <img src="/userImages/<%=user.image %>" class="avatar avatar-sm me-3 border-radius-lg" alt="">
@@ -220,6 +226,25 @@
               </tbody>
             </table>
           </div>
+
+          <!-- pagination -->
+
+          <ul class="pagination">
+            <li class="page-item">
+                <a class="page-link" href="?page=<%= Math.max(currentPage - 1, 0) %>">Previous</a>
+            </li>
+            <% for (let i = 1; i <= totalPages; i++) { %>
+                <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                    <a class="page-link" href="?page=<%= i - 1 %>"><%= i %></a>
+                </li>
+            <% } %>
+            <li class="page-item">
+                <a class="page-link" href="?page=<%= Math.min(currentPage + 1, totalPages - 1) %>">Next</a>
+            </li>
+        </ul>
+        
+         <!-- end pagination -->
+
         </div>
       </div>
     </div>
@@ -243,43 +268,48 @@
           customClass: {
             confirmButton: "btn btn-success",
             cancelButton: "btn btn-danger",
+            actions: "my-custom-class", // Add a custom class for styling
           },
           buttonsStyling: false,
         });
         successAlert.fire({
-            title: "Are you sure?",
-            text: "You won't be able to revert this!",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonText: "Blocke/Active!",
-            cancelButtonText: "No, cancel!",
-            reverseButtons: true,
+          title: "Are you sure?",
+          text: "You won't be able to revert this!",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "Block/Active!",
+          cancelButtonText: "No, cancel!",
+          reverseButtons: true,
+        }).then((result) => {
+          if (result.isConfirmed) {
+            window.location.href = link.href;
 
-          }).then((result) => {
-            if (result.isConfirmed) {
-              window.location.href = link.href;
-              
-              successAlert.fire({
-                title: "Blocked!",
-                text: "User has been blocked.",
-                icon: "success",
-                
-              });
-            } else if (
-              /* Read more about handling dismissals below */
-              result.dismiss === Swal.DismissReason.cancel
-              ) {
-                successAlert.fire({
-                  title: "Cancelled",
-                  text: "User safe :",
-                  icon: "error",
-                });
-            }
-          });
-
+            successAlert.fire({
+              title: "Blocked!",
+              text: "User has been blocked.",
+              icon: "success",
+            });
+          } else if (result.dismiss === Swal.DismissReason.cancel) {
+            successAlert.fire({
+              title: "Cancelled",
+              text: "Your action is Cancelled:",
+              icon: "error",
+            });
+          }
+        });
       });
     }
   });
 </script>
+
+<style>
+  /* Add some padding to the buttons */
+  .my-custom-class .swal2-confirm,
+  .my-custom-class .swal2-cancel {
+    padding: 10px 20px;
+    margin: 5px;
+  }
+</style>
+
 
 <%-include('../admin/adminLayout/footer.ejs')%>
