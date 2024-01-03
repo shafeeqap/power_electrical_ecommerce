@@ -65,6 +65,8 @@ user_router.get('/home', userAuth.isLogin, userAuth.is_blocked, userController.l
 
 user_router.get('/product',userAuth.isLogin, userAuth.is_blocked, userController.productLoad);
 user_router.get('/productDetails',userController.loadProductDetails);
+user_router.post('/productDetails/cart-quantity',cartController.productDetailsQuantity);
+
 
 user_router.get('/cart',userAuth.isLogin, userAuth.is_blocked, cartController.cartLoad);
 user_router.post('/addToCart',userAuth.isLogin, cartController.addToCart);

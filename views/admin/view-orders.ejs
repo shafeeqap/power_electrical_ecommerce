@@ -200,8 +200,9 @@
                                 </td>
 
 
-                    <td style="text-align: center;"><% if(data.orderDetails.paymentStatus==='success'){%></td>
-                      <p class="text-xs text-success font-weight-bold mb-0">Success</p>
+                                <td style="text-align: center;">
+                                <% if(data.orderDetails.paymentStatus==='success'){%>
+                                  <p class="text-xs text-success font-weight-bold mb-0">Success</p>
                                     <% }else if(data.orderDetails.paymentStatus==='Pending'){%>
                                         <p class="text-xs font-weight-bold mb-0">Pending</p>
                                         <% }else if(data.orderDetails.paymentStatus==='Failed'){%>
@@ -222,21 +223,11 @@
                     <td>
                       <tr>
                         <p class="text-xs font-weight-bold mb-0">Order not found</p>
-
                       </tr>
                     </td>
-                    <td>$675,000</td>
                   </tr>
                 </tbody>
-                <td>
-                  <tr>
-                    <p class="text-xs font-weight-bold mb-0">Order not found</p>
-
-                  </tr>
-                </td>
-              </tr>
               <% }%>
-            </tbody>
           </table>
             </div>
           </div>

@@ -343,7 +343,12 @@
                     timer:1000
                 })
             }else{
-                Swal("Fail to add");
+                Swal({
+                    icon:'warning',
+                    title:'Fail to add',
+                    showConfirmButton:false,
+                    timer:1000
+                });
             }
         });
     }

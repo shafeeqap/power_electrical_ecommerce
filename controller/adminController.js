@@ -9,6 +9,8 @@ const nodemailer = require('nodemailer');
 const { now } = require('mongoose');
 const { query } = require('express');
 
+const { findIncome } = require('../helpers/orderHelper');
+
 
 // securePassword (bcrypt)----------------------//
 const securePassword = async(password)=>{
@@ -53,7 +55,7 @@ const sendResetPasswordMail= async(name,email,token)=>{
     }
 }
 
-// Load Login 
+//--------------------------------- Load Login ---------------------------------//
 const loadLogin = async(req,res)=>{
     try {
         res.render('adminLogin')
@@ -90,16 +92,37 @@ const verifyLogin = async(req,res)=>{
 }
 
 
-// Load Home page
+// --------------------------------------------- Load Admin Home page -------------------------------------------------//
 const loadDashboard = async(req,res)=>{
     try {
-        res.render('adminHome',{message:"Admin Home"})
+
+        const today = new Date();   // Get the current date
+        const firstDayOfMonth   = new Date(today.getFullYear(), today.getMonth(), 1);
+        const firstDayOfPreviousMonth = new Date(
+            today.getFullYear(),
+            today.getMonth()-1, 1
+        );
+
+        const jan1OfTheYear = new Date(today.getFullYear(), 0, 1);
+
+        const totalIncome = await findIncome();
+        const thisMonthIncome = await findIncome(firstDayOfMonth);
+        const thisYearIncome = await findIncome(jan1OfTheYear);
+
+        // const totalUsersCount = formatNum(await User.find({}).count());
+
+
+
+        res.render('adminHome',{
+            message:"Admin Home",
+            totalIncome,
+        })
     } catch (error) {
         console.log(error);
     }
 }
 
-// Admin Logout
+// --------------------------------------------- Admin Logout -------------------------------------------------------//
 const logout = async(req,res)=>{
     try {
         req.session.destroy();
@@ -235,9 +258,9 @@ const userBlockorActive = async(req,res)=>{
     try {
 
         const user_id=req.query.id;
-        // console.log(user_id);
-       const userData = await User.findById({_id:user_id});
-    //    console.log(userData);
+        
+        const userData = await User.findById({_id:user_id});
+    
     if(userData.is_block===true){
 
         await User.updateOne({_id:user_id},{$set:{is_block:false}});
@@ -254,12 +277,10 @@ const userBlockorActive = async(req,res)=>{
 };
 
 
-// Load View Orders Page
+// ----------------------------------------- Load View Orders Page ----------------------------------------//
 const loadViewOrders = async (req, res) => {
     try {
-        const orderData = await Order.find()
-       
-
+        const orderData = await Order.find();
         const productsArray = [];
 
         for (let order of orderData) {
@@ -290,7 +311,6 @@ const loadViewOrders = async (req, res) => {
         }
 
         
-
         res.render('view-orders', {
             message: 'View Orders',
             orders: productsArray,
@@ -303,14 +323,12 @@ const loadViewOrders = async (req, res) => {
 
 
 
-// View OrderDetails
+
+// ----------------------------------------------- View OrderDetails ----------------------------------------//
 const viewOrderDetails = async(req, res)=>{
     try {
-        // const orderId = req.query.id
-        // const productId = req.query.productId;
+    
         const {orderId, productId}=req.query;
-        // console.log('orderId:', orderId);
-        // console.log('ProductId:', productId);
         
         if (!orderId || !productId) {
             return res.status(400).send("orderId and productId are required");
@@ -336,7 +354,7 @@ const viewOrderDetails = async(req, res)=>{
 
         }
 
-        // console.log(productOrder);
+    
 
         res.render('view-ordersDetails',{
             message:'View Order Details',
@@ -351,12 +369,12 @@ const viewOrderDetails = async(req, res)=>{
     }
 };
 
-// Change Order Status
+//----------------------------------------------- Change Order Status ---------------------------------------------//
 const changeOrderStatus = async(req, res)=>{
     try {
         const {status, orderId, productId}=req.body;
         const orderDetails = await Order.findById(orderId);
-        // console.log(orderDetails);
+
         if(!orderDetails){
             return res.status(404).send('Order not found.');
         }
@@ -371,14 +389,14 @@ const changeOrderStatus = async(req, res)=>{
         const statusLevel=statusMap[selectedStatus]
 
         const productDetails = orderDetails.products.find((product)=>product.productId.toString()===productId);
-        // console.log(productDetails);
+   
 
         productDetails.statusLevel=statusLevel;
         productDetails.orderStatus=status;
         productDetails.updatedAt=Date.now();
 
         const result = await orderDetails.save();
-        // console.log('Result',result);
+        
 
         res.redirect(`/admin/view-ordersDetails?orderId=${orderId}&productId=${productId}`);
 
@@ -394,19 +412,18 @@ const adminCancelOrder = async(req, res)=>{
         
         const orderId = req.body.orderId;
         const productId = req.body.productId;
-        // console.log('orderId',orderId);
-        // console.log('productId',productId);
+      
 
 
         const orderData = await Order.findById(orderId);
-        // console.log('orderData',orderData);
+       
 
         if (!orderData) {
             return res.status(404).json({ status: false, message: 'Order not found' });
         }
 
             const productInfo = orderData.products.find((product)=>product.productId.toString()===productId);
-            // console.log('productInfo',productInfo);
+          
 
             if (!productInfo) {
                 return res.status(404).json({ status: false, message: 'Product not found in the order' });
@@ -430,14 +447,7 @@ const adminCancelOrder = async(req, res)=>{
 
 };
 
-// Sample checking
-const sample =async(req,res)=>{
-    try {
-        res.render('sample')
-    } catch (error) {
-        console.log(error);
-    }
-}
+
 
 
 
@@ -458,8 +468,5 @@ module.exports={
     changeOrderStatus,
     adminCancelOrder,
 
-
-
-    sample // Only for checking
     
 }

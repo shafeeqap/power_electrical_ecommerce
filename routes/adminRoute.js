@@ -114,10 +114,6 @@ admin_route.get('/delete-coupon', adminAuth.isLogin, couponController.deletecoup
 
 
 
-admin_route.get('/sample',adminController.sample)
-
-
-
 
 
 module.exports = admin_route

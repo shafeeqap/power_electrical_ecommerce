@@ -484,7 +484,7 @@ const loadProductDetails = async(req, res)=>{
         
         const userData = await User.findById(req.session.user_id);
         const productData = await Product.findById({_id:productId});
-        console.log('ProductData',productData);
+        // console.log('ProductData',productData);
 
         if(productData){
 

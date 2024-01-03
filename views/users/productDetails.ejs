@@ -6,17 +6,18 @@
 <!-- Include jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 
+<script src="https://unpkg.com/js-image-zoom@0.4.1/js-image-zoom.js" type="application/javascript"></script>
 
 <!-- Include magnifier.js library -->
-<script src="https://unpkg.com/magnifierjs/dist/magnifier.min.js"></script>
+<!-- <script src="https://unpkg.com/magnifierjs/dist/magnifier.min.js"></script> -->
 
 
 <!-- Include Elevate Zoom script and stylesheet -->
 <!-- <script src="https://cdn.jsdelivr.net/npm/elevatezoom@3.0.8/dist/jquery.elevatezoom.min.js"></script> -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/elevatezoom@3.0.8/dist/jquery.elevatezoom.css" />
+<!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/elevatezoom@3.0.8/dist/jquery.elevatezoom.css" /> -->
 
 
-<style>
+<!-- <style>
     .zoomThumb{
         width: 100px;
         height: 100px;
@@ -28,7 +29,7 @@
         height: 500px;
     }
 
-</style>
+</style> -->
 
 
 <!-- SECTION -->
@@ -41,8 +42,8 @@
             <div class="col-md-5 col-md-push-2">
                 <div id="product-main-img">
                     <% if(product.image.length>0){%>
-                    <div class="magnifier-container">
-                        <img id="zoom_01" src="/adminAssets/images/<%= product.image[0] %>" alt="">
+                    <div id="img-container" style="width: 700px;">
+                        <img src="/adminAssets/images/<%= product.image[0] %>" alt="">
                     </div>
                     <% } %> 
                 </div>
@@ -54,9 +55,9 @@
                 <div id="product-imgs">
                     <% if(product.image.length>0){%>
                     <% product.image.forEach((image, index)=>{%>
-                        <div class="product-preview-thumb" data-image="/adminAssets/images/<%= image %>">
-                        <img class="zoomThumb"  src="/adminAssets/images/<%= image %>" alt="">
-                    </div>
+                        <!-- <div class="product-preview-thumb" data-image="/adminAssets/images/<%= image %>">
+                        <img src="/adminAssets/images/<%= image %>" alt="">
+                    </div> -->
                 
                     <% }); %>
                     <% } %>
@@ -378,7 +379,7 @@
         }
 
         $.ajax({
-            url:'/cart-quantity',
+            url:'/productDetails/cart-quantity',
             method:'post',
             // encoded:true,
             data:{
@@ -430,7 +431,7 @@
 
 <!-- Initialize Elevate Zoom -->
 
-<script>
+<!-- <script>
     document.addEventListener('DOMContentLoaded', function () {
         var magnifier = new Magnifier({
             magnifier: '#product-main-img',
@@ -450,9 +451,21 @@
             });
         });
     });
-    </script>
+    </script> -->
     
 
+
+    
+    <script>
+        var options = {
+            width: 250,
+            zoomWidth: 450,
+            offset: {vertical: 0, horizontal: 10}
+        };
+        new ImageZoom(document.getElementById("img-container"), options);
+         
+        </script>
+    
 
 
 <%-include('../layout/footer.ejs')%>
