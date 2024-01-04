@@ -16,6 +16,7 @@ const findIncome = async(startDate = new Date('1990-01-01'), endDate = new Date(
                 ]
             }
         );
+
         
         let totalIncome =0;
 
@@ -27,7 +28,7 @@ const findIncome = async(startDate = new Date('1990-01-01'), endDate = new Date(
             }
         };
 
-        return totalIncome(totalIncome)
+        return formatNum(totalIncome)
         
     } catch (error) {
         console.log(error);
@@ -40,15 +41,15 @@ const countSales = async(startDate = new Date('1990-01-01'), endDate = new Date(
         const orderData = await Order.find(
             {
                 "products.orderStatus":"Delivered",
-                createdAt:{
+                    createdAt:{
                     $gte: startDate,
                     $lt: endDate
                 }
             }
         );
-        console.log('orderData',orderData);
+    
 
-        let salesCount =0;
+        let salesCount = 0;
         for(const order of orderData){
             for(const product of order.products){
                 if(product.orderStatus==='Delivered'){
@@ -57,6 +58,7 @@ const countSales = async(startDate = new Date('1990-01-01'), endDate = new Date(
             }
         }
 
+        console.log('salesCount', salesCount);
         return salesCount;
 
     } catch (error) {
@@ -140,6 +142,9 @@ const findSalesDataOfMonth = async(year, month)=>{
     }
 };
 
+
+
+
 const findSalesDataOfYear = async(year)=>{
     try {
 
@@ -169,9 +174,12 @@ const findSalesDataOfYear = async(year)=>{
         return orderData
 
     } catch (error) {
-        console.log(error);
+        throw error;
     }
 };
+
+
+
 
 const formatNum = (num)=>{
     if(num>=10000000){

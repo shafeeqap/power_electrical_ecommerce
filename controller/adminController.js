@@ -9,7 +9,14 @@ const nodemailer = require('nodemailer');
 const { now } = require('mongoose');
 const { query } = require('express');
 
-const { findIncome } = require('../helpers/orderHelper');
+const { 
+    findIncome,
+    countSales,
+    findSalesData,
+    findSalesDataOfMonth,
+    findSalesDataOfYear,
+    formatNum,
+} = require('../helpers/orderHelper');
 
 
 // securePassword (bcrypt)----------------------//
@@ -93,34 +100,121 @@ const verifyLogin = async(req,res)=>{
 
 
 // --------------------------------------------- Load Admin Home page -------------------------------------------------//
-const loadDashboard = async(req,res)=>{
+const loadDashboard = async (req, res) => {
     try {
-
-        const today = new Date();   // Get the current date
-        const firstDayOfMonth   = new Date(today.getFullYear(), today.getMonth(), 1);
-        const firstDayOfPreviousMonth = new Date(
-            today.getFullYear(),
-            today.getMonth()-1, 1
-        );
-
+        const today = new Date();
+        const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+        const firstDayOfPreviousMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
         const jan1OfTheYear = new Date(today.getFullYear(), 0, 1);
 
         const totalIncome = await findIncome();
         const thisMonthIncome = await findIncome(firstDayOfMonth);
         const thisYearIncome = await findIncome(jan1OfTheYear);
 
-        // const totalUsersCount = formatNum(await User.find({}).count());
+        const totalUsersCount = formatNum(await User.find({}).count());
+        const usersOntheMonth = formatNum(await User.find({ updatedAt: { $gte: firstDayOfMonth } }).count());
+
+        const totalSalesCount = formatNum(await countSales());
+        const salesOnTheYear = formatNum(await countSales(jan1OfTheYear));
+        const salesOnTheMonth = formatNum(await countSales(firstDayOfMonth));
+        const salesOnPrevMonth = formatNum(await countSales(firstDayOfPreviousMonth, firstDayOfPreviousMonth));
 
 
 
-        res.render('adminHome',{
-            message:"Admin Home",
+        // const dailyOrders = await Order.aggregate([
+        //     {
+        //         $match:{
+        //             "date":{ $gte: startDate, $lte: endDate},
+        //         },
+        //     },
+        //     {
+        //         $group: {
+        //             _id: {
+        //                 dayOfWeek: { $dayOfWeek: "$date" },
+        //             },
+        //             totalAmount: { $sum: "$totalAmount" },
+        //             count: { $sum: 1 },
+        //         },
+        //     },            
+        //     {
+        //         $sort: {
+        //             "_id.dayOfWeek": 1,
+        //         }
+        //     }
+        // ]);
+
+        
+
+        // Prepare data for the chart
+        // const labels = ["M", "T", "W", "T", "F", "S", "S"];
+        // const salesData = Array(7).fill(0);
+
+          
+        // dailyOrders.forEach((order) => {
+        //     const dayOfWeek = order._id.dayOfWeek - 1; 
+        //     salesData[dayOfWeek] = order.totalAmount;
+        // });
+        // console.log('salesData',salesData);
+
+        // const shortFormSalesData = salesData.map(amount => Math.floor(amount / 100));
+        // const integerSalesData = shortFormSalesData[0]; // Since it's a single value, not an array
+        
+        
+        // const dailyReport = { dailyOrders, labels, salesData, integerSalesData };
+    
+        // console.log('dailyRiport',dailyReport);
+
+        // Fetch daily sales data from MongoDB
+        const pipeline = [
+            {
+                $match: {
+                    "products.orderStatus": "Delivered",
+                    date: {
+                        $gte: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0),
+                        $lt: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1, 0, 0, 0),
+                    },
+                },
+            },
+            {
+                $group: {
+                    _id: null,
+                    totalAmount: { $sum: '$totalAmount' },
+                    count: { $sum: 1 },
+                },
+            },
+        ];
+
+        const dailySalesData = await Order.aggregate(pipeline);
+
+       
+
+        const labels = ['today'];
+        const salesData = [dailySalesData[0] ? dailySalesData[0].totalAmount : 0];
+        const integerSalesData = [dailySalesData[0] ? dailySalesData[0].count : 0];
+
+        res.render('adminHome', {
+            message: "Admin Home",
             totalIncome,
-        })
+            totalUsersCount,
+            thisMonthIncome,
+            thisYearIncome,
+            usersOntheMonth,
+            totalSalesCount,
+            salesOnTheYear,
+            salesOnTheMonth,
+            salesOnPrevMonth,
+            labels,
+            salesData,
+            integerSalesData,
+        });
+
+        
     } catch (error) {
         console.log(error);
+        return res.status(500).send("Internal Server Error");
     }
-}
+};
+
 
 // --------------------------------------------- Admin Logout -------------------------------------------------------//
 const logout = async(req,res)=>{
@@ -245,10 +339,11 @@ const viewUsers = async(req,res)=>{
             userData,
             totalPages:Math.ceil(count/limit),  //Ex:- count of document/limit (9/6 = 1.5 => 2)
             currentPage:page,   // page 1
-         })
+         });
         
     } catch (error) {
         console.log(error);
+        res.status(500).send("Internal Server Error");
     }
 
 };
@@ -273,6 +368,7 @@ const userBlockorActive = async(req,res)=>{
         
     } catch (error) {
         console.log(error);
+        res.status(500).send("Internal Server Error");
     }
 };
 
@@ -280,7 +376,7 @@ const userBlockorActive = async(req,res)=>{
 // ----------------------------------------- Load View Orders Page ----------------------------------------//
 const loadViewOrders = async (req, res) => {
     try {
-        const orderData = await Order.find();
+        const orderData = await Order.find().sort({date:-1});
         const productsArray = [];
 
         for (let order of orderData) {
@@ -361,11 +457,12 @@ const viewOrderDetails = async(req, res)=>{
             products:productOrder,
             orderId,
             productId
-        })
+        });
         
         
     } catch (error) {
         console.log(error);
+        res.status(500).send("Internal Server Error");
     }
 };
 
@@ -403,6 +500,7 @@ const changeOrderStatus = async(req, res)=>{
         
     } catch (error) {
         console.log(error);
+        res.status(500).send("Internal Server Error");
     }
 };
 
