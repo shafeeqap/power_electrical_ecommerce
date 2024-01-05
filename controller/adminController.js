@@ -177,20 +177,35 @@ const loadDashboard = async (req, res) => {
             },
             {
                 $group: {
-                    _id: null,
+                    _id: { $dayOfWeek: "$date" },
                     totalAmount: { $sum: '$totalAmount' },
                     count: { $sum: 1 },
                 },
             },
+            {
+                $sort: {
+                    "_id": 1,
+                }
+            }
         ];
 
-        const dailySalesData = await Order.aggregate(pipeline);
 
+        const dailySalesData = await Order.aggregate(pipeline);
+        console.log('dailySalesData',dailySalesData);
        
 
-        const labels = ['today'];
-        const salesData = [dailySalesData[0] ? dailySalesData[0].totalAmount : 0];
-        const integerSalesData = [dailySalesData[0] ? dailySalesData[0].count : 0];
+        const labels = ["M", "T", "W", "T", "F", "S", "S"];
+        const salesData = Array(7).fill(0);
+       
+        dailySalesData.forEach((order) => {
+            const dayOfWeek = order._id; // dayOfWeek values are 1 to 7
+            salesData[dayOfWeek] = order.totalAmount;
+        });
+
+        console.log('labels',labels);
+        console.log('salesData',salesData);
+        console.log('dailySalesData',dailySalesData);
+      
 
         res.render('adminHome', {
             message: "Admin Home",
@@ -205,7 +220,7 @@ const loadDashboard = async (req, res) => {
             salesOnPrevMonth,
             labels,
             salesData,
-            integerSalesData,
+            
         });
 
         

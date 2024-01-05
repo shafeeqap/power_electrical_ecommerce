@@ -213,17 +213,17 @@
             <h6 class="mb-0 ">Daily Sales Report</h6>
             <!-- <p class="text-sm ">Last Campaign Performance</p> -->
             <hr class="dark horizontal">
-            <% dailyOrders.forEach(order => { %>
+            
             <div class="d-flex align-items-center">
               <i class="material-icons text-sm my-auto me-1">schedule</i>
               <!-- <p class="mb-0 text-sm"> campaign sent 2 days ago </p> -->
               <ul>
                   <li>
-                    <%= order.orderId %>, Total Amount: <%= order.totalAmount %>
+                    
                   </li>
                 </ul>
               </div>
-              <% }); %>
+            
           </div>
         </div>
       </div>
@@ -742,12 +742,13 @@
 
 <script>
   var ctx = document.getElementById("chart-bars").getContext("2d");
-
+  var labels = JSON.parse('<%- JSON.stringify(labels) %>');
+  var data = JSON.parse('<%- JSON.stringify(salesData || []) %>'); // Ensure salesData is defined
 
   new Chart(ctx, {
       type: "bar",
       data: {
-        labels: label,
+        labels: labels,
         datasets: [{
           label: "Sales",
           tension: 0.4,
@@ -755,9 +756,9 @@
           borderRadius: 4,
           borderSkipped: false,
           backgroundColor: "rgba(255, 255, 255, .8)",
-          data: salesData,
+          data: data,
           maxBarThickness: 6
-        }, ],
+        }],
       },
       options: {
         responsive: true,
