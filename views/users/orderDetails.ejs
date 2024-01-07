@@ -143,7 +143,7 @@
                         <td style="text-align: center;">
                           <% if(products.orderStatus === 'Placed' || products.orderStatus === 'Shipped' || products.orderStatus === 'OutforDelivery'){%>
                             <div type="button" class="badge bg-warning rounded-pill text-dark" data-bs-toggle="modal" data-bs-target="#cancelModal" data-bs-whatever="@mdo">Cancel Order</div>
-                          <% } else if(products.orderStatus !=='Cancelled') {%>
+                          <% } else if(products.orderStatus !=='Cancelled' && products.orderStatus !=='Returned') {%>
                             <div type="button" class="badge bg-danger rounded-pill" data-bs-toggle="modal" data-bs-target="#returnModal" data-bs-whatever="@mdo">Return Product</div>
                           <% } %>
                         </td>

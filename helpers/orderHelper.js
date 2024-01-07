@@ -58,7 +58,7 @@ const countSales = async(startDate = new Date('1990-01-01'), endDate = new Date(
             }
         }
 
-        console.log('salesCount', salesCount);
+        // console.log('salesCount', salesCount);
         return salesCount;
 
     } catch (error) {
@@ -145,38 +145,37 @@ const findSalesDataOfMonth = async(year, month)=>{
 
 
 
-const findSalesDataOfYear = async(year)=>{
+const findSalesDataOfYear = async (year) => {
     try {
-
-        const pipeline =[
+        const pipeline = [
             {
-                $match:{
-                    "products.orderStatus":'Delivered',
-                    date:{
-                        $gte:new Date(`${year}01-01`),
-                        $lt:new DataTransfer(`$(year +1)-01-01`)
+                $match: {
+                    "products.orderStatus": 'Delivered',
+                    date: {
+                        $gte: new Date(`${year}-01-01`),
+                        $lt: new Date(`${year + 1}-01-01`)
                     }
                 }
             },
             {
-                $group:{
-                    _id:{createdAt:{$dateToString:{format:'%m', date:'$createdAt'}}},
-                    sales:{$sum:'$totalPrice'}
+                $group: {
+                    _id: { createdAt: { $dateToString: { format: '%m', date: '$createdAt' } } },
+                    sales: { $sum: '$totalPrice' }
                 }
             },
             {
-                $sort: {'_id.correctedAt':1}
+                $sort: { '_id.correctedAt': 1 }
             }
         ];
 
         const orderData = await Order.aggregate(pipeline);
-        console.log("findSalesDataOfYear : ",orderData);
-        return orderData
-
+        console.log("findSalesDataOfYear : ", orderData);
+        return orderData;
     } catch (error) {
         throw error;
     }
 };
+
 
 
 

@@ -337,7 +337,7 @@ const orderPlacedPageLoad = async(req, res)=>{
 };
 
 
-// Load Order Page
+//------------------------------------------- Load Order Page ---------------------------------------//
 const loadOrderPage = async(req, res)=>{
     try {
         const userId = req.session.user_id
@@ -387,8 +387,6 @@ const cancelOrder = async(req, res)=>{
         const cancelAmount = req.body.totalPrice;
         const amount = parseInt(cancelAmount);
         const refundOption = req.body.refundOption;
-        
-        
         
         const userData = await User.findOne({_id:userId});
     
@@ -500,7 +498,7 @@ const returnOrder = async(req, res)=>{
 
             const productInfo = orderData.products.find((product)=>String(product.productId)===String(productIdToReturn));
 
-            productInfo.orderStatus = 'Cancelled';
+            productInfo.orderStatus = 'Returned';
             productInfo.paymentStatus = 'Cancelled';
             productInfo.returnOrderStatus.reason=returnReson;
             productInfo.updatedAt=Date.now();
@@ -537,7 +535,7 @@ const returnOrder = async(req, res)=>{
         
                 const productInfo = orderData.products.find((order)=>String(order.productId)===String(productIdToReturn));
 
-                productInfo.orderStatus='Cancelled';
+                productInfo.orderStatus='Returned';
                 productInfo.paymentStatus='Refund';
                 productInfo.returnOrderStatus.reason=returnReson;
                 productInfo.updatedAt=Date.now();
@@ -564,7 +562,7 @@ const returnOrder = async(req, res)=>{
 
 
 
-// Load Checkout Edit Addrss
+//-------------------------------------------- Load Checkout Edit Addrss -------------------------------------------//
 const loadCheckoutEditAddress = async(req, res)=>{
     try {
         const id = req.query.id
@@ -583,7 +581,7 @@ const loadCheckoutEditAddress = async(req, res)=>{
     }
 };
 
-// Edit Checkout Address
+//---------------------------------------- Edit Checkout Address -----------------------------------//
 const editCheckoutAddress = async(req, res)=>{
     try {
 
@@ -610,7 +608,7 @@ const editCheckoutAddress = async(req, res)=>{
 };
 
 
-// Delete Checkout address
+//------------------------------------ Delete Checkout address ----------------------------------//
 const deleteCheckoutaddress = async(req, res)=>{
     try {
        const userId = req.session.user_id;

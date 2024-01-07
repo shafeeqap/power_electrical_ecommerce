@@ -190,14 +190,18 @@
                           
                           <% }else if(data.orderDetails && data.orderDetails.orderStatus==='Cancelled'){ %>
                             
-                                <p class="text-xs text-danger font-weight-bold mb-0">Cancelled</p>
+                                <p class="text-xs text-warning font-weight-bold mb-0">Cancelled</p>
                               
                               <% }else if(data.orderDetails && data.orderDetails.orderStatus==='OutforDelivery'){%>
                                 
                                     <p class="text-xs text-info font-weight-bold mb-0">OutforDelivery</p>
-                                  </td>
-                                  <% } %>
+                                  
+                                  <% }else if(data.orderDetails && data.orderDetails.orderStatus==='Returned'){%> %>
+
+                                    <p class="text-xs text-danger font-weight-bold mb-0">Returned</p>
                                 </td>
+                                <% } %>
+                              </td>
 
 
                                 <td style="text-align: center;">
