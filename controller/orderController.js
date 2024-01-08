@@ -79,7 +79,7 @@ const loadCheckOut = async(req,res)=>{
     }
 };
 
-// Place Order
+//---------------------------------------------- Place Order -----------------------------------------//
 const placeOrder = async(req, res)=>{
     try {
         const userId = req.session.user_id
@@ -258,23 +258,41 @@ const placeOrder = async(req, res)=>{
 
 };
 
-// Checkout page Verify Payment
+//------------------------------------------- Checkout page Verify Payment --------------------------------------//
 const verifyPayment = async (req, res) => {
     try {
       const details = req.body;
       const cartData = await Cart.findOne({ userId: req.session.user_id });
       const products = cartData.products;
+
+
       const hmac = crypto.createHmac('sha256', process.env.KEY_SECRET);
       hmac.update(details.payment.razorpay_order_id + '|' + details.payment.razorpay_payment_id);
       const hmacValue = hmac.digest('hex');
+
+ 
+
   
       if (hmacValue === details.payment.razorpay_signature) {
         for (let i = 0; i < products.length; i++) {
           const productId = products[i].productId;
           const quantity = products[i].qty;
+
+    
         
-  
-          const updatedqty = await Product.findByIdAndUpdate({ _id: productId }, { $inc: { qty: -quantity } });
+        // Update product quantity in a way that it cannot go below 0
+        const updatedqty = await Product.findByIdAndUpdate(
+            { _id: productId, qty: { $gte: quantity } },
+            { $inc: { qty:-quantity } }
+        );
+
+
+
+
+        if (!updatedqty) {
+            // Handle the case where the product quantity is insufficient
+            return res.status(400).json({ error: 'Insufficient product quantity' });
+        }
 
         }
 
@@ -313,8 +331,10 @@ const verifyPayment = async (req, res) => {
         }
   
         return res.json({ codsuccess: true, orderid });
-      } else {
-        console.log(details.order.receipt);
+    } else {
+
+        return res.status(400).json({ error: 'Invalid signature' });
+        
       }
     } catch (error) {
       console.log(error);
@@ -323,7 +343,7 @@ const verifyPayment = async (req, res) => {
   };
   
 
-// Order Placed Page Load
+//------------------------------------------ Order Placed Page Load ---------------------------------------//
 const orderPlacedPageLoad = async(req, res)=>{
     try {
         const userId = req.session.user_id;
@@ -338,25 +358,75 @@ const orderPlacedPageLoad = async(req, res)=>{
 
 
 //------------------------------------------- Load Order Page ---------------------------------------//
-const loadOrderPage = async(req, res)=>{
+const loadOrderPage = async (req, res) => {
     try {
-        const userId = req.session.user_id
-        
-        const userData = await User.findOne({_id:userId});
+        // Search
+        var search = '';
+        if (req.query.search) {
+            search = req.query.search;
+        }
+
+        // Pagination
+        var page = 1;
+        if (req.query.page) {
+            page = req.query.page;
+        }
+
+        const limit = 6;
+
+        const userId = req.session.user_id;
+
+        const userData = await User.findOne({ _id: userId });
+
+        const isValidDate = (date) => date instanceof Date && !isNaN(date.valueOf());
+
+        const orderData = await Order.find({
+            userId: userId,
+            $or: [
+                { date: isValidDate(new Date(search)) ? new Date(search) : null },
+                { totalAmount: { $eq: !isNaN(search) ? Number(search) : null } },
+                { paymentMethod: { $regex: '.*' + search + '.*', $options: 'i' } },
+                { 'products.orderStatus': { $regex: '.*' + search + '.*', $options: 'i' } },
+                { uniqueId: { $eq: !isNaN(search) ? Number(search) : null } },
+            ],
+        })
+        .sort({ date: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .exec();
+
+        // count of page
+        const totalDocuments = await Order.countDocuments({
+            userId: userId,
+            $or: [
+                { date: isValidDate(new Date(search)) ? new Date(search) : null },
+                { totalAmount: { $eq: !isNaN(search) ? Number(search) : null } },
+                { paymentMethod: { $regex: '.*' + search + '.*', $options: 'i' } },
+                { 'products.orderStatus': { $regex: '.*' + search + '.*', $options: 'i' } },
+                { uniqueId: { $eq: !isNaN(search) ? Number(search) : null } },
+            ],
+        });
+
     
-        
-        const orderData = await Order.find({userId:userId}).sort({date:-1});
 
+        // Count of all documents (without pagination)
+        const totalPages = Math.ceil(totalDocuments / limit);
 
-        res.render('orders',{user:userData, orderData})
-        
+        res.render('orders', {
+            user: userData,
+            orderData,
+            totalPages,
+            currentPage: page,
+        });
     } catch (error) {
         console.log(error);
+        res.status(500).render('error', { error: 'Internal Server Error' });
     }
 };
 
 
-// Load Order Details
+
+//------------------------------------ Load Order Details -------------------------------//
 const orderDetails = async(req, res)=>{
     try {
         const id = req.query.id

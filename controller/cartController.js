@@ -12,6 +12,7 @@ const addToCart = async (req, res) => {
         if (req.session.user_id) {
             const productId = req.body.id;
             const userId = req.session.user_id;
+
             const userData = await User.findOne({ _id: userId });
 
             if (!userData) {
@@ -22,8 +23,14 @@ const addToCart = async (req, res) => {
 
             const productData = await Product.findById(productId);
 
+            if (!productData) {
+                return res.json({ error: 'Product not found' });
+            }
+
+
             if (userCart) {
                 const productExist = userCart.products.findIndex(product => product.productId == productId);
+    
 
                 if (productExist !== -1) {
                     const cartData = await Cart.findOne(
@@ -47,8 +54,10 @@ const addToCart = async (req, res) => {
                     // Add new product to the cart
                     await Cart.findOneAndUpdate(
                         { userId: userId },
-                        { $push: { products: { productId: productId, price: productData.price } } }
+                        { $push: { products: { productId: productId, price: productData.price } } },
+                        { new: true }
                     );
+
                 }
             } else {
                 // Create a new cart and add the product
@@ -58,8 +67,12 @@ const addToCart = async (req, res) => {
                 });
 
                 await data.save();
+
+
+                
             }
 
+          
             return res.json({ success: true });
 
         } else {

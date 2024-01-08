@@ -436,23 +436,44 @@
               <span class="font-weight-bold">24%</span> this month
             </p>
           </div> -->
-          <div class="card-body d-flex justify-content-center p-3">
+          <div class="card-body d-flex p-3">
             <!-- <div class="timeline timeline-one-side"> -->
-              <!-- <div class="timeline-block mb-3">
-                <span class="timeline-step">
-                  <i class="material-icons text-success text-gradient">notifications</i>
-                </span>
-                <div class="timeline-content">
-                  <h6 class="text-dark text-sm font-weight-bold mb-0">$2400, Design changes</h6>
-                  <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">22 DEC 7:20 PM</p>
+              <!-- <div class="timeline-block mb-3"> -->
+                <!-- <span class="timeline-step"> -->
+                  <!-- <i class="material-icons text-success text-gradient">notifications</i> -->
+                <!-- </span> -->
+                <!-- <div class="row"> -->
+                  <div class="col-md-6 sm-6" style="margin-top: 20px;">
+                    <!-- <div class="timeline-content"> -->
+                      <h6 class="text-dark font-weight-bold mb-0">Payment Method</h6>
+                         
+                      <table class="table" style="text-align: center;">
+                        <thead class="thead-light">
+                          <tr>
+                            <% paymentMethod.forEach((method)=>{%>
+                            <th scope="col"><%= method %></th>
+                               <% }); %> 
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <% paymentValue.forEach((value)=>{%>
+                            <td>₹ <%=value%></td>
+                              <% }); %>
+                          </tr>
+                        </tbody>
+                      </table>
+                        
+                    <!-- </div> -->
+                  </div>
+
+                
+
+              <!-- </div> -->
+                <div class="col-md-6 sm-6">
+                  <canvas id="myChart" style="width:70%;max-width:350px;"></canvas>
                 </div>
-              </div> -->
-
-
-              <canvas id="myChart" style="width:70%;max-width:350px; height: 50%; "></canvas>
-
-
-
+              <!-- </div> -->
             <!-- </div> -->
           </div>
         </div>
@@ -881,16 +902,18 @@
     },
   });
 
-//-------------------------------------------------------------------------------------------------------//
+//-------------------------------------------------------- Chart Payment-----------------------------------------------//
 
-const xValues = ["Italy", "France", "Spain", "USA", "Argentina"];
-const yValues = [55, 49, 44, 24, 15];
+
+
+const xValues = JSON.parse('<%- JSON.stringify(paymentMethod) %>');
+const yValues = JSON.parse('<%- JSON.stringify(paymentValue) %>');
 const barColors = [
   "#b91d47",
   "#00aba9",
   "#2b5797",
-  "#e8c3b9",
-  "#1e7145"
+  // "#e8c3b9",
+  // "#1e7145"
 ];
 
 new Chart("myChart", {
@@ -906,7 +929,12 @@ new Chart("myChart", {
     title: {
       display: true,
       text: "World Wide Wine Production 2018"
-    }
+    },
+    responsive: true,
+    maintainAspectRatio: false, // Set to false to adjust both width and height
+    aspectRatio: 1, // Set the desired aspect ratio (width / height)
+    height: 200, // Set the height of the chart
+    width: 400, // Set the width of the chart
   }
 });
 

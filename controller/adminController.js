@@ -121,49 +121,48 @@ const loadDashboard = async (req, res) => {
 
 
         //------------------------------------------- weeklySalesData ---------------------------------------//
-        const pipeline = [
+        const pipeline = ([
             {
-                $match: {
-                    "products.orderStatus": "Delivered",
-                    date: {
-                        $gte: new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay()),
-                        $lt: new Date(today.getFullYear(), today.getMonth(), today.getDate() + (7 - today.getDay())),
-                    },
-                },
+              $match: {
+                "products.orderStatus": "Delivered"
+              }
             },
             {
-                $group: {
-                    _id: { $dayOfWeek: "$date" },
-                    totalAmount: { $sum: "$totalAmount" },
+              $group: {
+                _id: {
+                  $week: "$date"
                 },
+                totalAmount: {
+                  $sum: "$totalAmount"
+                }
+              }
             },
             {
-                $sort: {
-                    _id: 1,
-                },
-            },
-        ];
+              $sort: {
+                _id: 1
+              }
+            }
+          ]);
+      
+      
         
-        
-
         const weeklySalesData = await Order.aggregate(pipeline);
+        console.log(weeklySalesData);
         
        
     
-        const labels = ["S", "M", "T", "W", "T", "F", "S"];
-        const salesData = Array(7).fill(0);
+        const labels = ["Week 1", "Week 2", "Week 3", "Week 4"];
+        const salesData = Array(4).fill(0);
         // const salesData = weeklySalesData.map(item => item.totalAmount)
         let weeklyTotal = 0;
        
         weeklySalesData.forEach(item => {
-            const dayOfWeek = item._id;
-            const dayIndex = dayOfWeek === 1 ? 0 : dayOfWeek - 2; // Adjust dayIndex to start from 0 (Sunday)
-            salesData[dayIndex] += item.totalAmount;
-            weeklyTotal += item.totalAmount;
-
-        });
-
-
+            const weekIndex = item._id; // Adjusted index
+            if (weekIndex >= 0 && weekIndex < 4) {
+              salesData[weekIndex] = item.totalAmount;
+              weeklyTotal += item.totalAmount;
+            }
+          });
 
 
         //------------------------------------------- monthlySalesData ---------------------------------------//
@@ -193,7 +192,7 @@ const loadDashboard = async (req, res) => {
         ];
 
         const monthlySalesData = await Order.aggregate(monthly);
-     
+    
 
         const monthLabel = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
         const monthlyData = Array(monthLabel.length).fill(0);
@@ -269,7 +268,39 @@ const loadDashboard = async (req, res) => {
             }).sort({createdAt: -1}).populate("products.productId");
 
         }
-        // console.log('orderDataToDownload',orderDataToDownload);
+        
+
+        // -------------------------------------------Paymetn Method -------------------------------------------//
+
+        const fromDate = '2022-01-01';
+        const toDate = '2024-01-31';
+
+        const fromDateObj = new Date(fromDate);
+        const toDateObj = new Date(toDate);
+
+        toDateObj.setHours(23, 59, 59, 999);
+
+        const payment = [
+            {
+                $match:{
+                    "products.orderStatus":"Delivered",
+                    createdAt:{ $gte:fromDateObj, $lte:toDateObj },
+                }
+            },
+            {
+                $group:{
+                    _id :"$paymentMethod", totalAmount: { $sum: "$totalAmount"}
+                }
+            }
+        ]
+        
+        const paymentChart = await Order.aggregate(payment);
+      
+
+        const paymentMethod = paymentChart.map(item =>item._id);
+        const paymentValue = paymentChart.map(item =>item.totalAmount);
+
+
 
         res.render('adminHome', {
             message: "Admin Home",
@@ -292,7 +323,9 @@ const loadDashboard = async (req, res) => {
             yearlySalesData,
             yearLabels,
             yearlyData,
-            orderDataToDownload
+            orderDataToDownload,
+            paymentMethod,
+            paymentValue
 
         });
 

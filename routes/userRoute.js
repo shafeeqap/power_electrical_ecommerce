@@ -84,7 +84,7 @@ user_router.post('/changePassword',userController.changePasswordVerify);
 
 
 user_router.get('/checkout',userAuth.isLogin, userAuth.is_blocked, orderController.loadCheckOut);
-user_router.post('/verifyPayment',userAuth.isLogin, userAuth.is_blocked, orderController.verifyPayment);
+user_router.post('/verifyPayment',userAuth.isLogin, orderController.verifyPayment);
 user_router.get('/editCheckoutAddress',userAuth.isLogin, userAuth.is_blocked, orderController.loadCheckoutEditAddress);
 user_router.post('/editCheckoutAddress',userAuth.isLogin, userAuth.is_blocked, orderController.editCheckoutAddress);
 user_router.get('/deleteCheckoutaddress',userAuth.isLogin, orderController.deleteCheckoutaddress);
